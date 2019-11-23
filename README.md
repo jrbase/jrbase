@@ -47,11 +47,6 @@ ZREM
 ZSCORE
 
 
-app/protoc-3.10.1-linux-x86_64/bin/protoc --proto_path=src --java_out=src/main/java src/protobuf/Message.proto
-
-
-
-
 
 
 
