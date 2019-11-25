@@ -2,4 +2,5 @@ rootProject.name = 'jrbase'
 include 'client'
 include 'server'
 include 'common'
+include 'common'
 

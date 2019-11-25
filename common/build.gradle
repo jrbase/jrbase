@@ -1,17 +1,14 @@
 plugins {
     id 'java'
-    id 'application'
-    // ASSUMES GRADLE 2.12 OR HIGHER. Use plugin version 0.7.5 with earlier gradle versions
-    id 'com.google.protobuf' version '0.8.8'
-    // Generate IntelliJ IDEA's .idea & .iml project files
-    id 'idea'
 }
+
 group 'org.github.jrbase'
 version '1.0.1'
 
+sourceCompatibility = 1.8
+
 def grpcVersion = '1.25.0' // CURRENT_GRPC_VERSION
 def protobufVersion = '3.10.0'
-def protocVersion = protobufVersion
 
 repositories {
     mavenCentral()
@@ -30,23 +27,4 @@ dependencies {
     testImplementation "io.grpc:grpc-testing:${grpcVersion}"
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.25.1"
-}
-
-protobuf {
-    protoc { artifact = "com.google.protobuf:protoc:${protocVersion}" }
-    plugins {
-        grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" }
-    }
-    generateProtoTasks {
-        all()*.plugins { grpc {} }
-    }
-}
-
-sourceSets {
-    main {
-        java {
-            srcDirs 'build/generated/source/proto/main/grpc'
-            srcDirs 'build/generated/source/proto/main/java'
-        }
-    }
 }

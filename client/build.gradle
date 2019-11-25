@@ -30,3 +30,14 @@ dependencies {
     compile project(":common")
     compile("org.jline:jline:3.6.2")
 }
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File JRBaseClient',
+                'Implementation-Version': '1.0',
+                'Main-Class': 'org.github.jrbase.client.JRBaseClient'
+    }
+    baseName = project.name
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
