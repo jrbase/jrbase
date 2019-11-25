@@ -29,3 +29,14 @@ dependencies {
     testImplementation "org.mockito:mockito-core:2.25.1"
     compile project(":common")
 }
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File JRBaseClient',
+                'Implementation-Version': '1.0',
+                'Main-Class': 'org.github.jrbase.server.JRBaseServer'
+    }
+    baseName = project.name
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
