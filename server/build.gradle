@@ -11,23 +11,15 @@ def grpcVersion = '1.25.0' // CURRENT_GRPC_VERSION
 def protobufVersion = '3.10.0'
 
 repositories {
+    mavenLocal()
+    maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
     mavenCentral()
 }
 
 dependencies {
-    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
-    implementation "io.grpc:grpc-stub:${grpcVersion}"
-    compileOnly "javax.annotation:javax.annotation-api:1.2"
-
-    // examples/advanced need this for JsonFormat
-    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
-
-    runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
-
-    testImplementation "io.grpc:grpc-testing:${grpcVersion}"
+    compile "io.netty:netty-all:4.0.32.Final"
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.25.1"
-    compile project(":common")
 }
 
 task fatJar(type: Jar) {

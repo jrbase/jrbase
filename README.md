@@ -6,7 +6,7 @@ java distributed database
 
 ## step
 ```shell script
-# gren proto
+# gen proto
 gradle clean generateProto
 # build jar
 gradle clean fatJar
@@ -69,6 +69,9 @@ eg.
 
 ZADD price 8.5 apple 5.0 banana 6.0 cherry
 
+## Replication
+## Partitioning
+## Transactions
 
 
 

@@ -16,59 +16,37 @@
 
 package org.github.jrbase.server;
 
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import org.github.jrbase.service.CmdImpl;
 
-import java.io.IOException;
-import java.util.logging.Logger;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
 /**
  *
  */
 public class JRBaseServer {
-    private static final Logger logger = Logger.getLogger(JRBaseServer.class.getName());
 
-    private Server server;
+    static final int PORT = Integer.parseInt(System.getProperty("port", "6379"));
 
-    private void start() throws IOException {
-        /* The port on which the server should run */
-        int port = 20040;
-        server = ServerBuilder.forPort(port)
-                .addService(new CmdImpl())
-                .build()
-                .start();
-        logger.info("Server started, listening on " + port);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-            System.err.println("*** shutting down gRPC server since JVM is shutting down");
-            JRBaseServer.this.stop();
-            System.err.println("*** server shut down");
-        }));
-    }
+    public static void main(String[] args) throws Exception {
 
-    private void stop() {
-        if (server != null) {
-            server.shutdown();
+        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        try {
+            ServerBootstrap b = new ServerBootstrap();
+            b.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .childHandler(new ServerInitializer());
+
+            b.bind(PORT).sync().channel().closeFuture().sync();
+        } finally {
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
         }
-    }
-
-    /**
-     * Await termination on the main thread since the grpc library uses daemon threads.
-     */
-    private void blockUntilShutdown() throws InterruptedException {
-        if (server != null) {
-            server.awaitTermination();
-        }
-    }
-
-    /**
-     * Main launches the server from the command line.
-     */
-    public static void main(String[] args) throws IOException, InterruptedException {
-        final JRBaseServer server = new JRBaseServer();
-        server.start();
-        server.blockUntilShutdown();
     }
 
 }
