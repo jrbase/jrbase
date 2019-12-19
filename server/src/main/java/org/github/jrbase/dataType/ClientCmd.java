@@ -1,11 +1,13 @@
 package org.github.jrbase.dataType;
 
 import io.netty.channel.ChannelHandlerContext;
+import org.github.jrbase.proxyRheakv.rheakv.Client;
 
 public class ClientCmd {
-    String cmd;
-    String[] args;
-    ChannelHandlerContext context;
+    private String cmd;
+    private String key;
+    private String[] args;
+    private ChannelHandlerContext context;
 
     public ChannelHandlerContext getContext() {
         return context;
@@ -21,6 +23,14 @@ public class ClientCmd {
 
     public void setCmd(String cmd) {
         this.cmd = cmd;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String[] getArgs() {

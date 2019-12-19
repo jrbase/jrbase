@@ -1,12 +1,12 @@
 package org.github.jrbase.process;
 
 import org.github.jrbase.dataType.ClientCmd;
+import org.github.jrbase.execption.MyKVException;
+
+import java.util.concurrent.ExecutionException;
 
 public interface CmdProcess {
-    default void process(ClientCmd clientCmd){
-        requestKV();
-        replyClient();
-    }
-    void requestKV();
-    void replyClient();
+    void process(ClientCmd clientCmd) throws MyKVException;
+    void requestKVAndReplyClient() throws MyKVException;
+
 }

@@ -54,20 +54,27 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
 
     }
 
+    //             key   value
     // 0  1  2  3  4  5  6
     //*3 $3 set $1 a $1  b
     private ClientCmd translateClientCmd(String[] arr) {
         ClientCmd clientCmd = new ClientCmd();
 
-        if (isHaveArgs(arr.length)) {
+        if (isHaveKey(arr.length)) {
             clientCmd.setCmd(arr[2]);
-            final int argsCount = arr.length - 4 / 2;
-            String[] args = new String[argsCount];
-            int count = 0;
-            for (int i = 4; i < arr.length; i = i + 2) {
-                args[count++] = arr[i];
+            clientCmd.setKey(arr[4]);
+            if (isHaveArgs(arr.length)) {
+                final int argsCount = (arr.length + 1 - 6) / 2;
+                String[] args = new String[argsCount];
+                int count = 0;
+                for (int i = 6; i < arr.length; i = i + 2) {
+                    args[count++] = arr[i];
+                }
+                clientCmd.setArgs(args);
+            } else {
+
             }
-            clientCmd.setArgs(args);
+        } else {
 
         }
         return clientCmd;
@@ -77,8 +84,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
         return length >= 3;
     }
 
-    private boolean isHaveArgs(int length) {
+    private boolean isHaveKey(int length) {
         return length > 4;
+    }
+
+    private boolean isHaveArgs(int length) {
+        return length > 6;
     }
 
     private void replySimpleStringToClient(ChannelHandlerContext ctx, String msg) {

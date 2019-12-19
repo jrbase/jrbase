@@ -17,7 +17,7 @@ dependencies {
     compile "io.netty:netty-all:4.0.32.Final"
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.25.1"
-//    compile "org.github.jrbase:jraftdemo:1.0.1"
+    compile project(":jraftdemo")
 }
 
 task fatJar(type: Jar) {

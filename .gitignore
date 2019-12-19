@@ -4,3 +4,5 @@ target
 build/
 .gradle/
 log
+raft_data
+rhea_db
