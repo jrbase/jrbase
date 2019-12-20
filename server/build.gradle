@@ -2,6 +2,8 @@ plugins {
     id 'java'
 }
 
+apply plugin: "groovy"
+
 group 'org.github.jrbase'
 version '1.0.1'
 
@@ -18,6 +20,10 @@ dependencies {
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.25.1"
     compile project(":jraftdemo")
+
+    compile "org.codehaus.groovy:groovy-all:2.4.15"
+    testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-2"
+    testRuntime "net.bytebuddy:byte-buddy:1.9.3"
 }
 
 task fatJar(type: Jar) {
@@ -26,7 +32,6 @@ task fatJar(type: Jar) {
                 'Implementation-Version': '1.0',
                 'Main-Class': 'org.github.jrbase.server.JRBaseServer'
     }
-    baseName = project.name
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }

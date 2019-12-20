@@ -8,7 +8,6 @@ import org.github.jrbase.process.GetProcess;
 import org.github.jrbase.process.SetProcess;
 import org.github.jrbase.proxyRheakv.rheakv.Client;
 
-import java.util.concurrent.ExecutionException;
 
 public class CmdManager {
 
@@ -19,14 +18,13 @@ public class CmdManager {
     }
 
     static {
-//        client = new Client();
         client.init();
     }
 
     public static void process(ClientCmd clientCmd) {
 
         final Cmd cmd = Cmd.get(clientCmd.getCmd());
-        CmdProcess cmdProcess = null;
+        CmdProcess cmdProcess;
         switch (cmd) {
             case SET: {
                 cmdProcess = new SetProcess();
