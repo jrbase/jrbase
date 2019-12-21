@@ -6,7 +6,9 @@ import java.util.Map;
 
 public enum Cmd {
     SET("set"),
+    MSET("mset"),
     GET("get"),
+    MGET("mget"),
 
     OTHER("other");
 
