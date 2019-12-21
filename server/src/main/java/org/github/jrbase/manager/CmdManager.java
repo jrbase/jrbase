@@ -5,6 +5,7 @@ import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.execption.MyKVException;
 import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.process.GetProcess;
+import org.github.jrbase.process.IgnoreProcess;
 import org.github.jrbase.process.SetProcess;
 import org.github.jrbase.proxyRheakv.rheakv.Client;
 
@@ -23,6 +24,16 @@ public class CmdManager {
 
     public static void process(ClientCmd clientCmd) {
 
+        final CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
+        try {
+            cmdProcess.process(clientCmd);
+        } catch (MyKVException ignore) {
+            clientCmd.getContext().channel().writeAndFlush("-rhea kv is not started or shutdown\r\n");
+        }
+
+    }
+
+    public static CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
         final Cmd cmd = Cmd.get(clientCmd.getCmd());
         CmdProcess cmdProcess;
         switch (cmd) {
@@ -35,15 +46,9 @@ public class CmdManager {
                 break;
             }
             default:
-                throw new RuntimeException("error cmd");
+                cmdProcess = new IgnoreProcess();
         }
-        //
-        try {
-            cmdProcess.process(clientCmd);
-        } catch (MyKVException ignore) {
-            clientCmd.getContext().channel().writeAndFlush("-rhea kv is not started or shutdown\r\n");
-
-        }
+        return cmdProcess;
     }
 
     public static void shutdown() {

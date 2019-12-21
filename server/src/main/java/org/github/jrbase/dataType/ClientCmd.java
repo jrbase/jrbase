@@ -9,6 +9,14 @@ public class ClientCmd {
     private String[] args;
     private ChannelHandlerContext context;
 
+    public ClientCmd() {
+
+    }
+
+    public ClientCmd(String cmd) {
+        this.cmd = cmd;
+    }
+
     public ChannelHandlerContext getContext() {
         return context;
     }

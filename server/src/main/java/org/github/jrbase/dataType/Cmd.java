@@ -21,7 +21,8 @@ public enum Cmd {
     }
 
     public static Cmd get(String cmdName) {
-        return lookup.get(cmdName);
+        final Cmd cmd = lookup.get(cmdName);
+        return cmd == null ? OTHER : cmd;
     }
 
     private static final Map<String, Cmd> lookup = new HashMap<>();
@@ -30,6 +31,7 @@ public enum Cmd {
         for (Cmd c : EnumSet.allOf(Cmd.class)) {
             lookup.put(c.getCmdName(), c);
         }
+
 
     }
 }
