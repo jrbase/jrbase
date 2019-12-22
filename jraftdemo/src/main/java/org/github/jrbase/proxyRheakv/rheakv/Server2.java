@@ -32,21 +32,21 @@ import com.alipay.sofa.jraft.util.Endpoint;
  */
 public class Server2 {
 
-    public static void main(final String[] args) throws Exception {
+    public static void main(final String[] args) {
         final PlacementDriverOptions pdOpts = PlacementDriverOptionsConfigured.newConfigured()
                 .withFake(true) // use a fake pd
                 .config();
-        final StoreEngineOptions storeOpts = StoreEngineOptionsConfigured.newConfigured() //
+        final StoreEngineOptions storeOpts = StoreEngineOptionsConfigured.newConfigured()
                 .withStorageType(StorageType.RocksDB)
                 .withRocksDBOptions(RocksDBOptionsConfigured.newConfigured().withDbPath(Configs.DB_PATH).config())
                 .withRaftDataPath(Configs.RAFT_DATA_PATH)
                 .withServerAddress(new Endpoint("127.0.0.1", 8182))
                 .config();
-        final RheaKVStoreOptions opts = RheaKVStoreOptionsConfigured.newConfigured() //
-                .withClusterName(Configs.CLUSTER_NAME) //
+        final RheaKVStoreOptions opts = RheaKVStoreOptionsConfigured.newConfigured()
+                .withClusterName(Configs.CLUSTER_NAME)
                 .withInitialServerList(Configs.ALL_NODE_ADDRESSES)
-                .withStoreEngineOptions(storeOpts) //
-                .withPlacementDriverOptions(pdOpts) //
+                .withStoreEngineOptions(storeOpts)
+                .withPlacementDriverOptions(pdOpts)
                 .config();
         System.out.println(opts);
         final Node node = new Node(opts);

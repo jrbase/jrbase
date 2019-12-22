@@ -68,3 +68,8 @@ Server
 
 ```
 ## Architecture
+
+
+## Others
+
+[use tikv to build distrubuted redis service](https://pingcap.com/blog-cn/use-tikv-to-build-distributed-redis-service/)

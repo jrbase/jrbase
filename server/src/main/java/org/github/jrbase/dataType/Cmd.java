@@ -6,13 +6,15 @@ import java.util.Map;
 
 public enum Cmd {
     SET("set"),
-    MSET("mset"),
     GET("get"),
+    MSET("mset"),
     MGET("mget"),
+    HSET("hset"),
+    HGET("hget"),
 
     OTHER("other");
 
-    private String cmdName;
+    final private String cmdName;
 
     Cmd(String cmdName) {
         this.cmdName = cmdName;

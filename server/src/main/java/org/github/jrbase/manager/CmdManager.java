@@ -2,7 +2,6 @@ package org.github.jrbase.manager;
 
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
-import org.github.jrbase.execption.MyKVException;
 import org.github.jrbase.process.*;
 import org.github.jrbase.proxyRheakv.rheakv.Client;
 
@@ -30,6 +29,9 @@ public class CmdManager {
         registerCmdProcess(Cmd.MSET, new MSetProcess());
         registerCmdProcess(Cmd.GET, new GetProcess());
         registerCmdProcess(Cmd.MGET, new MGetProcess());
+        registerCmdProcess(Cmd.HSET, new HSetProcess());
+        registerCmdProcess(Cmd.HGET, new HGetProcess());
+
         registerCmdProcess(Cmd.OTHER, new IgnoreProcess());
     }
 
@@ -40,11 +42,7 @@ public class CmdManager {
     public static void process(ClientCmd clientCmd) {
 
         final CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
-        try {
-            cmdProcess.process(clientCmd);
-        } catch (MyKVException ignore) {
-            clientCmd.getContext().channel().writeAndFlush("-rhea kv is not started or shutdown\r\n");
-        }
+        cmdProcess.process(clientCmd);
 
     }
 

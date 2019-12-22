@@ -6,20 +6,29 @@ import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.manager.CmdManager;
 
-public class GetProcess implements CmdProcess {
+import static org.github.jrbase.utils.Tools.isRightArgs;
+
+
+public class HGetProcess implements CmdProcess {
 
     @Override
     public void process(ClientCmd clientCmd) {
-        clientCmd.setKey(clientCmd.getKey() + RedisDataType.STRINGS.getAbbreviation());
+        clientCmd.setKey(clientCmd.getKey() + RedisDataType.HASHES.getAbbreviation());
 
         requestKVAndReplyClient(clientCmd);
     }
 
     public void requestKVAndReplyClient(ClientCmd clientCmd) {
         final Channel channel = clientCmd.getContext().channel();
-        // no args
+
         final RheaKVStore rheaKVStore = CmdManager.getClient().getRheaKVStore();
-        final byte[] bytes = rheaKVStore.bGet(clientCmd.getKey());
+
+        if (!isRightArgs(1, clientCmd.getArgs().length)) {
+            channel.writeAndFlush("-ERR wrong number of arguments for 'hget' command\r\n");
+            return;
+        }
+        final String buildUpKey = clientCmd.getKey() + "f" + clientCmd.getArgs()[0];
+        final byte[] bytes = rheaKVStore.bGet(buildUpKey);
         if (bytes == null) {
             channel.writeAndFlush("$-1\r\n");
         } else {
@@ -27,4 +36,5 @@ public class GetProcess implements CmdProcess {
             channel.writeAndFlush("$" + length + "\r\n" + new String(bytes) + "\r\n");
         }
     }
+
 }

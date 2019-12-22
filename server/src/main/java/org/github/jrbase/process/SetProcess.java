@@ -3,36 +3,37 @@ package org.github.jrbase.process;
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.Channel;
 import org.github.jrbase.dataType.ClientCmd;
-import org.github.jrbase.execption.MyKVException;
+import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.manager.CmdManager;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import static org.github.jrbase.utils.Tools.isRightArgs;
+
 
 public class SetProcess implements CmdProcess {
 
     @Override
-    public void process(ClientCmd clientCmd) throws MyKVException {
+    public void process(ClientCmd clientCmd) {
+        clientCmd.setKey(clientCmd.getKey() + RedisDataType.STRINGS.getAbbreviation());
 
         requestKVAndReplyClient(clientCmd);
     }
 
 
-    public void requestKVAndReplyClient(ClientCmd clientCmd) throws MyKVException {
+    public void requestKVAndReplyClient(ClientCmd clientCmd) {
         final Channel channel = clientCmd.getContext().channel();
-        final RheaKVStore rheaKVStore = CmdManager.getClient().getRheaKVStore();
-        final CompletableFuture<Boolean> put = rheaKVStore.put(clientCmd.getKey(), clientCmd.getArgs()[0].getBytes());
-
-        try {
-            final Boolean aBoolean = put.get();
-            if (aBoolean) {
-                channel.writeAndFlush(":1\r\n");
-            } else {
-                channel.writeAndFlush("-set error\r\n");
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new MyKVException();
+        if (!isRightArgs(1, clientCmd.getArgs().length)) {
+            channel.writeAndFlush("-ERR wrong number of arguments for 'set' command\r\n");
+            return;
         }
+        final RheaKVStore rheaKVStore = CmdManager.getClient().getRheaKVStore();
+        final byte[] bytes = rheaKVStore.bGetAndPut(clientCmd.getKey(), clientCmd.getArgs()[0].getBytes());
+        if (bytes == null) {
+            channel.writeAndFlush(":1\r\n");
+        } else {
+            channel.writeAndFlush(":0\r\n");
+        }
+
     }
+
 
 }

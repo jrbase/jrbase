@@ -3,12 +3,14 @@ package org.github.jrbase.process;
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.Channel;
 import org.github.jrbase.dataType.ClientCmd;
+import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.manager.CmdManager;
 
 public class MSetProcess implements CmdProcess {
 
     @Override
     public void process(ClientCmd clientCmd) {
+        clientCmd.setKey(clientCmd.getKey() + RedisDataType.STRINGS.getAbbreviation());
 
         requestKVAndReplyClient(clientCmd);
     }
@@ -32,8 +34,8 @@ public class MSetProcess implements CmdProcess {
             for (int i = 1; i < args.length; i = i + 2) {
                 final byte[] key = args[i].getBytes();
                 final byte[] value = args[i + 1].getBytes();
-                final Boolean isSuccess = rheaKVStore.bPut(key, value);
-                if (isSuccess) {
+                final byte[] bytes = rheaKVStore.bGetAndPut(key, value);
+                if (bytes == null) {
                     successCount++;
                 }
             }
