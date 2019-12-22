@@ -1,5 +1,10 @@
-## command codec specification
+# command codec specification
 
+## Question?
+* how to spot different command(Strings, Hashes,Lists, Sets, Sorted Sets) for scan command?
+* how to build up key and value for KV database by using redis's key and value?
+
+## commands
 ### strings
 
 ```
@@ -44,7 +49,7 @@
 +-----------+-------------------------------------+
 ```
 
-### list:
+### lists:
 ```
 LPUSH
 RPUSH 

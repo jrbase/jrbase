@@ -6,8 +6,14 @@ import org.github.jrbase.execption.MyKVException;
 import org.github.jrbase.process.*;
 import org.github.jrbase.proxyRheakv.rheakv.Client;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class CmdManager {
+
+    private CmdManager() {
+    }
 
     private final static Client client = new Client();
 
@@ -15,8 +21,20 @@ public class CmdManager {
         return client;
     }
 
+    private static Map<Cmd, CmdProcess> cmdProcessManager = new HashMap<>();
+
     static {
         client.init();
+
+        registerCmdProcess(Cmd.SET, new SetProcess());
+        registerCmdProcess(Cmd.MSET, new MSetProcess());
+        registerCmdProcess(Cmd.GET, new GetProcess());
+        registerCmdProcess(Cmd.MGET, new MGetProcess());
+        registerCmdProcess(Cmd.OTHER, new IgnoreProcess());
+    }
+
+    private static void registerCmdProcess(Cmd cmd, CmdProcess cmdProcess) {
+        cmdProcessManager.put(cmd, cmdProcess);
     }
 
     public static void process(ClientCmd clientCmd) {
@@ -32,28 +50,7 @@ public class CmdManager {
 
     public static CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
         final Cmd cmd = Cmd.get(clientCmd.getCmd());
-        CmdProcess cmdProcess;
-        switch (cmd) {
-            case SET: {
-                cmdProcess = new SetProcess();
-                break;
-            }
-            case MSET: {
-                cmdProcess = new MSetProcess();
-                break;
-            }
-            case GET: {
-                cmdProcess = new GetProcess();
-                break;
-            }
-            case MGET: {
-                cmdProcess = new MGetProcess();
-                break;
-            }
-            default:
-                cmdProcess = new IgnoreProcess();
-        }
-        return cmdProcess;
+        return cmdProcessManager.get(cmd);
     }
 
     public static void shutdown() {
