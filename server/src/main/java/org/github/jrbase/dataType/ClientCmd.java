@@ -1,7 +1,6 @@
 package org.github.jrbase.dataType;
 
 import io.netty.channel.ChannelHandlerContext;
-import org.github.jrbase.proxyRheakv.rheakv.Client;
 
 public class ClientCmd {
     private String cmd;

@@ -36,7 +36,7 @@ public class IteratorExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(IteratorExample.class);
 
-    public static void main(final String[] args) throws Exception {
+    public static void main(final String[] args) {
         final Client client = new Client();
         client.init();
         iterator(client.getRheaKVStore());
@@ -56,7 +56,7 @@ public class IteratorExample {
         final byte[] lastKey = keys.get(keys.size() - 1);
         final String firstKeyString = readUtf8(firstKey);
         final String lastKeyString = readUtf8(lastKey);
-
+        //bufSize is max key size @see scan(limit)
         final RheaIterator<KVEntry> it1 = rheaKVStore.iterator(firstKey, lastKey, 5);
         final RheaIterator<KVEntry> it2 = rheaKVStore.iterator(firstKey, lastKey, 6, false);
         final RheaIterator<KVEntry> it3 = rheaKVStore.iterator(firstKeyString, lastKeyString, 5);
@@ -67,6 +67,7 @@ public class IteratorExample {
                 final KVEntry kv = it.next();
                 LOG.info("Sync iterator: key={}, value={}", readUtf8(kv.getKey()), readUtf8(kv.getValue()));
             }
+            System.out.println("--------------------------------------------");
         }
     }
 }

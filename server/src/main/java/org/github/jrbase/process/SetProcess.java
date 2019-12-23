@@ -6,6 +6,7 @@ import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.manager.CmdManager;
 
+import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 import static org.github.jrbase.utils.Tools.isRightArgs;
 
 
@@ -26,7 +27,7 @@ public class SetProcess implements CmdProcess {
             return;
         }
         final RheaKVStore rheaKVStore = CmdManager.getClient().getRheaKVStore();
-        final byte[] bytes = rheaKVStore.bGetAndPut(clientCmd.getKey(), clientCmd.getArgs()[0].getBytes());
+        final byte[] bytes = rheaKVStore.bGetAndPut(clientCmd.getKey(), writeUtf8(clientCmd.getArgs()[0]));
         if (bytes == null) {
             channel.writeAndFlush(":1\r\n");
         } else {

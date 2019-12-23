@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
+
 public class MGetProcess implements CmdProcess {
 
 
@@ -34,7 +36,7 @@ public class MGetProcess implements CmdProcess {
         }
         final Map<ByteArray, byte[]> byteArrayMap = rheaKVStore.bMultiGet(getList);
         if (byteArrayMap == null) {
-            channel.writeAndFlush("-any key not found\r\n");
+            channel.writeAndFlush("-ERR wrong number of arguments for 'mget' command\r\n");
         } else {
             StringBuffer result = new StringBuffer();
             result.append('*').append(getList.size()).append("\r\n");
@@ -47,7 +49,7 @@ public class MGetProcess implements CmdProcess {
                 if (value == null) {
                     result.append('$').append(-1).append("\r\n");
                 } else {
-                    result.append('$').append(value.length).append("\r\n").append(new String(value)).append("\r\n");
+                    result.append('$').append(value.length).append("\r\n").append(readUtf8(value)).append("\r\n");
                 }
             }
             channel.writeAndFlush(result);

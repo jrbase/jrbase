@@ -25,14 +25,13 @@ import java.util.concurrent.CompletableFuture;
 import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 
 /**
- *
  * @author jiachun.fjc
  */
 public class MergeExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(MergeExample.class);
 
-    public static void main(final String[] args) throws Exception {
+    public static void main(final String[] args) {
         final Client client = new Client();
         client.init();
         merge(client.getRheaKVStore());
@@ -45,7 +44,7 @@ public class MergeExample {
         final CompletableFuture<Boolean> f3 = rheaKVStore.merge("merge_example", "3");
         final CompletableFuture<Boolean> f4 = rheaKVStore.merge("merge_example", "4");
         final CompletableFuture<Boolean> f5 = rheaKVStore.merge("merge_example", "5");
-
+        // wait for all merge operate to complete then to bGet the key(merge_example)
         CompletableFuture.allOf(f1, f2, f3, f4, f5).join();
         LOG.info("Merge result is: {}", readUtf8(rheaKVStore.bGet("merge_example")));
 

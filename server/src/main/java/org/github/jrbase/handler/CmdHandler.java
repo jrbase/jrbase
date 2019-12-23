@@ -12,7 +12,7 @@ public class CmdHandler {
     public void handleMsg(ChannelHandlerContext ctx, String message) {
         final ClientCmd clientCmd = parseMessage(message);
         //1. connect
-        if ("".equals(clientCmd.getCmd())) {
+        if (clientCmd.getCmd().isEmpty()) {
             replyErrorToClient(ctx, "empty command");
         } else if ("COMMAND".equals(clientCmd.getCmd())) {
             replyInfoToClient(ctx, REPLY_OK);

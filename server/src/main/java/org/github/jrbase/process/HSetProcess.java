@@ -7,6 +7,8 @@ import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.manager.CmdManager;
 import org.github.jrbase.utils.Tools;
 
+import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
+
 public class HSetProcess implements CmdProcess {
 
     @Override
@@ -40,7 +42,7 @@ public class HSetProcess implements CmdProcess {
             final String field = args[i];
             final String value = args[i + 1];
             String buildUpKey = key + "f" + field;
-            final byte[] bytes = rheaKVStore.bGetAndPut(buildUpKey, value.getBytes());
+            final byte[] bytes = rheaKVStore.bGetAndPut(buildUpKey, writeUtf8(value));
             successCount = bytes == null ? successCount + 1 : successCount;
         }
 
@@ -51,7 +53,9 @@ public class HSetProcess implements CmdProcess {
         rheaKVStore.put(mapCountKey, Tools.intToByteArray(mapCount));
 
         channel.writeAndFlush(":" + successCount + "\r\n");
-        // another way,but cant't get successCount //    kvList.add(new KVEntry(buildUpKey.getBytes(), value.getBytes()));
+
+        // another way,but cant't get successCount
+        // kvList.add(new KVEntry(buildUpKey, writeUtf8(value)));
 
     }
 

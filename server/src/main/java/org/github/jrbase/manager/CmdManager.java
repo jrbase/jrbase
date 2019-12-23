@@ -40,8 +40,12 @@ public class CmdManager {
     }
 
     public static void process(ClientCmd clientCmd) {
-
         final CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
+        // handle key is empty besides
+        if (clientCmd.getKey().isEmpty() && !(cmdProcess instanceof IgnoreProcess)) {
+            clientCmd.getContext().channel().writeAndFlush("-ERR wrong number of arguments for '" + clientCmd.getCmd() + "' command\r\n");
+            return;
+        }
         cmdProcess.process(clientCmd);
 
     }

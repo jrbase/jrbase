@@ -6,6 +6,7 @@ import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.manager.CmdManager;
 
+import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static org.github.jrbase.utils.Tools.isRightArgs;
 
 
@@ -33,7 +34,7 @@ public class HGetProcess implements CmdProcess {
             channel.writeAndFlush("$-1\r\n");
         } else {
             final int length = bytes.length;
-            channel.writeAndFlush("$" + length + "\r\n" + new String(bytes) + "\r\n");
+            channel.writeAndFlush("$" + length + "\r\n" + readUtf8(bytes) + "\r\n");
         }
     }
 

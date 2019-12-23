@@ -33,7 +33,7 @@ public class GetSequenceExample {
 
     private static final Logger LOG = LoggerFactory.getLogger(GetSequenceExample.class);
 
-    public static void main(final String[] args) throws Exception {
+    public static void main(final String[] args) {
         final Client client = new Client();
         client.init();
         getSequence(client.getRheaKVStore());
@@ -42,7 +42,7 @@ public class GetSequenceExample {
 
     public static void getSequence(final RheaKVStore rheaKVStore) {
         final byte[] key = writeUtf8("sequence");
-        rheaKVStore.getSequence(key, 10);
+        final CompletableFuture<Sequence> sequence = rheaKVStore.getSequence(key, 10);
 
         // async
         final CompletableFuture<Sequence> f1 = rheaKVStore.getSequence(key, 20);
