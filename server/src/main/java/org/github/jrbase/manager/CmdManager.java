@@ -31,6 +31,7 @@ public class CmdManager {
         registerCmdProcess(Cmd.MGET, new MGetProcess());
         registerCmdProcess(Cmd.HSET, new HSetProcess());
         registerCmdProcess(Cmd.HGET, new HGetProcess());
+        registerCmdProcess(Cmd.HLEN, new HLenProcess());
 
         registerCmdProcess(Cmd.OTHER, new IgnoreProcess());
     }

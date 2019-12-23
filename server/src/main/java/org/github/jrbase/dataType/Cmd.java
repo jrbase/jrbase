@@ -11,6 +11,7 @@ public enum Cmd {
     MGET("mget"),
     HSET("hset"),
     HGET("hget"),
+    HLEN("hlen"),
 
     OTHER("other");
 
