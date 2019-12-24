@@ -1,19 +1,14 @@
-//plugins {
-//    id 'java'
-//}
 
 group 'org.github.jrbase'
 version '1.0.1'
 
-allprojects {
-    repositories {
-        mavenLocal()
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
-        mavenLocal()
-    }
+task copyTask(type: Copy) {
+    from 'server/build/distributions/'
+    from 'jraftdemo/build/distributions/'
+    into 'build/'
 }
 
-subprojects {
+allprojects {
     apply plugin: "java"
     apply plugin: "groovy"
 
@@ -29,6 +24,12 @@ subprojects {
         }
     }
 
+    repositories {
+        mavenLocal()
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
+        mavenLocal()
+    }
+
     dependencies {
 
         testImplementation "junit:junit:4.12"
@@ -38,5 +39,5 @@ subprojects {
         testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-2"
         testRuntime "net.bytebuddy:byte-buddy:1.9.3"
     }
-
 }
+

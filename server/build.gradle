@@ -1,18 +1,5 @@
-plugins {
-    id 'java'
-}
 
 apply plugin: 'distribution'
-
-group 'org.github.jrbase'
-version '1.0.1'
-
-
-repositories {
-    mavenLocal()
-    maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
-    mavenCentral()
-}
 
 dependencies {
     compile "io.netty:netty-all:4.0.32.Final"
