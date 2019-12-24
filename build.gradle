@@ -1,20 +1,42 @@
-plugins {
-    id 'java'
-}
+//plugins {
+//    id 'java'
+//}
 
 group 'org.github.jrbase'
 version '1.0.1'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-    mavenLocal()
-    maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
-    mavenCentral()
+allprojects {
+    repositories {
+        mavenLocal()
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
+        mavenLocal()
+    }
 }
 
-dependencies {
-    testImplementation "junit:junit:4.12"
-    testImplementation "org.mockito:mockito-core:2.25.1"
+subprojects {
+    apply plugin: "java"
+    apply plugin: "groovy"
+
+    version = rootProject.version
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    plugins.withType(DistributionPlugin) {
+        distTar {
+            compression = Compression.GZIP
+            archiveExtension = 'tar.gz'
+        }
+    }
+
+    dependencies {
+
+        testImplementation "junit:junit:4.12"
+        testImplementation "org.mockito:mockito-core:2.25.1"
+
+        compile "org.codehaus.groovy:groovy-all:2.4.15"
+        testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-2"
+        testRuntime "net.bytebuddy:byte-buddy:1.9.3"
+    }
+
 }

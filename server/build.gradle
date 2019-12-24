@@ -2,12 +2,11 @@ plugins {
     id 'java'
 }
 
-apply plugin: "groovy"
+apply plugin: 'distribution'
 
 group 'org.github.jrbase'
 version '1.0.1'
 
-sourceCompatibility = 1.8
 
 repositories {
     mavenLocal()
@@ -17,13 +16,8 @@ repositories {
 
 dependencies {
     compile "io.netty:netty-all:4.0.32.Final"
-    testImplementation "junit:junit:4.12"
-    testImplementation "org.mockito:mockito-core:2.25.1"
     compile project(":jraftdemo")
 
-    compile "org.codehaus.groovy:groovy-all:2.4.15"
-    testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-2"
-    testRuntime "net.bytebuddy:byte-buddy:1.9.3"
 }
 
 task fatJar(type: Jar) {
@@ -34,4 +28,21 @@ task fatJar(type: Jar) {
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
+}
+
+distributions {
+    main {
+        contents {
+            from('src/main/bash') {
+                into 'bin'
+                fileMode = 0755
+            }
+            from(configurations.runtime) {
+                into 'lib'
+            }
+            from(jar) {
+                into 'lib'
+            }
+        }
+    }
 }

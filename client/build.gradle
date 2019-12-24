@@ -5,15 +5,7 @@ plugins {
 group 'org.github.jrbase'
 version '1.0.1'
 
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    testImplementation "junit:junit:4.12"
-    testImplementation "org.mockito:mockito-core:2.25.1"
     compile("org.jline:jline:3.6.2")
 }
 
@@ -26,3 +18,7 @@ task fatJar(type: Jar) {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
+
+
+
+
