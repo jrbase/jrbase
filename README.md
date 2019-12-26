@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/jrbase/jrbase.svg?style=svg)](https://circleci.com/gh/jrbase/jrbase)
 ## What is jrbase?
 
 jrbase is a Distributed NoSQL database like redis.
