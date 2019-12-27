@@ -33,6 +33,8 @@ public class CmdManager {
         registerCmdProcess(Cmd.HGET, new HGetProcess());
         registerCmdProcess(Cmd.HLEN, new HLenProcess());
 
+        registerCmdProcess(Cmd.GETBIT, new GetBitProcess());
+
         registerCmdProcess(Cmd.OTHER, new IgnoreProcess());
     }
 
