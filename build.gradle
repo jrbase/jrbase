@@ -39,5 +39,11 @@ allprojects {
         testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-2"
         testRuntime "net.bytebuddy:byte-buddy:1.9.3"
     }
+    test {
+        testLogging {
+            // Show that tests are run in the command-line output
+            events 'started', 'passed'
+        }
+    }
 }
 
