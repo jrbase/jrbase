@@ -25,7 +25,7 @@ jrbase implement redis server protocol, powered by [jraft-rheakv](https://github
 +-----------+-----------------------+------------------------------------
 |    mset   |           Y           | mset key1 value1 key2 value2 ...    
 +-----------+-----------------------+-------------------------------------
-|   getbit  |                       | getbit key offset                      
+|   getbit  |           Y           | getbit key offset                      
 +-----------+-----------------------+-------------------------------------
 |   setbit  |                       | setbit key offset value             
 +-----------+-----------------------+-------------------------------------

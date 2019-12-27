@@ -13,6 +13,8 @@ public enum Cmd {
     HGET("hget"),
     HLEN("hlen"),
 
+    GETBIT("getbit"),
+
     OTHER("other");
 
     final private String cmdName;
