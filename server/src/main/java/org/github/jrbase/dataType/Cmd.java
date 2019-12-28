@@ -14,6 +14,7 @@ public enum Cmd {
     HLEN("hlen"),
 
     GETBIT("getbit"),
+    SETBIT("setbit"),
 
     OTHER("other");
 

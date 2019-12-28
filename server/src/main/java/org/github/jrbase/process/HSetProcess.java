@@ -4,6 +4,7 @@ import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.Channel;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisDataType;
+import org.github.jrbase.execption.ArgumentsException;
 import org.github.jrbase.manager.CmdManager;
 import org.github.jrbase.utils.Tools;
 
@@ -12,19 +13,18 @@ import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 public class HSetProcess implements CmdProcess {
 
     @Override
-    public void process(ClientCmd clientCmd) {
+    public void process(ClientCmd clientCmd) throws ArgumentsException {
         clientCmd.setKey(clientCmd.getKey() + RedisDataType.HASHES.getAbbreviation());
 
         requestKVAndReplyClient(clientCmd);
     }
 
-    public void requestKVAndReplyClient(ClientCmd clientCmd) {
+    public void requestKVAndReplyClient(ClientCmd clientCmd) throws ArgumentsException {
         final Channel channel = clientCmd.getContext().channel();
         // hset key field value
         final int argsLength = clientCmd.getArgs().length;
         if (!isRightArgs(argsLength)) {
-            channel.writeAndFlush("-ERR wrong number of arguments for 'hset' command\r\n");
-            return;
+            throw new ArgumentsException();
         }
         final RheaKVStore rheaKVStore = CmdManager.getClient().getRheaKVStore();
 

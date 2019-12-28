@@ -21,12 +21,12 @@ public class GetProcess implements CmdProcess {
         final Channel channel = clientCmd.getContext().channel();
         // no args
         final RheaKVStore rheaKVStore = CmdManager.getClient().getRheaKVStore();
-        final byte[] bytes = rheaKVStore.bGet(clientCmd.getKey());
-        if (bytes == null) {
+        final byte[] getValue = rheaKVStore.bGet(clientCmd.getKey());
+        if (getValue == null) {
             channel.writeAndFlush("$-1\r\n");
         } else {
-            final int length = bytes.length;
-            channel.writeAndFlush("$" + length + "\r\n" + readUtf8(bytes) + "\r\n");
+            final int length = getValue.length;
+            channel.writeAndFlush("$" + length + "\r\n" + readUtf8(getValue) + "\r\n");
         }
     }
 }

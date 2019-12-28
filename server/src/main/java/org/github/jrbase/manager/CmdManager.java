@@ -1,12 +1,16 @@
 package org.github.jrbase.manager;
 
+import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
+import org.github.jrbase.execption.ArgumentsException;
 import org.github.jrbase.process.*;
 import org.github.jrbase.proxyRheakv.rheakv.Client;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.github.jrbase.utils.Tools.checkKey;
 
 
 public class CmdManager {
@@ -20,20 +24,27 @@ public class CmdManager {
         return client;
     }
 
+    public static RheaKVStore getRheaKVStore() {
+        return client.getRheaKVStore();
+    }
+
     private static Map<Cmd, CmdProcess> cmdProcessManager = new HashMap<>();
 
     static {
         client.init();
 
         registerCmdProcess(Cmd.SET, new SetProcess());
-        registerCmdProcess(Cmd.MSET, new MSetProcess());
         registerCmdProcess(Cmd.GET, new GetProcess());
+
+        registerCmdProcess(Cmd.MSET, new MSetProcess());
         registerCmdProcess(Cmd.MGET, new MGetProcess());
+
         registerCmdProcess(Cmd.HSET, new HSetProcess());
         registerCmdProcess(Cmd.HGET, new HGetProcess());
         registerCmdProcess(Cmd.HLEN, new HLenProcess());
 
         registerCmdProcess(Cmd.GETBIT, new GetBitProcess());
+        registerCmdProcess(Cmd.SETBIT, new SetBitProcess());
 
         registerCmdProcess(Cmd.OTHER, new IgnoreProcess());
     }
@@ -44,12 +55,12 @@ public class CmdManager {
 
     public static void process(ClientCmd clientCmd) {
         final CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
-        // handle key is empty besides
-        if (clientCmd.getKey().isEmpty() && !(cmdProcess instanceof IgnoreProcess)) {
-            clientCmd.getContext().channel().writeAndFlush("-ERR wrong number of arguments for '" + clientCmd.getCmd() + "' command\r\n");
-            return;
+        try {
+            checkKey(clientCmd.getKey());
+            cmdProcess.process(clientCmd);
+        } catch (ArgumentsException argumentsException) {
+            argumentsException.handleArgumentsException(clientCmd);
         }
-        cmdProcess.process(clientCmd);
 
     }
 

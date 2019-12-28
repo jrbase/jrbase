@@ -12,6 +12,10 @@ public class ClientCmd {
 
     }
 
+    public int getArgLength() {
+        return args != null ? args.length : 0;
+    }
+
     public ClientCmd(String cmd) {
         this.cmd = cmd;
     }

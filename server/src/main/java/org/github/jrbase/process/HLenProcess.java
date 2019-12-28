@@ -22,11 +22,20 @@ public class HLenProcess implements CmdProcess {
 
         final RheaKVStore rheaKVStore = CmdManager.getClient().getRheaKVStore();
 
+        checkKeyType();
+        // llen key
+        // key is first arg
         //get hash length
         String mapCountKey = clientCmd.getKey() + "h";
         final byte[] mapCountBytes = rheaKVStore.bGet(mapCountKey);
         int length = Tools.byteArrayToInt(mapCountBytes);
+
         channel.writeAndFlush(":" + length + "\r\n");
+    }
+
+    private void checkKeyType() {
+        //TODO:
+        // WRONGTYPE Operation against a key holding the wrong kind of value
     }
 
 }

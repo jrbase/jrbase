@@ -1,5 +1,7 @@
 package org.github.jrbase.utils;
 
+import org.github.jrbase.execption.ArgumentsException;
+
 public class Tools {
     public static byte[] intToByteArray(int value) {
         return new byte[]{
@@ -23,14 +25,23 @@ public class Tools {
         return expectLength == exactLength;
     }
 
-    public static int getByteBit(int position, byte bit) {
-        return (0x01 & (bit >> (7 - position)));
+    public static void checkArgs(int expectLength, int exactLength) throws ArgumentsException {
+        if (expectLength != exactLength) {
+            throw new ArgumentsException();
+        }
     }
+
+    public static void checkKey(String key) throws ArgumentsException {
+        if (key.isEmpty()) {
+            throw new ArgumentsException();
+        }
+    }
+
 
     public static int getBit(String position, byte[] bits) {
         try {
-            final int i = Integer.parseInt(position);
-            return getBit(i, bits);
+            final int positionInt = Integer.parseInt(position);
+            return getBit(positionInt, bits);
         } catch (NumberFormatException ignore) {
             return -1;
         }
@@ -55,5 +66,63 @@ public class Tools {
         final int positionByte = (position) % 8;
         return getByteBit(positionByte, bits[bitsIndex]);
     }
+
+
+    public static int getByteBit(int position, byte bit) {
+        return (0x01 & (bit >> (7 - position)));
+    }
+
+    // value 1 0
+    public static int setBit(String position, String value, byte[] bits) {
+        try {
+            int positionInt = Integer.parseInt(position);
+            int valueInt = Integer.parseInt(value);
+            return setBit(positionInt, valueInt, bits);
+        } catch (NumberFormatException ignore) {
+            return -1;
+        }
+
+    }
+
+    // value 1 0
+    public static int setBit(int position, int value, byte[] bits) {
+        if (position < 0) {
+            return -1;
+        }
+        if (position >= bits.length * 8) {
+            return 0;
+        }
+
+        final int bitsIndex = position / 8;
+        final int positionByte = (position) % 8;
+        //get bits count
+        //   0 1 2 3 4 5 6 7 8
+        // a 0 1 1 0 0 0 0 1
+        //   0 1 0 0 0 0 0 0
+        //~  1 0 1 1 1 1 1 1
+        // & a 0 1 1 0 0 0 0 1
+        // = 1 0 1 0 0 0 0 1
+//------------
+        // a 0 1 1 0 0 0 0 1
+        // | 0 0 0 0 0 0 1 0
+        // = 1 0 0 0 0 0 0 1
+
+        //1 0   0
+        //0 0   0
+        if (value == 0) {
+            int updateByte = bits[bitsIndex] & ~(0x01 << (7 - positionByte));
+            bits[bitsIndex] = (byte) updateByte;
+        } else {
+            int updateByte = bits[bitsIndex] | (0x01 << (7 - positionByte));
+            bits[bitsIndex] = (byte) updateByte;
+        }
+        return 0;
+        // |
+        //1 1   1
+        //0 1   1
+        //1 0   1
+        //0 0   0
+    }
+
 
 }

@@ -4,26 +4,26 @@ import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.Channel;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisDataType;
+import org.github.jrbase.execption.ArgumentsException;
 import org.github.jrbase.manager.CmdManager;
 import org.github.jrbase.utils.Tools;
 
-import static org.github.jrbase.utils.Tools.isRightArgs;
+import static org.github.jrbase.utils.Tools.checkArgs;
 
 public class GetBitProcess implements CmdProcess {
 
     @Override
-    public void process(ClientCmd clientCmd) {
+    public void process(ClientCmd clientCmd) throws ArgumentsException {
         clientCmd.setKey(clientCmd.getKey() + RedisDataType.STRINGS.getAbbreviation());
 
         requestKVAndReplyClient(clientCmd);
     }
 
-    public void requestKVAndReplyClient(ClientCmd clientCmd) {
+    public void requestKVAndReplyClient(ClientCmd clientCmd) throws ArgumentsException {
         final Channel channel = clientCmd.getContext().channel();
-        if (!isRightArgs(1, clientCmd.getArgs().length)) {
-            channel.writeAndFlush("-ERR wrong number of arguments for 'getbit' command\r\n");
-            return;
-        }
+
+        checkArgs(1, clientCmd.getArgLength());
+
         final String[] args = clientCmd.getArgs();
         final String position = args[0];
 
