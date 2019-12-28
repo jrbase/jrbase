@@ -1,11 +1,9 @@
 package org.github.jrbase.process;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
-import io.netty.channel.Channel;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.execption.ArgumentsException;
-import org.github.jrbase.manager.CmdManager;
 import org.github.jrbase.utils.Tools;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
@@ -13,20 +11,19 @@ import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 public class HSetProcess implements CmdProcess {
 
     @Override
-    public void process(ClientCmd clientCmd) throws ArgumentsException {
+    public String process(ClientCmd clientCmd) throws ArgumentsException {
         clientCmd.setKey(clientCmd.getKey() + RedisDataType.HASHES.getAbbreviation());
 
-        requestKVAndReplyClient(clientCmd);
+        return requestKVAndReplyClient(clientCmd);
     }
 
-    public void requestKVAndReplyClient(ClientCmd clientCmd) throws ArgumentsException {
-        final Channel channel = clientCmd.getContext().channel();
+    public String requestKVAndReplyClient(ClientCmd clientCmd) throws ArgumentsException {
         // hset key field value
         final int argsLength = clientCmd.getArgs().length;
         if (!isRightArgs(argsLength)) {
             throw new ArgumentsException();
         }
-        final RheaKVStore rheaKVStore = CmdManager.getClient().getRheaKVStore();
+        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         final String key = clientCmd.getKey();
         final String[] args = clientCmd.getArgs();
@@ -51,8 +48,8 @@ public class HSetProcess implements CmdProcess {
 
         //4 put mapCount
         rheaKVStore.put(mapCountKey, Tools.intToByteArray(mapCount));
+        return ":" + successCount + "\r\n";
 
-        channel.writeAndFlush(":" + successCount + "\r\n");
 
         // another way,but cant't get successCount
         // kvList.add(new KVEntry(buildUpKey, writeUtf8(value)));

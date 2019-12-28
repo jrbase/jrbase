@@ -1,32 +1,31 @@
 package org.github.jrbase.process;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
-import io.netty.channel.Channel;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.execption.ArgumentsException;
-import org.github.jrbase.manager.CmdManager;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 
 public class MSetProcess implements CmdProcess {
 
     @Override
-    public void process(ClientCmd clientCmd) throws ArgumentsException {
+    public String process(ClientCmd clientCmd) throws ArgumentsException {
         clientCmd.setKey(clientCmd.getKey() + RedisDataType.STRINGS.getAbbreviation());
 
-        requestKVAndReplyClient(clientCmd);
+        return requestKVAndReplyClient(clientCmd);
     }
 
 
-    public void requestKVAndReplyClient(ClientCmd clientCmd) throws ArgumentsException {
-        final Channel channel = clientCmd.getContext().channel();
+    public String requestKVAndReplyClient(ClientCmd clientCmd) throws ArgumentsException {
 
-        final RheaKVStore rheaKVStore = CmdManager.getClient().getRheaKVStore();
         //
         if (isWrongArgs(clientCmd)) {
             throw new ArgumentsException();
         }
+
+        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
+
         final String[] args = clientCmd.getArgs();
         rheaKVStore.put(clientCmd.getKey(), writeUtf8(args[0]));
         // 1 key value, key value
@@ -41,7 +40,7 @@ public class MSetProcess implements CmdProcess {
                 successCount++;
             }
         }
-        channel.writeAndFlush(":" + successCount + "\r\n");
+        return (":" + successCount + "\r\n");
 
     }
 

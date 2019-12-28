@@ -57,7 +57,12 @@ public class CmdManager {
         final CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
         try {
             checkKey(clientCmd.getKey());
-            cmdProcess.process(clientCmd);
+
+            final RheaKVStore rheaKVStore = CmdManager.getRheaKVStore();
+            clientCmd.setRheaKVStore(rheaKVStore);
+
+            final String message = cmdProcess.process(clientCmd);
+            clientCmd.getContext().channel().writeAndFlush(message);
         } catch (ArgumentsException argumentsException) {
             argumentsException.handleArgumentsException(clientCmd);
         }
