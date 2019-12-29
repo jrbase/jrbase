@@ -2,16 +2,21 @@ package org.github.jrbase.process;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
-import org.github.jrbase.dataType.RedisDataType;
+import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.utils.Tools;
+
+import static org.github.jrbase.dataType.RedisDataType.HASHES;
 
 
 public class HLenProcess implements CmdProcess {
 
     @Override
-    public String process(ClientCmd clientCmd) {
-        clientCmd.setKey(clientCmd.getKey() + RedisDataType.HASHES.getAbbreviation());
+    public String getCmdName() {
+        return Cmd.HLEN.getCmdName();
+    }
 
+    @Override
+    public String process(ClientCmd clientCmd) {
         return requestKVAndReplyClient(clientCmd);
     }
 
@@ -23,7 +28,7 @@ public class HLenProcess implements CmdProcess {
         // llen key
         // key is first arg
         //get hash length
-        String mapCountKey = clientCmd.getKey() + "h";
+        String mapCountKey = clientCmd.getKey() + HASHES.getAbbreviation();
         final byte[] mapCountBytes = rheaKVStore.bGet(mapCountKey);
         int length = Tools.byteArrayToInt(mapCountBytes);
         return ":" + length + "\r\n";

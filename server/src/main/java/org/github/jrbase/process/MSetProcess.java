@@ -2,17 +2,21 @@ package org.github.jrbase.process;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
-import org.github.jrbase.dataType.RedisDataType;
+import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.execption.ArgumentsException;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
+import static org.github.jrbase.dataType.RedisDataType.STRINGS;
 
 public class MSetProcess implements CmdProcess {
 
     @Override
-    public String process(ClientCmd clientCmd) throws ArgumentsException {
-        clientCmd.setKey(clientCmd.getKey() + RedisDataType.STRINGS.getAbbreviation());
+    public String getCmdName() {
+        return Cmd.MSET.getCmdName();
+    }
 
+    @Override
+    public String process(ClientCmd clientCmd) throws ArgumentsException {
         return requestKVAndReplyClient(clientCmd);
     }
 
@@ -26,16 +30,17 @@ public class MSetProcess implements CmdProcess {
 
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
+        String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation();
         final String[] args = clientCmd.getArgs();
-        rheaKVStore.put(clientCmd.getKey(), writeUtf8(args[0]));
+        rheaKVStore.put(buildUpKey, writeUtf8(args[0]));
         // 1 key value, key value
         // 0  1    2    3    4
         int successCount = 1;
 
         for (int i = 1; i < args.length; i = i + 2) {
-            final byte[] key = args[i].getBytes();
+            final byte[] buildUpArgKey = (args[i] + STRINGS.getAbbreviation()).getBytes();
             final byte[] value = writeUtf8(args[i + 1]);
-            final byte[] bytes = rheaKVStore.bGetAndPut(key, value);
+            final byte[] bytes = rheaKVStore.bGetAndPut(buildUpArgKey, value);
             if (bytes == null) {
                 successCount++;
             }

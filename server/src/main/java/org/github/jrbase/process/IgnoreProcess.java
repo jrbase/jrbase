@@ -1,11 +1,17 @@
 package org.github.jrbase.process;
 
 import org.github.jrbase.dataType.ClientCmd;
+import org.github.jrbase.dataType.Cmd;
 
 /**
  * error command process class
  */
 public class IgnoreProcess implements CmdProcess {
+
+    @Override
+    public String getCmdName() {
+        return Cmd.OTHER.getCmdName();
+    }
 
     @Override
     public String process(ClientCmd clientCmd) {

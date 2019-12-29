@@ -2,17 +2,22 @@ package org.github.jrbase.process;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
-import org.github.jrbase.dataType.RedisDataType;
+import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.execption.ArgumentsException;
 import org.github.jrbase.utils.Tools;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
+import static org.github.jrbase.dataType.RedisDataType.HASHES;
 
 public class HSetProcess implements CmdProcess {
 
     @Override
+    public String getCmdName() {
+        return Cmd.HSET.getCmdName();
+    }
+
+    @Override
     public String process(ClientCmd clientCmd) throws ArgumentsException {
-        clientCmd.setKey(clientCmd.getKey() + RedisDataType.HASHES.getAbbreviation());
 
         return requestKVAndReplyClient(clientCmd);
     }
@@ -38,7 +43,7 @@ public class HSetProcess implements CmdProcess {
         for (int i = 0; i < argsLength; i = i + 2) {
             final String field = args[i];
             final String value = args[i + 1];
-            String buildUpKey = key + "f" + field;
+            String buildUpKey = key + "f" + field + HASHES.getAbbreviation();
             final byte[] bytes = rheaKVStore.bGetAndPut(buildUpKey, writeUtf8(value));
             successCount = bytes == null ? successCount + 1 : successCount;
         }

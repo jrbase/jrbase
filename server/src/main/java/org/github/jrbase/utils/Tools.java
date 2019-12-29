@@ -12,7 +12,7 @@ public class Tools {
     }
 
     public static int byteArrayToInt(byte[] bytes) {
-        if (bytes == null) {
+        if (bytes == null || bytes.length != 4) {
             return 0;
         }
         return ((bytes[0] & 0xFF) << 24) |
