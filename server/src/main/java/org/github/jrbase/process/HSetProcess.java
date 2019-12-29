@@ -1,32 +1,34 @@
 package org.github.jrbase.process;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
-import io.netty.channel.Channel;
 import org.github.jrbase.dataType.ClientCmd;
-import org.github.jrbase.dataType.RedisDataType;
-import org.github.jrbase.manager.CmdManager;
+import org.github.jrbase.dataType.Cmd;
+import org.github.jrbase.execption.ArgumentsException;
 import org.github.jrbase.utils.Tools;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
+import static org.github.jrbase.dataType.RedisDataType.HASHES;
 
 public class HSetProcess implements CmdProcess {
 
     @Override
-    public void process(ClientCmd clientCmd) {
-        clientCmd.setKey(clientCmd.getKey() + RedisDataType.HASHES.getAbbreviation());
-
-        requestKVAndReplyClient(clientCmd);
+    public String getCmdName() {
+        return Cmd.HSET.getCmdName();
     }
 
-    public void requestKVAndReplyClient(ClientCmd clientCmd) {
-        final Channel channel = clientCmd.getContext().channel();
+    @Override
+    public String process(ClientCmd clientCmd) throws ArgumentsException {
+
+        return requestKVAndReplyClient(clientCmd);
+    }
+
+    public String requestKVAndReplyClient(ClientCmd clientCmd) throws ArgumentsException {
         // hset key field value
         final int argsLength = clientCmd.getArgs().length;
         if (!isRightArgs(argsLength)) {
-            channel.writeAndFlush("-ERR wrong number of arguments for 'hset' command\r\n");
-            return;
+            throw new ArgumentsException();
         }
-        final RheaKVStore rheaKVStore = CmdManager.getClient().getRheaKVStore();
+        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         final String key = clientCmd.getKey();
         final String[] args = clientCmd.getArgs();
@@ -41,7 +43,7 @@ public class HSetProcess implements CmdProcess {
         for (int i = 0; i < argsLength; i = i + 2) {
             final String field = args[i];
             final String value = args[i + 1];
-            String buildUpKey = key + "f" + field;
+            String buildUpKey = key + "f" + field + HASHES.getAbbreviation();
             final byte[] bytes = rheaKVStore.bGetAndPut(buildUpKey, writeUtf8(value));
             successCount = bytes == null ? successCount + 1 : successCount;
         }
@@ -51,8 +53,8 @@ public class HSetProcess implements CmdProcess {
 
         //4 put mapCount
         rheaKVStore.put(mapCountKey, Tools.intToByteArray(mapCount));
+        return ":" + successCount + "\r\n";
 
-        channel.writeAndFlush(":" + successCount + "\r\n");
 
         // another way,but cant't get successCount
         // kvList.add(new KVEntry(buildUpKey, writeUtf8(value)));

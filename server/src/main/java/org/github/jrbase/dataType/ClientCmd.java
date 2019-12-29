@@ -1,5 +1,6 @@
 package org.github.jrbase.dataType;
 
+import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.ChannelHandlerContext;
 
 public class ClientCmd {
@@ -7,9 +8,22 @@ public class ClientCmd {
     private String key;
     private String[] args;
     private ChannelHandlerContext context;
+    private RheaKVStore rheaKVStore;
 
     public ClientCmd() {
 
+    }
+
+    public RheaKVStore getRheaKVStore() {
+        return rheaKVStore;
+    }
+
+    public void setRheaKVStore(RheaKVStore rheaKVStore) {
+        this.rheaKVStore = rheaKVStore;
+    }
+
+    public int getArgLength() {
+        return args != null ? args.length : 0;
     }
 
     public ClientCmd(String cmd) {

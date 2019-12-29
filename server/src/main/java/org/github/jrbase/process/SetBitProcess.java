@@ -4,17 +4,17 @@ import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.execption.ArgumentsException;
+import org.github.jrbase.utils.Tools;
 
-import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 import static org.github.jrbase.dataType.RedisDataType.STRINGS;
 import static org.github.jrbase.utils.Tools.checkArgs;
 
 
-public class SetProcess implements CmdProcess {
+public class SetBitProcess implements CmdProcess {
 
     @Override
     public String getCmdName() {
-        return Cmd.SET.getCmdName();
+        return Cmd.SETBIT.getCmdName();
     }
 
     @Override
@@ -24,16 +24,27 @@ public class SetProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) throws ArgumentsException {
-        checkArgs(1, clientCmd.getArgLength());
-
+        checkArgs(2, clientCmd.getArgLength());
+        //setbit key 2 1
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation();
-        final byte[] bytes = rheaKVStore.bGetAndPut(buildUpKey, writeUtf8(clientCmd.getArgs()[0]));
+        final byte[] bytes = rheaKVStore.bGet(buildUpKey);
         if (bytes == null) {
-            return (":1\r\n");
-        } else {
             return (":0\r\n");
+        } else {
+            final String[] args = clientCmd.getArgs();
+            final int lastBit = Tools.getBit(args[0], bytes);
+
+            final int result = Tools.setBit(args[0], args[1], bytes);
+            // update bytes
+            rheaKVStore.bPut(buildUpKey, bytes);
+
+            if (result == -1) {
+                return ("-ERR bit offset is not an integer or out of range\r\n");
+            } else {
+                return (":" + lastBit + "\r\n");
+            }
         }
 
     }

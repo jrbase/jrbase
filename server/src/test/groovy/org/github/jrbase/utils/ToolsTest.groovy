@@ -24,6 +24,17 @@ class ToolsTest extends Specification {
 
     def "testByteArrayToInt"() {
         expect:
+        Tools.byteArrayToInt(input as byte[]) == output
+
+        where:
+        input        | output
+        null         | 0
+        [0, 0, 0]    | 0
+        [0, 0, 0, 1] | 1
+    }
+
+    def "testByteArrayToInt2"() {
+        expect:
         Tools.byteArrayToInt(Tools.intToByteArray(input)) == output
 
         where:

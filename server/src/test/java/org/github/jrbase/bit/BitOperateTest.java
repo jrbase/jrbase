@@ -35,4 +35,9 @@ public class BitOperateTest {
     }
 
 
+    @Test
+    public void testLeftMove() {
+//        1<<
+    }
+
 }

@@ -1,41 +1,43 @@
 package org.github.jrbase.process;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
-import io.netty.channel.Channel;
 import org.github.jrbase.dataType.ClientCmd;
-import org.github.jrbase.dataType.RedisDataType;
-import org.github.jrbase.manager.CmdManager;
+import org.github.jrbase.dataType.Cmd;
+import org.github.jrbase.execption.ArgumentsException;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
-import static org.github.jrbase.utils.Tools.isRightArgs;
+import static org.github.jrbase.dataType.RedisDataType.HASHES;
+import static org.github.jrbase.utils.Tools.checkArgs;
 
 
 public class HGetProcess implements CmdProcess {
 
     @Override
-    public void process(ClientCmd clientCmd) {
-        clientCmd.setKey(clientCmd.getKey() + RedisDataType.HASHES.getAbbreviation());
-
-        requestKVAndReplyClient(clientCmd);
+    public String getCmdName() {
+        return Cmd.HGET.getCmdName();
     }
 
-    public void requestKVAndReplyClient(ClientCmd clientCmd) {
-        final Channel channel = clientCmd.getContext().channel();
+    @Override
+    public String process(ClientCmd clientCmd) throws ArgumentsException {
 
-        final RheaKVStore rheaKVStore = CmdManager.getClient().getRheaKVStore();
+        return requestKVAndReplyClient(clientCmd);
+    }
 
-        if (!isRightArgs(1, clientCmd.getArgs().length)) {
-            channel.writeAndFlush("-ERR wrong number of arguments for 'hget' command\r\n");
-            return;
-        }
-        final String buildUpKey = clientCmd.getKey() + "f" + clientCmd.getArgs()[0];
+    public String requestKVAndReplyClient(ClientCmd clientCmd) throws ArgumentsException {
+        checkArgs(1, clientCmd.getArgLength());
+
+        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
+
+        final String buildUpKey = clientCmd.getKey() + "f" + clientCmd.getArgs()[0] + HASHES.getAbbreviation();
         final byte[] bytes = rheaKVStore.bGet(buildUpKey);
+        StringBuilder result = new StringBuilder();
         if (bytes == null) {
-            channel.writeAndFlush("$-1\r\n");
+            result.append("$-1\r\n");
         } else {
             final int length = bytes.length;
-            channel.writeAndFlush("$" + length + "\r\n" + readUtf8(bytes) + "\r\n");
+            result.append("$").append(length).append("\r\n").append(readUtf8(bytes)).append("\r\n");
         }
+        return result.toString();
     }
 
 }

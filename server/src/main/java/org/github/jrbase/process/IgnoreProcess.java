@@ -1,6 +1,7 @@
 package org.github.jrbase.process;
 
 import org.github.jrbase.dataType.ClientCmd;
+import org.github.jrbase.dataType.Cmd;
 
 /**
  * error command process class
@@ -8,8 +9,13 @@ import org.github.jrbase.dataType.ClientCmd;
 public class IgnoreProcess implements CmdProcess {
 
     @Override
-    public void process(ClientCmd clientCmd) {
-        StringBuffer result = new StringBuffer();
+    public String getCmdName() {
+        return Cmd.OTHER.getCmdName();
+    }
+
+    @Override
+    public String process(ClientCmd clientCmd) {
+        StringBuilder result = new StringBuilder();
         result.append("-ERR unknown command '").append(clientCmd.getCmd()).append("', with args beginning with:");
         if (!clientCmd.getKey().isEmpty()) {
             result.append(clientCmd.getKey()).append(", ");
@@ -18,7 +24,7 @@ public class IgnoreProcess implements CmdProcess {
             result.append(arg).append(", ");
         }
         result.append("\r\n");
-        clientCmd.getContext().channel().writeAndFlush(result);
+        return result.toString();
     }
 
 }
