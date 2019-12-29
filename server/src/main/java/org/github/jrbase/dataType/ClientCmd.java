@@ -14,10 +14,6 @@ public class ClientCmd {
 
     }
 
-    public String getKeyAddAbbreviation(String abbreviation) {
-        return this.key + abbreviation;
-    }
-
     public RheaKVStore getRheaKVStore() {
         return rheaKVStore;
     }

@@ -12,7 +12,7 @@ import static org.github.jrbase.utils.Tools.checkArgs;
 public class GetBitProcess implements CmdProcess {
 
     @Override
-    public String getName() {
+    public String getCmdName() {
         return Cmd.GETBIT.getCmdName();
     }
 

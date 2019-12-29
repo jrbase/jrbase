@@ -9,7 +9,7 @@ import org.github.jrbase.dataType.Cmd;
 public class IgnoreProcess implements CmdProcess {
 
     @Override
-    public String getName() {
+    public String getCmdName() {
         return Cmd.OTHER.getCmdName();
     }
 
