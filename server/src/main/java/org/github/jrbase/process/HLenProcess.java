@@ -2,11 +2,17 @@ package org.github.jrbase.process;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
+import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.utils.Tools;
 
 
 public class HLenProcess implements CmdProcess {
+
+    @Override
+    public String getName() {
+        return Cmd.HLEN.getCmdName();
+    }
 
     @Override
     public String process(ClientCmd clientCmd) {

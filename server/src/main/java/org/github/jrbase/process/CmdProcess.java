@@ -4,5 +4,7 @@ import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.execption.ArgumentsException;
 
 public interface CmdProcess {
+    String getName();
+
     String process(ClientCmd clientCmd) throws ArgumentsException;
 }

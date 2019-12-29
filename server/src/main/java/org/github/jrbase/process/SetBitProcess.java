@@ -2,6 +2,7 @@ package org.github.jrbase.process;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
+import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.execption.ArgumentsException;
 import org.github.jrbase.utils.Tools;
@@ -10,6 +11,11 @@ import static org.github.jrbase.utils.Tools.checkArgs;
 
 
 public class SetBitProcess implements CmdProcess {
+
+    @Override
+    public String getName() {
+        return Cmd.SETBIT.getCmdName();
+    }
 
     @Override
     public String process(ClientCmd clientCmd) throws ArgumentsException {

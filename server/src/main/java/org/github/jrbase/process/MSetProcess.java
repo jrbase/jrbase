@@ -2,12 +2,18 @@ package org.github.jrbase.process;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
+import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.execption.ArgumentsException;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 
 public class MSetProcess implements CmdProcess {
+
+    @Override
+    public String getName() {
+        return Cmd.MSET.getCmdName();
+    }
 
     @Override
     public String process(ClientCmd clientCmd) throws ArgumentsException {
