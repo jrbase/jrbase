@@ -1,9 +1,9 @@
 package org.github.jrbase.manager;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
+import io.netty.channel.Channel;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
-import org.github.jrbase.execption.ArgumentsException;
 import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.process.IgnoreProcess;
 import org.github.jrbase.process.TypeProcess;
@@ -18,7 +18,7 @@ import org.github.jrbase.proxyRheakv.rheakv.Client;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.github.jrbase.utils.Tools.checkKey;
+import static org.github.jrbase.utils.Tools.isCorrectKey;
 
 
 public class CmdManager {
@@ -73,20 +73,29 @@ public class CmdManager {
 
     public static void process(ClientCmd clientCmd) {
         final CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
-        try {
-            checkKey(clientCmd.getKey());
-
-            final RheaKVStore rheaKVStore = CmdManager.getRheaKVStore();
-            clientCmd.setRheaKVStore(rheaKVStore);
-
-            cmdProcess.checkArguments(clientCmd);
-
-            final String message = cmdProcess.process(clientCmd);
-            clientCmd.getContext().channel().writeAndFlush(message);
-        } catch (ArgumentsException argumentsException) {
-            argumentsException.handleArgumentsException(clientCmd);
+        // check key
+        final boolean correctKey = isCorrectKey(clientCmd.getKey());
+        if (correctKey) {
+            sendWrongArgumentMessage(clientCmd);
+            return;
+        }
+        // check arguments
+        final boolean correctArguments = cmdProcess.isCorrectArguments(clientCmd);
+        if (correctArguments) {
+            sendWrongArgumentMessage(clientCmd);
+            return;
         }
 
+        final RheaKVStore rheaKVStore = CmdManager.getRheaKVStore();
+        clientCmd.setRheaKVStore(rheaKVStore);
+
+        final String message = cmdProcess.process(clientCmd);
+        clientCmd.getContext().channel().writeAndFlush(message);
+    }
+
+    private static void sendWrongArgumentMessage(ClientCmd clientCmd) {
+        final Channel channel = clientCmd.getContext().channel();
+        channel.writeAndFlush("-ERR wrong number of arguments for '" + clientCmd.getCmd() + "' command\r\n");
     }
 
     public static CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {

@@ -15,27 +15,22 @@ class LPopProcessTest extends Specification {
     private CmdProcess cmdProcess = new LPopProcess()
     private ClientCmd clientCmd = new ClientCmd()
 
-    def "Process"() {
-        given:
+    def setup() {
         clientCmd.setKey("a")
+    }
+
+    def "processData"() {
+        given:
         RheaKVStore rheaKVStore = Mock()
         clientCmd.setRheaKVStore(rheaKVStore)
         String buildUpKey = clientCmd.getKey() + LISTS.getAbbreviation()
         rheaKVStore.bGet(buildUpKey) >> input
         if (!isEmptyBytes(input)) {
-            StringBuilder buildUpValue = new StringBuilder()
             final String resultStr = readUtf8(input)
             final String[] valueArr = resultStr.split(",")
-            for (int i = 1; i < valueArr.length - 1; i++) {
-                buildUpValue.append(valueArr[i]).append(",")
-            }
-            if (buildUpValue.length() != 0) {
-                buildUpValue.deleteCharAt(buildUpValue.length() - 1)
-            }
-            //bGetAndPut
-            rheaKVStore.bGetAndPut(buildUpKey, writeUtf8(buildUpValue.toString()))
+            String buildUpValue = LPopProcess.getBuildUpValue(valueArr)
+            rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue))
         }
-
         expect:
         message == cmdProcess.process(clientCmd)
         where:

@@ -16,8 +16,8 @@ public class TypeProcess implements CmdProcess {
     }
 
     @Override
-    public void checkArguments(ClientCmd clientCmd) {
-
+    public boolean isCorrectArguments(ClientCmd clientCmd) {
+        return true;
     }
 
     @Override

@@ -12,9 +12,16 @@ class LPushProcessTest extends Specification {
     private CmdProcess cmdProcess = new LPushProcess()
     private ClientCmd clientCmd = new ClientCmd()
 
-    def "Process"() {
-        given:
+    def setup() {
         clientCmd.setKey("a")
+    }
+
+    def cleanup() {
+        println('Cleaning up after a test!')
+    }
+
+    def "processData"() {
+        given:
         clientCmd.setArgs(args as String[])
         RheaKVStore rheaKVStore = Mock()
         clientCmd.setRheaKVStore(rheaKVStore)
@@ -27,29 +34,18 @@ class LPushProcessTest extends Specification {
         args       | input            | message
         ["a"]      | null             | ':1\r\n'
         ["a", "b"] | null             | ':2\r\n'
-        ["a", "b"] | "".getBytes()    | ':3\r\n'
+        ["a", "b"] | "".getBytes()    | ':2\r\n'
         ["a", "b"] | "a".getBytes()   | ':3\r\n'
         ["a", "b"] | "a,b".getBytes() | ':4\r\n'
     }
 
     def "testArgumentsException"() {
         given:
-        clientCmd.setKey("key")
         clientCmd.setArgs([] as String[])
         when:
         cmdProcess.checkArguments(clientCmd)
         then:
         thrown ArgumentsException
     }
-
-    def "test StringBuilder"() {
-        when:
-        StringBuilder buildUpValue = new StringBuilder()
-        buildUpValue.append("1").append(",")
-        buildUpValue.deleteCharAt(buildUpValue.length() - 1)
-        then:
-        buildUpValue.toString() == "1"
-    }
-
 
 }

@@ -3,7 +3,6 @@ package org.github.jrbase.process.hash;
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
-import org.github.jrbase.execption.ArgumentsException;
 import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.utils.Tools;
 
@@ -18,11 +17,8 @@ public class HSetProcess implements CmdProcess {
     }
 
     @Override
-    public void checkArguments(ClientCmd clientCmd) throws ArgumentsException {
-        final int argsLength = clientCmd.getArgLength();
-        if (!isRightArgs(argsLength)) {
-            throw new ArgumentsException();
-        }
+    public boolean isCorrectArguments(ClientCmd clientCmd) {
+        return isRightArgs(clientCmd.getArgLength());
     }
 
     @Override

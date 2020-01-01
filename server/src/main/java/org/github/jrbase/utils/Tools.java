@@ -1,7 +1,5 @@
 package org.github.jrbase.utils;
 
-import org.github.jrbase.execption.ArgumentsException;
-
 public class Tools {
     public static byte[] intToByteArray(int value) {
         return new byte[]{
@@ -25,16 +23,12 @@ public class Tools {
         return expectLength == exactLength;
     }
 
-    public static void checkArgs(int expectLength, int exactLength) throws ArgumentsException {
-        if (expectLength != exactLength) {
-            throw new ArgumentsException();
-        }
+    public static boolean checkArgs(int expectLength, int exactLength) {
+        return expectLength == exactLength;
     }
 
-    public static void checkKey(String key) throws ArgumentsException {
-        if (key.isEmpty()) {
-            throw new ArgumentsException();
-        }
+    public static boolean isCorrectKey(String key) {
+        return !key.isEmpty();
     }
 
 

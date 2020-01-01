@@ -17,8 +17,8 @@ public class HLenProcess implements CmdProcess {
     }
 
     @Override
-    public void checkArguments(ClientCmd clientCmd) {
-
+    public boolean isCorrectArguments(ClientCmd clientCmd) {
+        return true;
     }
 
     @Override

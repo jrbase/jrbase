@@ -1,7 +1,6 @@
 package org.github.jrbase.process;
 
 import org.github.jrbase.dataType.ClientCmd;
-import org.github.jrbase.execption.ArgumentsException;
 
 public interface CmdProcess {
     /**
@@ -18,9 +17,9 @@ public interface CmdProcess {
      * check arguments
      *
      * @param clientCmd request all param
-     * @throws ArgumentsException arguments exception handle
+     * @return true correct argument, false error argument
      */
-    void checkArguments(ClientCmd clientCmd) throws ArgumentsException;
+    boolean isCorrectArguments(ClientCmd clientCmd);
 
     /**
      * handle command
