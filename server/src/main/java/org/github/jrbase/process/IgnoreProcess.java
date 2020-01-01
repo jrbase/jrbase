@@ -14,6 +14,11 @@ public class IgnoreProcess implements CmdProcess {
     }
 
     @Override
+    public boolean isCorrectArguments(ClientCmd clientCmd) {
+        return true;
+    }
+
+    @Override
     public String process(ClientCmd clientCmd) {
         StringBuilder result = new StringBuilder();
         result.append("-ERR unknown command '").append(clientCmd.getCmd()).append("', with args beginning with:");

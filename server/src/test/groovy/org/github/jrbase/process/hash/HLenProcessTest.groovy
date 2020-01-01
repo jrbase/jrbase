@@ -1,7 +1,9 @@
-package org.github.jrbase.process
+package org.github.jrbase.process.hash
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore
 import org.github.jrbase.dataType.ClientCmd
+import org.github.jrbase.process.CmdProcess
+import org.github.jrbase.process.hash.HLenProcess
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.RedisDataType.HASHES

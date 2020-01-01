@@ -1,13 +1,14 @@
-package org.github.jrbase.process;
+package org.github.jrbase.process.string;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
-import org.github.jrbase.execption.ArgumentsException;
+import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.utils.Tools;
 
 import static org.github.jrbase.dataType.RedisDataType.STRINGS;
 import static org.github.jrbase.utils.Tools.checkArgs;
+import static org.github.jrbase.utils.Tools.isEmptyBytes;
 
 
 public class SetBitProcess implements CmdProcess {
@@ -18,19 +19,23 @@ public class SetBitProcess implements CmdProcess {
     }
 
     @Override
-    public String process(ClientCmd clientCmd) throws ArgumentsException {
+    public boolean isCorrectArguments(ClientCmd clientCmd) {
+        return checkArgs(2, clientCmd.getArgLength());
+    }
+
+    @Override
+    public String process(ClientCmd clientCmd) {
         return requestKVAndReplyClient(clientCmd);
     }
 
 
-    public String requestKVAndReplyClient(ClientCmd clientCmd) throws ArgumentsException {
-        checkArgs(2, clientCmd.getArgLength());
+    public String requestKVAndReplyClient(ClientCmd clientCmd) {
         //setbit key 2 1
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation();
         final byte[] bytes = rheaKVStore.bGet(buildUpKey);
-        if (bytes == null) {
+        if (isEmptyBytes(bytes)) {
             return (":0\r\n");
         } else {
             final String[] args = clientCmd.getArgs();

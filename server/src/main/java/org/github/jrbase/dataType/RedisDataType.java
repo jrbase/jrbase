@@ -1,11 +1,17 @@
 package org.github.jrbase.dataType;
 
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
 public enum RedisDataType {
-    STRINGS("strings", "s"),
-    HASHES("Hashes", "h"),
-    LISTS("Lists", "l"),
-    SETS("Sets", "c"),
-    SORTED_SETS("Sorted Sets", "z");
+    STRINGS("string", "s"),
+    HASHES("hash", "h"),
+    LISTS("list", "l"),
+    SETS("set", "c"),
+    SORTED_SETS("zset", "z"),
+    NONE("none", "n"),
+    KEYS("key", "k");
 
     private final String name;
     private final String abbreviation;
@@ -21,5 +27,18 @@ public enum RedisDataType {
 
     public String getAbbreviation() {
         return abbreviation;
+    }
+
+    public static RedisDataType get(String redisDataTypeName) {
+        final RedisDataType redisDataType = lookup.get(redisDataTypeName);
+        return redisDataType == null ? NONE : redisDataType;
+    }
+
+    private static final Map<String, RedisDataType> lookup = new HashMap<>();
+
+    static {
+        for (RedisDataType c : EnumSet.allOf(RedisDataType.class)) {
+            lookup.put(c.getName(), c);
+        }
     }
 }

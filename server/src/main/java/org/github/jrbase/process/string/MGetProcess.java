@@ -1,9 +1,10 @@
-package org.github.jrbase.process;
+package org.github.jrbase.process.string;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import com.alipay.sofa.jraft.rhea.util.ByteArray;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
+import org.github.jrbase.process.CmdProcess;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,11 @@ public class MGetProcess implements CmdProcess {
     @Override
     public String getCmdName() {
         return Cmd.MGET.getCmdName();
+    }
+
+    @Override
+    public boolean isCorrectArguments(ClientCmd clientCmd) {
+        return true;
     }
 
     @Override

@@ -1,14 +1,16 @@
-package org.github.jrbase.process
+package org.github.jrbase.process.string
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.execption.ArgumentsException
+import org.github.jrbase.process.CmdProcess
+import org.github.jrbase.process.string.SetBitProcess
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.RedisDataType.STRINGS
 
-class GetBitProcessTest extends Specification {
-    CmdProcess cmdProcess = new GetBitProcess()
+class SetBitProcessTest extends Specification {
+    CmdProcess cmdProcess = new SetBitProcess()
     ClientCmd clientCmd = new ClientCmd()
 
     def "Process"() {
@@ -21,20 +23,19 @@ class GetBitProcessTest extends Specification {
         expect:
         message == cmdProcess.process(clientCmd)
         where:
-        args  | input          | message
-        ['1'] | null           | '$-1\r\n'
-        ['1'] | "a".getBytes() | ':1\r\n'
-        ['2'] | "a".getBytes() | ':1\r\n'
-        ['3'] | "a".getBytes() | ':0\r\n'
+        args       | input          | message
+        ['1', '0'] | null           | ':0\r\n'
+        ['1', '0'] | "a".getBytes() | ':1\r\n'
+        ['2', '0'] | "a".getBytes() | ':1\r\n'
+        ['3', '0'] | "a".getBytes() | ':0\r\n'
     }
-
 
     def "testArgumentsException"() {
         given:
         clientCmd.setKey("key")
         clientCmd.setArgs([] as String[])
         when:
-        cmdProcess.process(clientCmd)
+        cmdProcess.checkArguments(clientCmd)
         then:
         thrown ArgumentsException
     }
