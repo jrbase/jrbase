@@ -1,10 +1,13 @@
-package org.github.jrbase.process
+package org.github.jrbase.process.hash
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.execption.ArgumentsException
+import org.github.jrbase.process.CmdProcess
+import org.github.jrbase.process.hash.HGetProcess
 import spock.lang.Specification
 
+import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING
 import static org.github.jrbase.dataType.RedisDataType.HASHES
 
 class HGetProcessTest extends Specification {
@@ -24,7 +27,7 @@ class HGetProcessTest extends Specification {
         message == cmdProcess.process(clientCmd)
         where:
         input               | message
-        null                | '$-1\r\n'
+        null | REDIS_EMPTY_STRING
         "value1".getBytes() | '$6\r\nvalue1\r\n'
     }
 
@@ -33,7 +36,7 @@ class HGetProcessTest extends Specification {
         clientCmd.setKey("key")
         clientCmd.setArgs(["value", "error arg"] as String[])
         when:
-        cmdProcess.process(clientCmd)
+        cmdProcess.checkArguments(clientCmd)
         then:
         thrown ArgumentsException
     }
@@ -43,7 +46,7 @@ class HGetProcessTest extends Specification {
         clientCmd.setKey("key")
         clientCmd.setArgs([] as String[])
         when:
-        cmdProcess.process(clientCmd)
+        cmdProcess.checkArguments(clientCmd)
         then:
         thrown ArgumentsException
     }

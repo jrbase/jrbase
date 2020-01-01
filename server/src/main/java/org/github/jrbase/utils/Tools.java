@@ -125,4 +125,8 @@ public class Tools {
     }
 
 
+    public static boolean isEmptyBytes(byte[] bytes) {
+        return bytes == null || bytes.length == 0;
+    }
+
 }

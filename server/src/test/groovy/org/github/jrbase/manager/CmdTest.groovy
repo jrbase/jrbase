@@ -1,7 +1,7 @@
 package org.github.jrbase.manager
 
-import org.github.jrbase.dataType.ClientCmd
-import org.github.jrbase.process.SetProcess
+
+import org.github.jrbase.process.string.SetProcess
 import spock.lang.Specification
 
 class CmdTest extends Specification {
@@ -10,7 +10,7 @@ class CmdTest extends Specification {
         expect:
         input == output
         where:
-        input | output
+        input        | output
         'SetProcess' | SetProcess.getSimpleName()
     }
 

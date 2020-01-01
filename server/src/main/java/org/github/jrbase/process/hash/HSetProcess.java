@@ -1,9 +1,10 @@
-package org.github.jrbase.process;
+package org.github.jrbase.process.hash;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.execption.ArgumentsException;
+import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.utils.Tools;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
@@ -17,17 +18,22 @@ public class HSetProcess implements CmdProcess {
     }
 
     @Override
-    public String process(ClientCmd clientCmd) throws ArgumentsException {
+    public void checkArguments(ClientCmd clientCmd) throws ArgumentsException {
+        final int argsLength = clientCmd.getArgLength();
+        if (!isRightArgs(argsLength)) {
+            throw new ArgumentsException();
+        }
+    }
+
+    @Override
+    public String process(ClientCmd clientCmd) {
 
         return requestKVAndReplyClient(clientCmd);
     }
 
-    public String requestKVAndReplyClient(ClientCmd clientCmd) throws ArgumentsException {
+    public String requestKVAndReplyClient(ClientCmd clientCmd) {
         // hset key field value
-        final int argsLength = clientCmd.getArgs().length;
-        if (!isRightArgs(argsLength)) {
-            throw new ArgumentsException();
-        }
+
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         final String key = clientCmd.getKey();
@@ -40,7 +46,7 @@ public class HSetProcess implements CmdProcess {
 
         //2 put hset
         int successCount = 0;
-        for (int i = 0; i < argsLength; i = i + 2) {
+        for (int i = 0; i < clientCmd.getArgLength(); i = i + 2) {
             final String field = args[i];
             final String value = args[i + 1];
             String buildUpKey = key + "f" + field + HASHES.getAbbreviation();

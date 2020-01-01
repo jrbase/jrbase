@@ -5,17 +5,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Cmd {
+    // Keys
+    TYPE("type"),
+    // Strings
     SET("set"),
     GET("get"),
     MSET("mset"),
     MGET("mget"),
+    GETBIT("getbit"),
+    SETBIT("setbit"),
+    // Hashes
     HSET("hset"),
     HGET("hget"),
     HLEN("hlen"),
+    // Lists
+    LPUSH("lpush"),
+    LPOP("lpop"),
 
-    GETBIT("getbit"),
-    SETBIT("setbit"),
-
+    // others
     OTHER("other");
 
     final private String cmdName;
@@ -39,7 +46,5 @@ public enum Cmd {
         for (Cmd c : EnumSet.allOf(Cmd.class)) {
             lookup.put(c.getCmdName(), c);
         }
-
-
     }
 }

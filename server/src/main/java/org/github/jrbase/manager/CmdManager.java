@@ -4,7 +4,15 @@ import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.execption.ArgumentsException;
-import org.github.jrbase.process.*;
+import org.github.jrbase.process.CmdProcess;
+import org.github.jrbase.process.IgnoreProcess;
+import org.github.jrbase.process.TypeProcess;
+import org.github.jrbase.process.hash.HGetProcess;
+import org.github.jrbase.process.hash.HLenProcess;
+import org.github.jrbase.process.hash.HSetProcess;
+import org.github.jrbase.process.list.LPopProcess;
+import org.github.jrbase.process.list.LPushProcess;
+import org.github.jrbase.process.string.*;
 import org.github.jrbase.proxyRheakv.rheakv.Client;
 
 import java.util.HashMap;
@@ -32,20 +40,30 @@ public class CmdManager {
 
     static {
         client.init();
-
+        //Strings
         registerCmdProcess(Cmd.SET, new SetProcess());
         registerCmdProcess(Cmd.GET, new GetProcess());
 
         registerCmdProcess(Cmd.MSET, new MSetProcess());
         registerCmdProcess(Cmd.MGET, new MGetProcess());
 
+        registerCmdProcess(Cmd.GETBIT, new GetBitProcess());
+        registerCmdProcess(Cmd.SETBIT, new SetBitProcess());
+
+        //Hashes
         registerCmdProcess(Cmd.HSET, new HSetProcess());
         registerCmdProcess(Cmd.HGET, new HGetProcess());
         registerCmdProcess(Cmd.HLEN, new HLenProcess());
 
-        registerCmdProcess(Cmd.GETBIT, new GetBitProcess());
-        registerCmdProcess(Cmd.SETBIT, new SetBitProcess());
+        //Lists
+        registerCmdProcess(Cmd.LPUSH, new LPushProcess());
+        registerCmdProcess(Cmd.LPOP, new LPopProcess());
 
+
+        //Keys
+        registerCmdProcess(Cmd.TYPE, new TypeProcess());
+
+        //others
         registerCmdProcess(Cmd.OTHER, new IgnoreProcess());
     }
 
@@ -60,6 +78,8 @@ public class CmdManager {
 
             final RheaKVStore rheaKVStore = CmdManager.getRheaKVStore();
             clientCmd.setRheaKVStore(rheaKVStore);
+
+            cmdProcess.checkArguments(clientCmd);
 
             final String message = cmdProcess.process(clientCmd);
             clientCmd.getContext().channel().writeAndFlush(message);

@@ -1,10 +1,9 @@
 package org.github.jrbase.manager
 
 import org.github.jrbase.dataType.ClientCmd
-import org.github.jrbase.process.GetProcess
 import org.github.jrbase.process.IgnoreProcess
-import org.github.jrbase.process.SetProcess
-import org.junit.Test
+import org.github.jrbase.process.string.GetProcess
+import org.github.jrbase.process.string.SetProcess
 import spock.lang.Specification
 
 class CmdManagerTest extends Specification {
