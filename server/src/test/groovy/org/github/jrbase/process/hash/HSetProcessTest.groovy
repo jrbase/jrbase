@@ -2,7 +2,6 @@ package org.github.jrbase.process.hash
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore
 import org.github.jrbase.dataType.ClientCmd
-import org.github.jrbase.execption.ArgumentsException
 import org.github.jrbase.process.CmdProcess
 import org.github.jrbase.process.hash.HSetProcess
 import spock.lang.Specification
@@ -44,8 +43,8 @@ class HSetProcessTest extends Specification {
         clientCmd.setKey("key")
         clientCmd.setArgs(["field1", "value1", "error arg"] as String[])
         when:
-        cmdProcess.checkArguments(clientCmd)
+        def result = cmdProcess.isCorrectArguments(clientCmd)
         then:
-        thrown ArgumentsException
+        !result
     }
 }

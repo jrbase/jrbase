@@ -2,7 +2,6 @@ package org.github.jrbase.process.list
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore
 import org.github.jrbase.dataType.ClientCmd
-import org.github.jrbase.execption.ArgumentsException
 import org.github.jrbase.process.CmdProcess
 import spock.lang.Specification
 
@@ -43,9 +42,9 @@ class LPushProcessTest extends Specification {
         given:
         clientCmd.setArgs([] as String[])
         when:
-        cmdProcess.checkArguments(clientCmd)
+        def result = cmdProcess.isCorrectArguments(clientCmd)
         then:
-        thrown ArgumentsException
+        !result
     }
 
 }

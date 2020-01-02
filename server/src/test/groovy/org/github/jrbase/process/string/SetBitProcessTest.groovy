@@ -2,7 +2,6 @@ package org.github.jrbase.process.string
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore
 import org.github.jrbase.dataType.ClientCmd
-import org.github.jrbase.execption.ArgumentsException
 import org.github.jrbase.process.CmdProcess
 import org.github.jrbase.process.string.SetBitProcess
 import spock.lang.Specification
@@ -35,8 +34,8 @@ class SetBitProcessTest extends Specification {
         clientCmd.setKey("key")
         clientCmd.setArgs([] as String[])
         when:
-        cmdProcess.checkArguments(clientCmd)
+        def result = cmdProcess.isCorrectArguments(clientCmd)
         then:
-        thrown ArgumentsException
+        !result
     }
 }
