@@ -10,8 +10,7 @@ import org.github.jrbase.process.TypeProcess;
 import org.github.jrbase.process.hash.HGetProcess;
 import org.github.jrbase.process.hash.HLenProcess;
 import org.github.jrbase.process.hash.HSetProcess;
-import org.github.jrbase.process.list.LPopProcess;
-import org.github.jrbase.process.list.LPushProcess;
+import org.github.jrbase.process.list.*;
 import org.github.jrbase.process.string.*;
 import org.github.jrbase.proxyRheakv.rheakv.Client;
 
@@ -58,6 +57,9 @@ public class CmdManager {
         //Lists
         registerCmdProcess(Cmd.LPUSH, new LPushProcess());
         registerCmdProcess(Cmd.LPOP, new LPopProcess());
+        registerCmdProcess(Cmd.LRANGE, new LRangeProcess());
+        registerCmdProcess(Cmd.RPUSH, new RPushProcess());
+        registerCmdProcess(Cmd.RPOP, new RPopProcess());
 
 
         //Keys
@@ -73,28 +75,31 @@ public class CmdManager {
 
     public static void process(ClientCmd clientCmd) {
         final CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
+        if (cmdProcess == null) {
+            //TODO: test forget to register command replace next line
+            throw new RuntimeException("lack register command: " + clientCmd.getCmd());
+        }
         // check key
         final boolean correctKey = isCorrectKey(clientCmd.getKey());
-        if (correctKey) {
+        if (!correctKey) {
             sendWrongArgumentMessage(clientCmd);
             return;
         }
         // check arguments
         final boolean correctArguments = cmdProcess.isCorrectArguments(clientCmd);
-        if (correctArguments) {
+        if (!correctArguments) {
             sendWrongArgumentMessage(clientCmd);
             return;
         }
 
         final RheaKVStore rheaKVStore = CmdManager.getRheaKVStore();
         clientCmd.setRheaKVStore(rheaKVStore);
-
         final String message = cmdProcess.process(clientCmd);
-        clientCmd.getContext().channel().writeAndFlush(message);
+        clientCmd.getChannel().writeAndFlush(message);
     }
 
-    private static void sendWrongArgumentMessage(ClientCmd clientCmd) {
-        final Channel channel = clientCmd.getContext().channel();
+    static void sendWrongArgumentMessage(ClientCmd clientCmd) {
+        final Channel channel = clientCmd.getChannel();
         channel.writeAndFlush("-ERR wrong number of arguments for '" + clientCmd.getCmd() + "' command\r\n");
     }
 

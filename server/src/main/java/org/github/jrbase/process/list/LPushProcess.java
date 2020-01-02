@@ -7,8 +7,11 @@ import org.github.jrbase.process.CmdProcess;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
+import static org.github.jrbase.dataType.CommonMessage.REDIS_LIST_DELIMITER;
 import static org.github.jrbase.dataType.RedisDataType.LISTS;
 import static org.github.jrbase.utils.Tools.isEmptyBytes;
+import static org.github.jrbase.utils.ToolsString.getLeftBuildUpArgsValue;
+import static org.github.jrbase.utils.ToolsString.getLeftBuildUpValue;
 
 
 public class LPushProcess implements CmdProcess {
@@ -38,44 +41,21 @@ public class LPushProcess implements CmdProcess {
         final byte[] bGetResult = rheaKVStore.bGet(buildUpKey);
         if (isEmptyBytes(bGetResult)) {
             //only set
-            String buildUpValue = getBuildUpArgsValue(clientCmd);
+            StringBuilder buildUpValue = getLeftBuildUpArgsValue(clientCmd.getArgs());
             //bPut
-            rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue));
+            rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue.toString()));
             return (":" + clientCmd.getArgLength() + "\r\n");
         } else {     // update list values
             final String resultStr = readUtf8(bGetResult);
-            final String[] valueArr = resultStr.split(",");
-            String buildUpValue = getBuildUpValue(clientCmd, valueArr);
+            final String[] getValueArr = resultStr.split(REDIS_LIST_DELIMITER);
+            String buildUpValue = getLeftBuildUpValue(clientCmd.getArgs(), getValueArr);
             //bPut
             rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue));
-            int allListLength = valueArr.length + clientCmd.getArgLength();
+            int allListLength = getValueArr.length + clientCmd.getArgLength();
             return (":" + allListLength + "\r\n");
         }
     }
 
-    private String getBuildUpArgsValue(ClientCmd clientCmd) {
-        StringBuilder buildUpValue = new StringBuilder();
-        for (String arg : clientCmd.getArgs()) {
-            buildUpValue.append(arg).append(",");
-        }
-        if (buildUpValue.length() != 0) {
-            buildUpValue.deleteCharAt(buildUpValue.length() - 1);
-        }
-        return buildUpValue.toString();
-    }
 
-    public static String getBuildUpValue(ClientCmd clientCmd, String[] valueArr) {
-        StringBuilder buildUpValue = new StringBuilder();
-        for (String s : valueArr) {
-            buildUpValue.append(s).append(",");
-        }
-        for (String arg : clientCmd.getArgs()) {
-            buildUpValue.append(arg).append(",");
-        }
-        if (buildUpValue.length() != 0) {
-            buildUpValue.deleteCharAt(buildUpValue.length() - 1);
-        }
-        return buildUpValue.toString();
-    }
 
 }

@@ -21,6 +21,9 @@ public enum Cmd {
     // Lists
     LPUSH("lpush"),
     LPOP("lpop"),
+    LRANGE("lrange"),
+    RPUSH("rpush"),
+    RPOP("rpop"),
 
     // others
     OTHER("other");

@@ -10,6 +10,7 @@ public class CmdHandler {
 
 
     public void handleMsg(ChannelHandlerContext ctx, String message) {
+
         final ClientCmd clientCmd = parseMessage(message);
         //1. connect
         if (clientCmd.getCmd().isEmpty()) {
@@ -19,7 +20,7 @@ public class CmdHandler {
         } else if ("ping".equals(clientCmd.getCmd())) {
             replyInfoToClient(ctx, "PONG");
         } else {
-            clientCmd.setContext(ctx);
+            clientCmd.setChannel(ctx.channel());
             CmdManager.process(clientCmd);
         }
 
@@ -27,15 +28,13 @@ public class CmdHandler {
 
     public ClientCmd parseMessage(String message) {
         final String[] arr = message.split("\r\n");
-
-        return translateClientCmd(arr);
-
+        return parseMessageToClientCmd(arr);
     }
 
     //             key   value
     // 0  1  2  3  4  5  6
     //*3 $3 set $1 a $1  b
-    public ClientCmd translateClientCmd(String[] arr) {
+    public ClientCmd parseMessageToClientCmd(String[] arr) {
         ClientCmd clientCmd = new ClientCmd();
         clientCmd.setCmd("");
         clientCmd.setKey("");

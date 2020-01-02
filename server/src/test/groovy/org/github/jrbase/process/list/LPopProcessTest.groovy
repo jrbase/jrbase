@@ -3,6 +3,7 @@ package org.github.jrbase.process.list
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.CmdProcess
+import org.github.jrbase.utils.ToolsString
 import spock.lang.Specification
 
 import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8
@@ -28,7 +29,7 @@ class LPopProcessTest extends Specification {
         if (!isEmptyBytes(input)) {
             final String resultStr = readUtf8(input)
             final String[] valueArr = resultStr.split(",")
-            String buildUpValue = LPopProcess.getBuildUpValue(valueArr)
+            String buildUpValue = ToolsString.getLPopBuildUpValue(valueArr)
             rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue))
         }
         expect:

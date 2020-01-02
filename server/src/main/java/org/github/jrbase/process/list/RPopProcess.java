@@ -11,14 +11,14 @@ import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING;
 import static org.github.jrbase.dataType.CommonMessage.REDIS_LIST_DELIMITER;
 import static org.github.jrbase.dataType.RedisDataType.LISTS;
 import static org.github.jrbase.utils.Tools.isEmptyBytes;
-import static org.github.jrbase.utils.ToolsString.getLPopBuildUpValue;
+import static org.github.jrbase.utils.ToolsString.getRPopBuildUpValue;
 
 
-public class LPopProcess implements CmdProcess {
+public class RPopProcess implements CmdProcess {
 
     @Override
     public String getCmdName() {
-        return Cmd.LPOP.getCmdName();
+        return Cmd.RPOP.getCmdName();
     }
 
     @Override
@@ -31,7 +31,7 @@ public class LPopProcess implements CmdProcess {
         return requestKVAndReplyClient(clientCmd);
     }
 
-
+    // a b c d
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
 
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
@@ -44,12 +44,12 @@ public class LPopProcess implements CmdProcess {
         } else {
             final String resultStr = readUtf8(bGetResult);
             final String[] getValueArr = resultStr.split(REDIS_LIST_DELIMITER);
-            String buildUpValue = getLPopBuildUpValue(getValueArr);
+            String buildUpValue = getRPopBuildUpValue(getValueArr);
             //bPut
             rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue));
             // return left first value
-            final String lPopValue = getValueArr[0];
-            return ("$" + lPopValue.length() + "\r\n" + lPopValue + "\r\n");
+            final String rPopValue = getValueArr[getValueArr.length - 1];
+            return ("$" + rPopValue.length() + "\r\n" + rPopValue + "\r\n");
         }
     }
 

@@ -7,23 +7,23 @@ import org.github.jrbase.process.CmdProcess;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
-import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING;
 import static org.github.jrbase.dataType.CommonMessage.REDIS_LIST_DELIMITER;
 import static org.github.jrbase.dataType.RedisDataType.LISTS;
 import static org.github.jrbase.utils.Tools.isEmptyBytes;
-import static org.github.jrbase.utils.ToolsString.getLPopBuildUpValue;
+import static org.github.jrbase.utils.ToolsString.getRightBuildUpArgsValue;
+import static org.github.jrbase.utils.ToolsString.getRightBuildUpValue;
 
 
-public class LPopProcess implements CmdProcess {
+public class RPushProcess implements CmdProcess {
 
     @Override
     public String getCmdName() {
-        return Cmd.LPOP.getCmdName();
+        return Cmd.RPUSH.getCmdName();
     }
 
     @Override
     public boolean isCorrectArguments(ClientCmd clientCmd) {
-        return true;
+        return clientCmd.getArgLength() >= 1;
     }
 
     @Override
@@ -40,17 +40,21 @@ public class LPopProcess implements CmdProcess {
         //bGet
         final byte[] bGetResult = rheaKVStore.bGet(buildUpKey);
         if (isEmptyBytes(bGetResult)) {
-            return REDIS_EMPTY_STRING;
-        } else {
+            //only set
+            StringBuilder buildUpValue = getRightBuildUpArgsValue(clientCmd.getArgs());
+            //bPut
+            rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue.toString()));
+            return (":" + clientCmd.getArgLength() + "\r\n");
+        } else {     // update list values
             final String resultStr = readUtf8(bGetResult);
             final String[] getValueArr = resultStr.split(REDIS_LIST_DELIMITER);
-            String buildUpValue = getLPopBuildUpValue(getValueArr);
+            String buildUpValue = getRightBuildUpValue(clientCmd.getArgs(), getValueArr);
             //bPut
             rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue));
-            // return left first value
-            final String lPopValue = getValueArr[0];
-            return ("$" + lPopValue.length() + "\r\n" + lPopValue + "\r\n");
+            int allListLength = getValueArr.length + clientCmd.getArgLength();
+            return (":" + allListLength + "\r\n");
         }
     }
+
 
 }
