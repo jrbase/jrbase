@@ -45,6 +45,10 @@ public enum Cmd {
 
     private static final Map<String, Cmd> lookup = new HashMap<>();
 
+    public static Map<String, Cmd> getLookup() {
+        return lookup;
+    }
+
     static {
         for (Cmd c : EnumSet.allOf(Cmd.class)) {
             lookup.put(c.getCmdName(), c);

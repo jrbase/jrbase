@@ -25,20 +25,27 @@ public class CmdManager {
     private CmdManager() {
     }
 
-    private final static Client client = new Client();
+    private static Client client = null;
 
     public static Client getClient() {
+        if (client == null) {
+            client = new Client();
+            client.init();
+        }
         return client;
     }
 
     public static RheaKVStore getRheaKVStore() {
-        return client.getRheaKVStore();
+        return getClient().getRheaKVStore();
     }
 
     private static Map<Cmd, CmdProcess> cmdProcessManager = new HashMap<>();
 
+    public static Map<Cmd, CmdProcess> getCmdProcessManager() {
+        return cmdProcessManager;
+    }
+
     static {
-        client.init();
         //Strings
         registerCmdProcess(Cmd.SET, new SetProcess());
         registerCmdProcess(Cmd.GET, new GetProcess());
@@ -76,7 +83,7 @@ public class CmdManager {
     public static void process(ClientCmd clientCmd) {
         final CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
         if (cmdProcess == null) {
-            //TODO: test forget to register command replace next line
+            shutdown();
             throw new RuntimeException("lack register command: " + clientCmd.getCmd());
         }
         // check key
@@ -107,6 +114,8 @@ public class CmdManager {
     }
 
     public static void shutdown() {
-        client.shutdown();
+        if (client != null) {
+            client.shutdown();
+        }
     }
 }

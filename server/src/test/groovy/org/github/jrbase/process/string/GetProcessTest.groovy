@@ -9,7 +9,6 @@ import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING
 import static org.github.jrbase.dataType.RedisDataType.STRINGS
 
 class GetProcessTest extends Specification {
-    //TODO: test GetProcess --learn groovy test
 
     //get a = b
     def "Process"() {
