@@ -1,12 +1,14 @@
 package org.github.jrbase.manager
 
-
+import com.alipay.sofa.jraft.rhea.client.RheaKVStore
 import io.netty.channel.Channel
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.IgnoreProcess
 import org.github.jrbase.process.string.GetProcess
 import org.github.jrbase.process.string.SetProcess
 import spock.lang.Specification
+
+import static org.github.jrbase.dataType.RedisDataType.STRINGS
 
 class CmdManagerTest extends Specification {
 
@@ -27,6 +29,11 @@ class CmdManagerTest extends Specification {
         given:
         ClientCmd clientCmd = new ClientCmd("get")
         clientCmd.setKey("key")
+        final RheaKVStore rheaKVStore = Mock()
+        clientCmd.setRheaKVStore(rheaKVStore)
+        String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation()
+        rheaKVStore.bGet(buildUpKey) >> null
+
         Channel channel = Mock()
         channel.writeAndFlush("\$-1\r\n")
         clientCmd.setChannel(channel)

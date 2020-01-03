@@ -92,8 +92,6 @@ public class CmdManager {
             return;
         }
 
-        final RheaKVStore rheaKVStore = CmdManager.getRheaKVStore();
-        clientCmd.setRheaKVStore(rheaKVStore);
         final String message = cmdProcess.process(clientCmd);
         clientCmd.getChannel().writeAndFlush(message);
     }

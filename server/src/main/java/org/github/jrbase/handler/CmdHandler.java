@@ -1,5 +1,6 @@
 package org.github.jrbase.handler;
 
+import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.ChannelHandlerContext;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.manager.CmdManager;
@@ -21,6 +22,8 @@ public class CmdHandler {
             replyInfoToClient(ctx, "PONG");
         } else {
             clientCmd.setChannel(ctx.channel());
+            final RheaKVStore rheaKVStore = CmdManager.getRheaKVStore();
+            clientCmd.setRheaKVStore(rheaKVStore);
             CmdManager.process(clientCmd);
         }
 
