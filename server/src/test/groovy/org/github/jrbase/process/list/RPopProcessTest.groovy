@@ -14,8 +14,8 @@ import static org.github.jrbase.dataType.RedisDataType.LISTS
 import static org.github.jrbase.utils.Tools.isEmptyBytes
 import static org.github.jrbase.utils.ToolsString.toRedisListDelimiter
 
-class LPopProcessTest extends Specification {
-    private CmdProcess cmdProcess = new LPopProcess()
+class RPopProcessTest extends Specification {
+    private CmdProcess cmdProcess = new RPopProcess()
     private ClientCmd clientCmd = new ClientCmd()
 
     def setup() {
@@ -41,8 +41,8 @@ class LPopProcessTest extends Specification {
         null                                       | REDIS_EMPTY_STRING
         "".getBytes()                              | REDIS_EMPTY_STRING
         "a".getBytes()                             | '$1\r\na\r\n'
-        toRedisListDelimiter("aa,b").getBytes()    | '$2\r\naa\r\n'
-        toRedisListDelimiter("abc,b,c").getBytes() | '$3\r\nabc\r\n'
+        toRedisListDelimiter("aa,b").getBytes()    | '$1\r\nb\r\n'
+        toRedisListDelimiter("abc,b,c").getBytes() | '$1\r\nc\r\n'
     }
 
 }

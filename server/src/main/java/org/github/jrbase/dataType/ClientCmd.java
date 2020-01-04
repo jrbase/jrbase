@@ -52,7 +52,11 @@ public class ClientCmd {
     }
 
     public void setCmd(String cmd) {
-        this.cmd = cmd;
+        if (cmd != null) {
+            this.cmd = cmd.toLowerCase();
+        } else {
+            this.cmd = null;
+        }
     }
 
     public String getKey() {

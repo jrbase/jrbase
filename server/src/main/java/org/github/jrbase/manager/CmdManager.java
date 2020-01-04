@@ -11,6 +11,8 @@ import org.github.jrbase.process.hash.HGetProcess;
 import org.github.jrbase.process.hash.HLenProcess;
 import org.github.jrbase.process.hash.HSetProcess;
 import org.github.jrbase.process.list.*;
+import org.github.jrbase.process.sets.SAddProcess;
+import org.github.jrbase.process.sets.SPopProcess;
 import org.github.jrbase.process.string.*;
 import org.github.jrbase.proxyRheakv.rheakv.Client;
 
@@ -67,6 +69,10 @@ public class CmdManager {
         registerCmdProcess(Cmd.LRANGE, new LRangeProcess());
         registerCmdProcess(Cmd.RPUSH, new RPushProcess());
         registerCmdProcess(Cmd.RPOP, new RPopProcess());
+
+        //Sets
+        registerCmdProcess(Cmd.SADD, new SAddProcess());
+        registerCmdProcess(Cmd.SPOP, new SPopProcess());
 
 
         //Keys

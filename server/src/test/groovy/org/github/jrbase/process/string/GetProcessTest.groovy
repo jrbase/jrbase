@@ -15,7 +15,7 @@ class GetProcessTest extends Specification {
         given:
         CmdProcess cmdProcess = new GetProcess()
         ClientCmd clientCmd = new ClientCmd()
-        clientCmd.setKey("a") // the is import, "a" must same as  clientCmd.getKey() in process: rheaKVStore.bGet(clientCmd.getKey())
+        clientCmd.setKey("a") // the is import, "a" must same as clientCmd.getKey() in process: rheaKVStore.bGet(clientCmd.getKey())
         RheaKVStore rheaKVStore = Mock()
         clientCmd.setRheaKVStore(rheaKVStore)
         String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation()
@@ -24,7 +24,7 @@ class GetProcessTest extends Specification {
         message == cmdProcess.process(clientCmd)
         where:
         input          | message
-        null | REDIS_EMPTY_STRING
+        null           | REDIS_EMPTY_STRING
         "a".getBytes() | '$1\r\na\r\n'
     }
 

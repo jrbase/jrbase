@@ -7,6 +7,7 @@ import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_LIST
 import static org.github.jrbase.dataType.RedisDataType.LISTS
+import static org.github.jrbase.utils.ToolsString.toRedisListDelimiter
 
 class LRangeProcessTest extends Specification {
 
@@ -32,7 +33,7 @@ class LRangeProcessTest extends Specification {
         ["0", "-1"] | null                 | REDIS_EMPTY_LIST
         ["0", "-1"] | "".getBytes()        | REDIS_EMPTY_LIST
         ["0", "-1"] | "a".getBytes()       | '*1\r\n$1\r\na\r\n'
-        ["0", "-1"] | "aa,b".getBytes()    | '*2\r\n$2\r\naa\r\n$1\r\nb\r\n'
+        ["0", "-1"] | toRedisListDelimiter("aa,b").getBytes() | '*2\r\n$2\r\naa\r\n$1\r\nb\r\n'
     }
 
 

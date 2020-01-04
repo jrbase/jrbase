@@ -24,6 +24,9 @@ public enum Cmd {
     LRANGE("lrange"),
     RPUSH("rpush"),
     RPOP("rpop"),
+    //Sets
+    SADD("sadd"),
+    SPOP("spop"),
 
     // others
     OTHER("other");

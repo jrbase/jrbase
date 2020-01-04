@@ -3,28 +3,75 @@ package org.github.jrbase.handler;
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.ChannelHandlerContext;
 import org.github.jrbase.dataType.ClientCmd;
+import org.github.jrbase.dataType.RedisClientContext;
+import org.github.jrbase.handler.connect.Command1Handler;
+import org.github.jrbase.handler.connect.EchoHandler;
+import org.github.jrbase.handler.connect.PingHandler;
 import org.github.jrbase.manager.CmdManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CmdHandler {
 
     private static final String REPLY_OK = "OK";
+    //TODO: read config file from local system
+    private boolean requirepass = false;
+    private String redisPassword = "123456";
 
+    // save session login status to HashMap<ChannelHandlerContext, RedisClientContext>
+    private Map<ChannelHandlerContext, RedisClientContext> clientContext = new HashMap<>();
+
+    private static final Map<String, ServerCmdHandler> serverCmdHandlerMap = new HashMap<>();
+
+    public CmdHandler() {
+        initHandlerMap();
+    }
+
+    private void initHandlerMap() {
+        serverCmdHandlerMap.put("echo", new EchoHandler());
+        serverCmdHandlerMap.put("ping", new PingHandler());
+        serverCmdHandlerMap.put("command", new Command1Handler());
+    }
 
     public void handleMsg(ChannelHandlerContext ctx, String message) {
 
         final ClientCmd clientCmd = parseMessage(message);
         //1. connect
+        //TODO:  handleAuth();
+        if (requirepass) {
+            final RedisClientContext redisClientContext = clientContext.get(ctx);
+            if (!redisClientContext.isLogin()) {
+                if ("auth".equals(clientCmd.getCmd())) {
+                    String password = clientCmd.getKey();
+                    if (password.equals(redisPassword)) {
+                        redisClientContext.setLogin(true);
+                        replyInfoToClient(ctx, REPLY_OK);
+                    } else {
+                        replyErrorToClient(ctx, "ERR invalid password");
+                    }
+                } else {
+                    replyInfoToClient(ctx, "NOAUTH Authentication required.");
+                }
+                return;
+            }
+        }
+
         if (clientCmd.getCmd().isEmpty()) {
             replyErrorToClient(ctx, "empty command");
-        } else if ("COMMAND".equals(clientCmd.getCmd())) {
-            replyInfoToClient(ctx, REPLY_OK);
-        } else if ("ping".equals(clientCmd.getCmd())) {
-            replyInfoToClient(ctx, "PONG");
         } else {
-            clientCmd.setChannel(ctx.channel());
-            final RheaKVStore rheaKVStore = CmdManager.getRheaKVStore();
-            clientCmd.setRheaKVStore(rheaKVStore);
-            CmdManager.process(clientCmd);
+            final ServerCmdHandler serverCmdHandler = serverCmdHandlerMap.get(clientCmd.getCmd());
+            if (serverCmdHandler != null) {
+                //handle server command
+                final String cmdHandlerResult = serverCmdHandler.handle(clientCmd);
+                ctx.channel().writeAndFlush(cmdHandlerResult);
+            } else {
+                //handle data command
+                clientCmd.setChannel(ctx.channel());
+                final RheaKVStore rheaKVStore = CmdManager.getRheaKVStore();
+                clientCmd.setRheaKVStore(rheaKVStore);
+                CmdManager.process(clientCmd);
+            }
         }
 
     }

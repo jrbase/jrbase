@@ -8,8 +8,8 @@ import spock.lang.Specification
 import static org.github.jrbase.dataType.RedisDataType.LISTS
 import static org.github.jrbase.utils.ToolsString.toRedisListDelimiter
 
-class LPushProcessTest extends Specification {
-    private CmdProcess cmdProcess = new LPushProcess()
+class RPushProcessTest extends Specification {
+    private CmdProcess cmdProcess = new RPushProcess()
     private ClientCmd clientCmd = new ClientCmd()
 
     def setup() {
@@ -30,11 +30,11 @@ class LPushProcessTest extends Specification {
         expect:
         message == cmdProcess.process(clientCmd)
         where:
-        args       | input            | message
-        ["a"]      | null             | ':1\r\n'
-        ["a", "b"] | null             | ':2\r\n'
-        ["a", "b"] | "".getBytes()    | ':2\r\n'
-        ["a", "b"] | "a".getBytes()   | ':3\r\n'
+        args       | input                                  | message
+        ["a"]      | null                                   | ':1\r\n'
+        ["a", "b"] | null                                   | ':2\r\n'
+        ["a", "b"] | "".getBytes()                          | ':2\r\n'
+        ["a", "b"] | "a".getBytes()                         | ':3\r\n'
         ["a", "b"] | toRedisListDelimiter("a,b").getBytes() | ':4\r\n'
     }
 

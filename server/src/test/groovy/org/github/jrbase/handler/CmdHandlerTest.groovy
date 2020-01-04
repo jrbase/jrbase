@@ -16,7 +16,7 @@ class CmdHandlerTest extends Specification {
 
         where:
         input   | output
-        command | 'COMMAND'
+        command | 'command'
         setCmd  | 'set'
     }
 

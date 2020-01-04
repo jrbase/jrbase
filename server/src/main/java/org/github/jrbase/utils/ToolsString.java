@@ -93,4 +93,16 @@ public class ToolsString {
         }
         return buildUpValue.toString();
     }
+
+    public static String toRedisListDelimiter(String str) {
+        StringBuilder result = new StringBuilder();
+        final String[] split = str.split(",");
+        for (String s : split) {
+            result.append(s).append(REDIS_LIST_DELIMITER);
+        }
+        if (result.length() == 0) {
+            result.deleteCharAt(result.length() - 1);
+        }
+        return result.toString();
+    }
 }

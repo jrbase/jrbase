@@ -1,0 +1,65 @@
+package org.github.jrbase.process.sets
+
+import com.alipay.sofa.jraft.rhea.client.RheaKVStore
+import org.github.jrbase.dataType.ClientCmd
+import org.github.jrbase.process.CmdProcess
+import spock.lang.Specification
+
+import static org.github.jrbase.dataType.RedisDataType.SETS
+import static org.github.jrbase.utils.ToolsString.toRedisListDelimiter
+
+class SPopProcessTest extends Specification {
+    private CmdProcess cmdProcess = new SPopProcess()
+    private ClientCmd clientCmd = new ClientCmd()
+
+    def setup() {
+        clientCmd.setKey("a")
+    }
+
+    def cleanup() {
+    }
+
+    def "processErrorData"() {
+        given:
+        clientCmd.setArgs(args as String[])
+        RheaKVStore rheaKVStore = Mock()
+        clientCmd.setRheaKVStore(rheaKVStore)
+        String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation()
+        //
+        rheaKVStore.bGet(buildUpKey) >> originValue
+        expect:
+        message == cmdProcess.process(clientCmd)
+        where:
+        args       | originValue                              | message
+        ["1", "2"] | "c".getBytes()                           | '-ERR syntax error\r\n'
+        []         | "c".getBytes()                           | '*1\r\n$1\r\nc\r\n'
+        ["a"]      | toRedisListDelimiter("a,b,c").getBytes() | '-ERR value is not an integer or out of range\r\n'
+    }
+
+    def "processData"() {
+        given:
+        clientCmd.setArgs(args as String[])
+        RheaKVStore rheaKVStore = Mock()
+        clientCmd.setRheaKVStore(rheaKVStore)
+        String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation()
+        //
+        rheaKVStore.bGet(buildUpKey) >> originValue
+        expect:
+        message == cmdProcess.process(clientCmd)
+        where:
+        args   | originValue                              | message
+        ["3"]  | toRedisListDelimiter("a,b,c").getBytes() | '*3\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nc\r\n'
+        ["10"] | toRedisListDelimiter("a,b,c").getBytes() | '*3\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nc\r\n'
+    }
+    //process data
+
+
+    def "testArgumentsException"() {
+        given:
+        clientCmd.setArgs([] as String[])
+        when:
+        def result = cmdProcess.isCorrectArguments(clientCmd)
+        then:
+        result
+    }
+}
