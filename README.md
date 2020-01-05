@@ -102,11 +102,11 @@ Sorted Sets
 |  command    |    supported            |               format                          
 |             |(Y=yes,N=no, D=doing)    |                                               
 +-------------+-------------------------+-------------------------------------------------
-|    sadd     |           D             | sadd key member [member ...]        
+|    sadd     |           Y             | sadd key member [member ...]        
 +-------------+-------------------------+-------------------------------------------------
-|    spop     |                         | spop key [count]                  
+|    spop     |           Y             | spop key [count]                  
 +-------------+-------------------------+-------------------------------------------------
-|  scard      |                         | hget key                   
+|  scard      |           Y             | hget key                   
 +-------------+-------------------------+-------------------------------------------------
 | smembers    |                         | smembers key                   
 +-------------+-------------------------+-------------------------------------------------
@@ -144,7 +144,7 @@ Geo
 +-------------+-------------------------+-------------------------------------------------
 | georadius   |                         | georadius key longitude latitude radius m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [ASC|DESC] [STORE key] [STOREDIST key]         
 +-------------+-------------------------+-------------------------------------------------
-|georadiusbymember|                     | georadiusbymember key member radius m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [ASC|DESC] [STORE key] [STOREDIST key]
+| georadiusbymember |                   | georadiusbymember key member radius m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] [ASC|DESC] [STORE key] [STOREDIST key]
 +-------------+-------------------------+-------------------------------------------------
 
 
@@ -168,9 +168,9 @@ connection
 |  command    |    supported            |               format                          
 |             |(Y=yes,N=no, D=doing)    |                                               
 +-------------+-------------------------+-------------------------------------------------
-|   auth      |          D              |     auth password             
+|   auth      |           Y             |     auth password             
 +-------------+-------------------------+-------------------------------------------------
-|   echo      |                         |     echo message       | Bulk string reply     
+|   echo      |           Y             |     echo message       | Bulk string reply     
 +-------------+-------------------------+-------------------------------------------------
 |   ping      |           Y             |     ping [message]             
 +-------------+-------------------------+-------------------------------------------------
@@ -189,11 +189,11 @@ Server
 +-------------+-------------------------+-------------------------------------------------
 |   flushall  |                         |     flushall [async]            |  Simple string reply
 +-------------+-------------------------+-------------------------------------------------
-|   flushdb  |                         |     flushdb [async]            |  Simple string reply
+|   flushdb   |                         |     flushdb [async]             |  Simple string reply
 +-------------+-------------------------+-------------------------------------------------
 |   info      |                         |     info [section]              |  Bulk string reply
 +-------------+-------------------------+-------------------------------------------------
-|   command   |                         |     command           
+|   command   |                         |     command -          
 +-------------+-------------------------+-------------------------------------------------
 |   command   |                         |     command  count         
 +-------------+-------------------------+-------------------------------------------------

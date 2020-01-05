@@ -6,6 +6,7 @@ import org.github.jrbase.process.CmdProcess
 import org.github.jrbase.process.hash.HLenProcess
 import spock.lang.Specification
 
+import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
 import static org.github.jrbase.dataType.RedisDataType.HASHES
 
 class HLenProcessTest extends Specification {
@@ -25,7 +26,7 @@ class HLenProcessTest extends Specification {
         key | result       | message
         "a" | [0, 0, 0, 1] | ':1\r\n'
         "a" | [0, 0, 0, 2] | ':2\r\n'
-        "a" | null         | ':0\r\n'
+        "a" | null | REDIS_ZORE_INTEGER
 
     }
 }

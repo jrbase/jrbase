@@ -75,4 +75,17 @@ class ToolsStringTest extends Specification {
         "e"    | ["e", "f"]
         "e,f"  | ["e", "f", "g"]
     }
+
+
+    def "toRedisListDelimiter"() {
+        expect:
+        result == ToolsString.toRedisListDelimiter(originValue)
+        where:
+        result  | originValue
+        ""      | ""
+        "a"     | "a"
+        "a,b"   | "a,b"
+        "a,b,c" | "a,b,c"
+    }
+
 }

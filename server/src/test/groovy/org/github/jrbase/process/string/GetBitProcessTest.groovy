@@ -7,6 +7,7 @@ import org.github.jrbase.process.string.GetBitProcess
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING
+import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
 import static org.github.jrbase.dataType.RedisDataType.STRINGS
 
 class GetBitProcessTest extends Specification {
@@ -27,7 +28,7 @@ class GetBitProcessTest extends Specification {
         ['1'] | null  | REDIS_EMPTY_STRING
         ['1'] | "a".getBytes() | ':1\r\n'
         ['2'] | "a".getBytes() | ':1\r\n'
-        ['3'] | "a".getBytes() | ':0\r\n'
+        ['3'] | "a".getBytes() | REDIS_ZORE_INTEGER
     }
 
 

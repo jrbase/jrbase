@@ -10,7 +10,7 @@ public class EchoHandler implements ServerCmdHandler {
         StringBuilder result = new StringBuilder();
         final String echoMessage = clientCmd.getKey();
         if (echoMessage.isEmpty()) {
-            result.append("-ERR wrong number of arguments for '").append(clientCmd.getCmd()).append("' command\r\n");
+            result.append("-ERR wrong number of arguments for 'echo' command\r\n");
         } else {
             result.append("$").append(echoMessage.length()).append("\r\n").append(echoMessage).append("\r\n");
         }

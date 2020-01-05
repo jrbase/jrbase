@@ -4,7 +4,7 @@ import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.ChannelHandlerContext;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisClientContext;
-import org.github.jrbase.handler.connect.Command1Handler;
+import org.github.jrbase.handler.connect.CommandHandler;
 import org.github.jrbase.handler.connect.EchoHandler;
 import org.github.jrbase.handler.connect.PingHandler;
 import org.github.jrbase.manager.CmdManager;
@@ -31,7 +31,7 @@ public class CmdHandler {
     private void initHandlerMap() {
         serverCmdHandlerMap.put("echo", new EchoHandler());
         serverCmdHandlerMap.put("ping", new PingHandler());
-        serverCmdHandlerMap.put("command", new Command1Handler());
+        serverCmdHandlerMap.put("command", new CommandHandler());
     }
 
     public void handleMsg(ChannelHandlerContext ctx, String message) {
@@ -96,17 +96,21 @@ public class CmdHandler {
             if (isHaveKey(arr.length)) {
                 clientCmd.setKey(arr[4]);
                 if (isHaveArgs(arr.length)) {
-                    final int argsCount = (arr.length + 1 - 6) / 2;
-                    String[] args = new String[argsCount];
-                    int count = 0;
-                    for (int i = 6; i < arr.length; i = i + 2) {
-                        args[count++] = arr[i];
-                    }
-                    clientCmd.setArgs(args);
+                    setArgs(arr, clientCmd);
                 }
             }
         }
         return clientCmd;
+    }
+
+    private void setArgs(String[] arr, ClientCmd clientCmd) {
+        final int argsCount = (arr.length + 1 - 6) / 2;
+        String[] args = new String[argsCount];
+        int count = 0;
+        for (int i = 6; i < arr.length; i = i + 2) {
+            args[count++] = arr[i];
+        }
+        clientCmd.setArgs(args);
     }
 
     private boolean isHaveCmd(int length) {

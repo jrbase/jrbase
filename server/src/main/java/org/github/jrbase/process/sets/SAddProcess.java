@@ -14,6 +14,7 @@ import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 import static org.github.jrbase.dataType.CommonMessage.REDIS_LIST_DELIMITER;
 import static org.github.jrbase.dataType.RedisDataType.SETS;
 import static org.github.jrbase.utils.Tools.isEmptyBytes;
+import static org.github.jrbase.utils.ToolsString.deleteLastChar;
 
 
 public class SAddProcess implements CmdProcess {
@@ -25,7 +26,7 @@ public class SAddProcess implements CmdProcess {
 
     @Override
     public boolean isCorrectArguments(ClientCmd clientCmd) {
-        return clientCmd.getArgLength() > 1;
+        return clientCmd.getArgLength() > 0;
     }
 
     @Override
@@ -38,30 +39,33 @@ public class SAddProcess implements CmdProcess {
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation();
+        final byte[] bytes = rheaKVStore.bGet(buildUpKey);
+
         final String[] args = clientCmd.getArgs();
         Set<String> argsMembers = new HashSet<>(Arrays.asList(args));
 
-        final byte[] bytes = rheaKVStore.bGet(buildUpKey);
         if (isEmptyBytes(bytes)) {
+            updateData(rheaKVStore, buildUpKey, argsMembers);
             return (":" + argsMembers.size() + "\r\n");
         } else {
             final String bGetSetsResult = readUtf8(bytes);
             final String[] getValueArr = bGetSetsResult.split(REDIS_LIST_DELIMITER);
-            StringBuilder saddResult = new StringBuilder();
             Set<String> bGetMembers = new HashSet<>(Arrays.asList(getValueArr));
             argsMembers.addAll(bGetMembers);
-            for (String member : argsMembers) {
-                saddResult.append(member).append(REDIS_LIST_DELIMITER);
-            }
-            if (saddResult.length() != 0) {
-                saddResult.deleteCharAt(saddResult.length() - 1);
-            }
-            rheaKVStore.bPut(buildUpKey, writeUtf8(saddResult.toString()));
-
+            updateData(rheaKVStore, buildUpKey, argsMembers);
             int finalCount = argsMembers.size() - bGetMembers.size();
             return (":" + finalCount + "\r\n");
         }
 
+    }
+
+    private void updateData(RheaKVStore rheaKVStore, String buildUpKey, Set<String> argsMembers) {
+        StringBuilder saddResult = new StringBuilder();
+        for (String member : argsMembers) {
+            saddResult.append(member).append(REDIS_LIST_DELIMITER);
+        }
+        deleteLastChar(saddResult);
+        rheaKVStore.bPut(buildUpKey, writeUtf8(saddResult.toString()));
     }
 
 

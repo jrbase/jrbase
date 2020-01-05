@@ -6,6 +6,7 @@ import org.github.jrbase.process.CmdProcess
 import spock.lang.Specification
 
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8
+import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
 import static org.github.jrbase.dataType.RedisDataType.STRINGS
 
 class SetProcessTest extends Specification {
@@ -28,7 +29,7 @@ class SetProcessTest extends Specification {
         input          | args      | message
 
         null           | ["value"] | ':1\r\n'
-        'a'.getBytes() | ["value"] | ':0\r\n'
+        'a'.getBytes() | ["value"] | REDIS_ZORE_INTEGER
     }
 
 

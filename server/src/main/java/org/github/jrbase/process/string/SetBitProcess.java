@@ -6,6 +6,7 @@ import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.utils.Tools;
 
+import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER;
 import static org.github.jrbase.dataType.RedisDataType.STRINGS;
 import static org.github.jrbase.utils.Tools.checkArgs;
 import static org.github.jrbase.utils.Tools.isEmptyBytes;
@@ -36,7 +37,7 @@ public class SetBitProcess implements CmdProcess {
         String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation();
         final byte[] bytes = rheaKVStore.bGet(buildUpKey);
         if (isEmptyBytes(bytes)) {
-            return (":0\r\n");
+            return REDIS_ZORE_INTEGER;
         } else {
             final String[] args = clientCmd.getArgs();
             final int lastBit = Tools.getBit(args[0], bytes);

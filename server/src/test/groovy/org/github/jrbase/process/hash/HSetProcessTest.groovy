@@ -7,6 +7,7 @@ import org.github.jrbase.process.hash.HSetProcess
 import spock.lang.Specification
 
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8
+import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
 import static org.github.jrbase.dataType.RedisDataType.HASHES
 
 class HSetProcessTest extends Specification {
@@ -33,8 +34,8 @@ class HSetProcessTest extends Specification {
 
         null           | ["field1", "value1"]                     | ':1\r\n'
         null           | ["field1", "value1", "field2", "value2"] | ':2\r\n'
-        'a'.getBytes() | ["field1", "value1"]                     | ':0\r\n'
-        'a'.getBytes() | ["field1", "value1", "field2", "value2"] | ':0\r\n'
+        'a'.getBytes() | ["field1", "value1"]                     | REDIS_ZORE_INTEGER
+        'a'.getBytes() | ["field1", "value1", "field2", "value2"] | REDIS_ZORE_INTEGER
     }
 
 

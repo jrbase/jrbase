@@ -27,6 +27,7 @@ public enum Cmd {
     //Sets
     SADD("sadd"),
     SPOP("spop"),
+    SCARD("scard"),
 
     // others
     OTHER("other");

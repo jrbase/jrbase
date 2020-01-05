@@ -36,7 +36,7 @@ class SPopProcessTest extends Specification {
         ["a"]      | toRedisListDelimiter("a,b,c").getBytes() | '-ERR value is not an integer or out of range\r\n'
     }
 
-    def "processData"() {
+    def "processReturnAllData"() {
         given:
         clientCmd.setArgs(args as String[])
         RheaKVStore rheaKVStore = Mock()
@@ -51,6 +51,22 @@ class SPopProcessTest extends Specification {
         ["3"]  | toRedisListDelimiter("a,b,c").getBytes() | '*3\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nc\r\n'
         ["10"] | toRedisListDelimiter("a,b,c").getBytes() | '*3\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nc\r\n'
     }
+
+    def "processArgsCount"() {
+        given:
+        clientCmd.setArgs(args as String[])
+        RheaKVStore rheaKVStore = Mock()
+        clientCmd.setRheaKVStore(rheaKVStore)
+        String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation()
+        //
+        rheaKVStore.bGet(buildUpKey) >> originValue
+        expect:
+        count == cmdProcess.process(clientCmd).split("\r\n")[0]
+        where:
+        args  | originValue                                  | count
+        ["2"] | toRedisListDelimiter("a,b,c").getBytes()     | "*2"
+        ["4"] | toRedisListDelimiter("a,b,c,d,f").getBytes() | "*4"
+    }
     //process data
 
 
@@ -62,4 +78,19 @@ class SPopProcessTest extends Specification {
         then:
         result
     }
+
+    def "GetPopResult"() {
+        when:
+        def result = cmdProcess.getPopResult(["a", "b", 'd'])
+        then:
+        result == '*3\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nd\r\n'
+    }
+
+    def "testMakeRandomSets"() {
+        when:
+        def result = cmdProcess.makeRandomSets(10, 8)
+        then:
+        result.size() == 8
+    }
+
 }

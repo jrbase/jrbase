@@ -6,6 +6,7 @@ import org.github.jrbase.process.CmdProcess
 import org.github.jrbase.process.string.SetBitProcess
 import spock.lang.Specification
 
+import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
 import static org.github.jrbase.dataType.RedisDataType.STRINGS
 
 class SetBitProcessTest extends Specification {
@@ -23,10 +24,10 @@ class SetBitProcessTest extends Specification {
         message == cmdProcess.process(clientCmd)
         where:
         args       | input          | message
-        ['1', '0'] | null           | ':0\r\n'
+        ['1', '0'] | null           | REDIS_ZORE_INTEGER
         ['1', '0'] | "a".getBytes() | ':1\r\n'
         ['2', '0'] | "a".getBytes() | ':1\r\n'
-        ['3', '0'] | "a".getBytes() | ':0\r\n'
+        ['3', '0'] | "a".getBytes() | REDIS_ZORE_INTEGER
     }
 
     def "testArgumentsException"() {

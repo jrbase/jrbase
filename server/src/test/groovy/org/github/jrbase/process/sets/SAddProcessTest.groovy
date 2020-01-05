@@ -5,6 +5,7 @@ import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.CmdProcess
 import spock.lang.Specification
 
+import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
 import static org.github.jrbase.dataType.RedisDataType.SETS
 import static org.github.jrbase.utils.ToolsString.toRedisListDelimiter
 
@@ -38,7 +39,7 @@ class SAddProcessTest extends Specification {
         ["a", "a"] | null                                   | ':1\r\n'
         ["a", "b"] | "".getBytes()                          | ':2\r\n'
         ["a", "b"] | "a".getBytes()                         | ':1\r\n'
-        ["a", "b"] | toRedisListDelimiter("a,b").getBytes() | ':0\r\n'
+        ["a", "b"] | toRedisListDelimiter("a,b").getBytes() | REDIS_ZORE_INTEGER
         ["a", "b"] | toRedisListDelimiter("c,d").getBytes() | ':2\r\n'
     }
 

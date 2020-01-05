@@ -10,9 +10,7 @@ public class ToolsString {
         for (int i = args.length - 1; i >= 0; i--) {
             buildUpValue.append(args[i]).append(REDIS_LIST_DELIMITER);
         }
-        if (buildUpValue.length() != 0) {
-            buildUpValue.deleteCharAt(buildUpValue.length() - 1);
-        }
+        deleteLastChar(buildUpValue);
         return buildUpValue;
     }
 
@@ -27,9 +25,7 @@ public class ToolsString {
         for (String value : originValueArr) {
             buildUpValue.append(value).append(REDIS_LIST_DELIMITER);
         }
-        if (buildUpValue.length() != 0) {
-            buildUpValue.deleteCharAt(buildUpValue.length() - 1);
-        }
+        deleteLastChar(buildUpValue);
         return buildUpValue.toString();
     }
 
@@ -43,9 +39,7 @@ public class ToolsString {
         for (int i = 1; i < originValueArr.length; i++) {
             buildUpValue.append(originValueArr[i]).append(REDIS_LIST_DELIMITER);
         }
-        if (buildUpValue.length() != 0) {
-            buildUpValue.deleteCharAt(buildUpValue.length() - 1);
-        }
+        deleteLastChar(buildUpValue);
         return buildUpValue.toString();
     }
 
@@ -55,9 +49,7 @@ public class ToolsString {
         for (String arg : args) {
             buildUpValue.append(arg).append(REDIS_LIST_DELIMITER);
         }
-        if (buildUpValue.length() != 0) {
-            buildUpValue.deleteCharAt(buildUpValue.length() - 1);
-        }
+        deleteLastChar(buildUpValue);
         return buildUpValue;
     }
 
@@ -72,9 +64,7 @@ public class ToolsString {
         for (String arg : args) {
             buildUpValue.append(arg).append(REDIS_LIST_DELIMITER);
         }
-        if (buildUpValue.length() != 0) {
-            buildUpValue.deleteCharAt(buildUpValue.length() - 1);
-        }
+        deleteLastChar(buildUpValue);
         return buildUpValue.toString();
     }
 
@@ -88,10 +78,15 @@ public class ToolsString {
         for (int i = 0; i < originValueArr.length - 1; i++) {
             buildUpValue.append(originValueArr[i]).append(REDIS_LIST_DELIMITER);
         }
-        if (buildUpValue.length() != 0) {
-            buildUpValue.deleteCharAt(buildUpValue.length() - 1);
-        }
+        deleteLastChar(buildUpValue);
         return buildUpValue.toString();
+    }
+
+
+    public static void deleteLastChar(final StringBuilder stringBuilder) {
+        if (stringBuilder.length() != 0) {
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        }
     }
 
     public static String toRedisListDelimiter(String str) {
@@ -100,9 +95,7 @@ public class ToolsString {
         for (String s : split) {
             result.append(s).append(REDIS_LIST_DELIMITER);
         }
-        if (result.length() == 0) {
-            result.deleteCharAt(result.length() - 1);
-        }
+        deleteLastChar(result);
         return result.toString();
     }
 }
