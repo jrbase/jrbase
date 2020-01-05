@@ -26,6 +26,7 @@ import static org.github.jrbase.utils.Tools.isCorrectKey;
 public class CmdManager {
 
     private CmdManager() {
+        throw new UnsupportedOperationException();
     }
 
     private static Client client = null;

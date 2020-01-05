@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.github.jrbase.benchmark;
+package org.github.jrbase.config;
 
-import com.alipay.sofa.jraft.rhea.options.RheaKVStoreOptions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
@@ -25,20 +24,20 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 /**
- * @author jiachun.fjc
+ *
  */
-public class Yaml {
+public class YamlTool {
 
     public static void main(final String[] args) {
-        readConfig(Paths.get("jraftKV", "config", "benchmark_client.yaml").toString());
-        readConfig(Paths.get("jraftKV", "config", "benchmark_server.yaml").toString());
+        final String filename = Paths.get("server", "config", "redis_client.yaml").toString();
+        readConfig(filename);
     }
 
-    public static RheaKVStoreOptions readConfig(final String name) {
+    public static RedisConfigurationOption readConfig(final String name) {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        final RheaKVStoreOptions opts;
+        final RedisConfigurationOption opts;
         try {
-            opts = mapper.readValue(new File(name), RheaKVStoreOptions.class);
+            opts = mapper.readValue(new File(name), RedisConfigurationOption.class);
             System.out.println(opts);
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -24,6 +24,9 @@ distributions {
                 into 'bin'
                 fileMode = 0755
             }
+            from('config') {
+                into 'config'
+            }
             from(configurations.runtime) {
                 into 'lib'
             }

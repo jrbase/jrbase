@@ -2,6 +2,8 @@ package org.github.jrbase.handler;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.ChannelHandlerContext;
+import org.apache.commons.lang.StringUtils;
+import org.github.jrbase.config.RedisConfigurationOption;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisClientContext;
 import org.github.jrbase.handler.connect.CommandHandler;
@@ -17,15 +19,18 @@ public class CmdHandler {
 
     private static final String REPLY_OK = "OK";
     //TODO: read config file from local system
-    private boolean requirepass = false;
-    private String redisPassword = "123456";
+//    private boolean requirepass = false;
+//    private String redisPassword = "123456";
 
     // save session login status to HashMap<ChannelHandlerContext, RedisClientContext>
     private Map<ChannelHandlerContext, RedisClientContext> clientContext = new HashMap<>();
 
     private static final Map<String, ServerCmdHandler> serverCmdHandlerMap = new HashMap<>();
 
-    public CmdHandler() {
+    private RedisConfigurationOption redisConfigurationOption;
+
+    public CmdHandler(RedisConfigurationOption redisConfigurationOption) {
+        this.redisConfigurationOption = redisConfigurationOption;
         initHandlerMap();
     }
 
@@ -40,10 +45,10 @@ public class CmdHandler {
         final ClientCmd clientCmd = parseMessage(message);
         //1. connect
         //TODO:  handleAuth();
-        if (requirepass) {
+        if (StringUtils.isNotEmpty(redisConfigurationOption.getRequirePass())) {
             final RedisClientContext redisClientContext = clientContext.get(ctx);
-            if (!redisClientContext.isLogin()) {
-                handleAuth(ctx, clientCmd, redisClientContext);
+            if (redisClientContext == null || !redisClientContext.isLogin()) {
+                handleAuth(ctx, clientCmd, clientContext, redisClientContext);
                 return;
             }
         }
@@ -67,10 +72,14 @@ public class CmdHandler {
 
     }
 
-    private void handleAuth(ChannelHandlerContext ctx, ClientCmd clientCmd, RedisClientContext redisClientContext) {
+    private void handleAuth(ChannelHandlerContext ctx, ClientCmd clientCmd, Map<ChannelHandlerContext, RedisClientContext> clientContext, RedisClientContext redisClientContext) {
         if ("auth".equals(clientCmd.getCmd())) {
             String password = clientCmd.getKey();
-            if (password.equals(redisPassword)) {
+            if (password.equals(redisConfigurationOption.getRequirePass())) {
+                if (redisClientContext == null) {
+                    redisClientContext = new RedisClientContext();
+                    clientContext.put(ctx, redisClientContext);
+                }
                 redisClientContext.setLogin(true);
                 replyInfoToClient(ctx, REPLY_OK);
             } else {
