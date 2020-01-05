@@ -26,12 +26,10 @@ public class HGetProcess implements CmdProcess {
 
     @Override
     public String process(ClientCmd clientCmd) {
-
         return requestKVAndReplyClient(clientCmd);
     }
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         final String buildUpKey = clientCmd.getKey() + "f" + clientCmd.getArgs()[0] + HASHES.getAbbreviation();

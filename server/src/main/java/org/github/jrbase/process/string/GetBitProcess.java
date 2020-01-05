@@ -31,8 +31,6 @@ public class GetBitProcess implements CmdProcess {
     }
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-
-
         final String[] args = clientCmd.getArgs();
         final String position = args[0];
 

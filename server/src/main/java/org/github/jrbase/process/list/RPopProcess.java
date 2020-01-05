@@ -33,7 +33,6 @@ public class RPopProcess implements CmdProcess {
 
     // a b c d
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         String buildUpKey = clientCmd.getKey() + LISTS.getAbbreviation();

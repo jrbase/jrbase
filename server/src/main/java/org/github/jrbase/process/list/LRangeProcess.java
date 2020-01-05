@@ -32,7 +32,6 @@ public class LRangeProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         String buildUpKey = clientCmd.getKey() + LISTS.getAbbreviation();
@@ -48,7 +47,7 @@ public class LRangeProcess implements CmdProcess {
     }
 
     // >> > <  == ><  <<
-    public static String getLRangeList(String[] originValueArr, String begin, String end) {
+    static String getLRangeList(String[] originValueArr, String begin, String end) {
         final int length = originValueArr.length;
         int beginInt = Integer.parseInt(begin);
         int endInt = Integer.parseInt(end);

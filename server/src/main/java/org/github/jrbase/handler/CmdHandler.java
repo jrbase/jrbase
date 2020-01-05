@@ -2,12 +2,15 @@ package org.github.jrbase.handler;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.ChannelHandlerContext;
+import org.apache.commons.lang.StringUtils;
+import org.github.jrbase.config.RedisConfigurationOption;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisClientContext;
 import org.github.jrbase.handler.connect.CommandHandler;
 import org.github.jrbase.handler.connect.EchoHandler;
 import org.github.jrbase.handler.connect.PingHandler;
 import org.github.jrbase.manager.CmdManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,15 +19,18 @@ public class CmdHandler {
 
     private static final String REPLY_OK = "OK";
     //TODO: read config file from local system
-    private boolean requirepass = false;
-    private String redisPassword = "123456";
+//    private boolean requirepass = false;
+//    private String redisPassword = "123456";
 
     // save session login status to HashMap<ChannelHandlerContext, RedisClientContext>
     private Map<ChannelHandlerContext, RedisClientContext> clientContext = new HashMap<>();
 
     private static final Map<String, ServerCmdHandler> serverCmdHandlerMap = new HashMap<>();
 
-    public CmdHandler() {
+    private RedisConfigurationOption redisConfigurationOption;
+
+    public CmdHandler(RedisConfigurationOption redisConfigurationOption) {
+        this.redisConfigurationOption = redisConfigurationOption;
         initHandlerMap();
     }
 
@@ -39,20 +45,10 @@ public class CmdHandler {
         final ClientCmd clientCmd = parseMessage(message);
         //1. connect
         //TODO:  handleAuth();
-        if (requirepass) {
+        if (StringUtils.isNotEmpty(redisConfigurationOption.getRequirePass())) {
             final RedisClientContext redisClientContext = clientContext.get(ctx);
-            if (!redisClientContext.isLogin()) {
-                if ("auth".equals(clientCmd.getCmd())) {
-                    String password = clientCmd.getKey();
-                    if (password.equals(redisPassword)) {
-                        redisClientContext.setLogin(true);
-                        replyInfoToClient(ctx, REPLY_OK);
-                    } else {
-                        replyErrorToClient(ctx, "ERR invalid password");
-                    }
-                } else {
-                    replyInfoToClient(ctx, "NOAUTH Authentication required.");
-                }
+            if (redisClientContext == null || !redisClientContext.isLogin()) {
+                handleAuth(ctx, clientCmd, clientContext, redisClientContext);
                 return;
             }
         }
@@ -76,41 +72,61 @@ public class CmdHandler {
 
     }
 
-    public ClientCmd parseMessage(String message) {
-        final String[] arr = message.split("\r\n");
-        return parseMessageToClientCmd(arr);
+    private void handleAuth(ChannelHandlerContext ctx, ClientCmd clientCmd, Map<ChannelHandlerContext, RedisClientContext> clientContext, RedisClientContext redisClientContext) {
+        if ("auth".equals(clientCmd.getCmd())) {
+            String password = clientCmd.getKey();
+            if (password.equals(redisConfigurationOption.getRequirePass())) {
+                if (redisClientContext == null) {
+                    redisClientContext = new RedisClientContext();
+                    clientContext.put(ctx, redisClientContext);
+                }
+                redisClientContext.setLogin(true);
+                replyInfoToClient(ctx, REPLY_OK);
+            } else {
+                replyErrorToClient(ctx, "ERR invalid password");
+            }
+        } else {
+            replyInfoToClient(ctx, "NOAUTH Authentication required.");
+        }
+    }
+
+    ClientCmd parseMessage(String message) {
+        // *3\r\n$3\r\nset\r\n$3\r\nkey$5\r\nvalue\r\n).split("\r\n")
+        final String[] redisClientCmdArr = message.split("\r\n");
+        return parseMessageToClientCmd(redisClientCmdArr);
     }
 
     //             key   value
     // 0  1  2  3  4  5  6
     //*3 $3 set $1 a $1  b
-    public ClientCmd parseMessageToClientCmd(String[] arr) {
+    private ClientCmd parseMessageToClientCmd(final String[] redisClientCmdArr) {
         ClientCmd clientCmd = new ClientCmd();
         clientCmd.setCmd("");
         clientCmd.setKey("");
         clientCmd.setArgs(new String[0]);
 
-        if (isHaveCmd(arr.length)) {
-            final String cmd = arr[2];
-            clientCmd.setCmd(cmd);
-            if (isHaveKey(arr.length)) {
-                clientCmd.setKey(arr[4]);
-                if (isHaveArgs(arr.length)) {
-                    setArgs(arr, clientCmd);
+        if (isHaveCmd(redisClientCmdArr.length)) {
+            clientCmd.setCmd(redisClientCmdArr[2]);
+            if (isHaveKey(redisClientCmdArr.length)) {
+                clientCmd.setKey(redisClientCmdArr[4]);
+                if (isHaveArgs(redisClientCmdArr.length)) {
+                    final String[] args = getArgs(redisClientCmdArr);
+                    clientCmd.setArgs(args);
                 }
             }
         }
         return clientCmd;
     }
 
-    private void setArgs(String[] arr, ClientCmd clientCmd) {
-        final int argsCount = (arr.length + 1 - 6) / 2;
+    @NotNull
+    String[] getArgs(final String[] redisClientCmdArr) {
+        final int argsCount = (redisClientCmdArr.length + 1 - 6) / 2;
         String[] args = new String[argsCount];
         int count = 0;
-        for (int i = 6; i < arr.length; i = i + 2) {
-            args[count++] = arr[i];
+        for (int i = 6; i < redisClientCmdArr.length; i = i + 2) {
+            args[count++] = redisClientCmdArr[i];
         }
-        clientCmd.setArgs(args);
+        return args;
     }
 
     private boolean isHaveCmd(int length) {
