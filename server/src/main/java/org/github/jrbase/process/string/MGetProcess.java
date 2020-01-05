@@ -31,7 +31,6 @@ public class MGetProcess implements CmdProcess {
     }
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
         // key is first arg
         List<byte[]> keyList = new ArrayList<>();

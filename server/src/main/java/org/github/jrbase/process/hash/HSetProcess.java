@@ -29,7 +29,6 @@ public class HSetProcess implements CmdProcess {
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
         // hset key field value
-
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         final String key = clientCmd.getKey();

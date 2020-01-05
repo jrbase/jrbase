@@ -27,7 +27,6 @@ public class HLenProcess implements CmdProcess {
     }
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-
         checkKeyType();
 
         final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();

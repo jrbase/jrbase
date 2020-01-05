@@ -32,7 +32,6 @@ public class JRBaseServer {
     static final int PORT = Integer.parseInt(System.getProperty("port", "6379"));
 
     public static void main(String[] args) throws Exception {
-
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup(1);
         try {
