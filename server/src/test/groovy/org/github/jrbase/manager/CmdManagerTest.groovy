@@ -5,7 +5,6 @@ import io.netty.channel.Channel
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.dataType.Cmd
 import org.github.jrbase.process.CmdProcess
-import org.github.jrbase.process.IgnoreProcess
 import org.github.jrbase.process.string.GetProcess
 import org.github.jrbase.process.string.SetProcess
 import org.junit.Assert
@@ -35,13 +34,22 @@ class CmdManagerTest extends Specification {
         })
     }
 
+    def "ClientCmdToCmdProcess0"() {
+        expect:
+        CmdManager.clientCmdToCmdProcess(new ClientCmd(input)) == output
+
+        where:
+        input     | output
+        ''        | null
+        'unknown' | null
+    }
+
     def "ClientCmdToCmdProcess"() {
         expect:
         CmdManager.clientCmdToCmdProcess(new ClientCmd(input)).getClass().getSimpleName() == output
 
         where:
         input | output
-        ''    | IgnoreProcess.getSimpleName()
         'set' | SetProcess.getSimpleName()
         'get' | GetProcess.getSimpleName()
     }
@@ -63,6 +71,36 @@ class CmdManagerTest extends Specification {
         CmdManager.process(clientCmd)
         then:
         1 * clientCmd.getChannel().writeAndFlush(_)
+    }
+
+    def "processErrorCmd"() {
+        given:
+        ClientCmd clientCmd = new ClientCmd("")
+        clientCmd.setKey("")
+        clientCmd.setArgs([] as String[])
+        Channel channel = Mock()
+        channel.writeAndFlush("\$-1\r\n")
+        clientCmd.setChannel(channel)
+
+        when:
+        CmdManager.process(clientCmd)
+        then:
+        1 * channel.writeAndFlush('-ERR wrong number of arguments for \'\' command\r\n')
+    }
+
+    def "processErrorCmd123"() {
+        given:
+        ClientCmd clientCmd = new ClientCmd("123")
+        clientCmd.setKey("")
+        clientCmd.setArgs([] as String[])
+        Channel channel = Mock()
+        channel.writeAndFlush("\$-1\r\n")
+        clientCmd.setChannel(channel)
+
+        when:
+        CmdManager.process(clientCmd)
+        then:
+        1 * channel.writeAndFlush('-ERR wrong number of arguments for \'123\' command\r\n')
     }
 
     def "processErrorKey"() {
