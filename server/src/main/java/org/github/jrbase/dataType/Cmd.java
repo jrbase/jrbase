@@ -29,6 +29,9 @@ public enum Cmd {
     SPOP("spop"),
     SCARD("scard"),
 
+    //Sets
+    ZADD("zadd"),
+
     // others
     OTHER("other");
 

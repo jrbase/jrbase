@@ -15,6 +15,7 @@ import org.github.jrbase.process.sets.SAddProcess;
 import org.github.jrbase.process.sets.SCardProcess;
 import org.github.jrbase.process.sets.SPopProcess;
 import org.github.jrbase.process.string.*;
+import org.github.jrbase.process.zsets.ZAddProcess;
 import org.github.jrbase.proxyRheakv.rheakv.Client;
 
 import java.util.HashMap;
@@ -76,6 +77,9 @@ public class CmdManager {
         registerCmdProcess(Cmd.SADD, new SAddProcess());
         registerCmdProcess(Cmd.SPOP, new SPopProcess());
         registerCmdProcess(Cmd.SCARD, new SCardProcess());
+
+        //Sorted Sets
+        registerCmdProcess(Cmd.ZADD, new ZAddProcess());
 
 
         //Keys
