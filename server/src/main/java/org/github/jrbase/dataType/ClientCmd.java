@@ -7,7 +7,6 @@ public class ClientCmd {
     private String cmd;
     private String key;
     private String[] args;
-    //    private ChannelHandlerContext context;
     private Channel channel;
     private RheaKVStore rheaKVStore;
 
@@ -38,14 +37,6 @@ public class ClientCmd {
     public ClientCmd(String cmd) {
         this.cmd = cmd;
     }
-
-//    public ChannelHandlerContext getContext() {
-//        return context;
-//    }
-//
-//    public void setContext(ChannelHandlerContext context) {
-//        this.context = context;
-//    }
 
     public String getCmd() {
         return cmd;

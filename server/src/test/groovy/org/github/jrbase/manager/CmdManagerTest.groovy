@@ -30,7 +30,7 @@ class CmdManagerTest extends Specification {
         keys.forEach({ cmd ->
             clientCmd.setCmd(cmd.cmdName)
             def cmdProcess = CmdManager.clientCmdToCmdProcess(clientCmd)
-            Assert.assertNotNull(cmdProcess)
+            Assert.assertNotNull("you forget register command: " + clientCmd.getCmd(), cmdProcess)
         })
     }
 
