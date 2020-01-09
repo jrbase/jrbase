@@ -15,6 +15,7 @@ import org.github.jrbase.process.sets.SAddProcess;
 import org.github.jrbase.process.sets.SCardProcess;
 import org.github.jrbase.process.sets.SPopProcess;
 import org.github.jrbase.process.string.*;
+import org.github.jrbase.process.zsets.ZAddProcess;
 import org.github.jrbase.proxyRheakv.rheakv.Client;
 
 import java.util.HashMap;
@@ -43,9 +44,9 @@ public class CmdManager {
         return getClient().getRheaKVStore();
     }
 
-    private static Map<Cmd, CmdProcess> cmdProcessManager = new HashMap<>();
+    private static Map<String, CmdProcess> cmdProcessManager = new HashMap<>();
 
-    public static Map<Cmd, CmdProcess> getCmdProcessManager() {
+    public static Map<String, CmdProcess> getCmdProcessManager() {
         return cmdProcessManager;
     }
 
@@ -77,6 +78,9 @@ public class CmdManager {
         registerCmdProcess(Cmd.SPOP, new SPopProcess());
         registerCmdProcess(Cmd.SCARD, new SCardProcess());
 
+        //Sorted Sets
+        registerCmdProcess(Cmd.ZADD, new ZAddProcess());
+
 
         //Keys
         registerCmdProcess(Cmd.TYPE, new TypeProcess());
@@ -86,24 +90,21 @@ public class CmdManager {
     }
 
     private static void registerCmdProcess(Cmd cmd, CmdProcess cmdProcess) {
-        cmdProcessManager.put(cmd, cmdProcess);
+        cmdProcessManager.put(cmd.getCmdName(), cmdProcess);
     }
 
     public static void process(ClientCmd clientCmd) {
-        final CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
+        CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
         if (cmdProcess == null) {
-            shutdown();
-            throw new RuntimeException("lack register command: " + clientCmd.getCmd());
+            cmdProcess = cmdProcessManager.get(Cmd.OTHER.getCmdName());
         }
         // check key
-        final boolean correctKey = isCorrectKey(clientCmd.getKey());
-        if (!correctKey) {
+        if (!isCorrectKey(clientCmd.getKey())) {
             sendWrongArgumentMessage(clientCmd);
             return;
         }
         // check arguments
-        final boolean correctArguments = cmdProcess.isCorrectArguments(clientCmd);
-        if (!correctArguments) {
+        if (!cmdProcess.isCorrectArguments(clientCmd)) {
             sendWrongArgumentMessage(clientCmd);
             return;
         }
@@ -118,8 +119,7 @@ public class CmdManager {
     }
 
     public static CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
-        final Cmd cmd = Cmd.get(clientCmd.getCmd());
-        return cmdProcessManager.get(cmd);
+        return cmdProcessManager.get(clientCmd.getCmd());
     }
 
     public static void shutdown() {

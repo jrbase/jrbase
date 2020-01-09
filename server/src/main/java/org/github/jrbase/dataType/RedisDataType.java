@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum RedisDataType {
+    /**
+     *
+     */
     STRINGS("string", "s"),
     HASHES("hash", "h"),
     LISTS("list", "l"),
@@ -30,15 +33,15 @@ public enum RedisDataType {
     }
 
     public static RedisDataType get(String redisDataTypeName) {
-        final RedisDataType redisDataType = lookup.get(redisDataTypeName);
+        final RedisDataType redisDataType = LOOK_UP.get(redisDataTypeName);
         return redisDataType == null ? NONE : redisDataType;
     }
 
-    private static final Map<String, RedisDataType> lookup = new HashMap<>();
+    private static final Map<String, RedisDataType> LOOK_UP = new HashMap<>();
 
     static {
         for (RedisDataType c : EnumSet.allOf(RedisDataType.class)) {
-            lookup.put(c.getName(), c);
+            LOOK_UP.put(c.getName(), c);
         }
     }
 }

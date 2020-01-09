@@ -29,6 +29,9 @@ public enum Cmd {
     SPOP("spop"),
     SCARD("scard"),
 
+    //Sets
+    ZADD("zadd"),
+
     // others
     OTHER("other");
 
@@ -43,19 +46,19 @@ public enum Cmd {
     }
 
     public static Cmd get(String cmdName) {
-        final Cmd cmd = lookup.get(cmdName);
+        final Cmd cmd = LOOKUP.get(cmdName);
         return cmd == null ? OTHER : cmd;
     }
 
-    private static final Map<String, Cmd> lookup = new HashMap<>();
+    private static final Map<String, Cmd> LOOKUP = new HashMap<>();
 
     public static Map<String, Cmd> getLookup() {
-        return lookup;
+        return LOOKUP;
     }
 
     static {
         for (Cmd c : EnumSet.allOf(Cmd.class)) {
-            lookup.put(c.getCmdName(), c);
+            LOOKUP.put(c.getCmdName(), c);
         }
     }
 }

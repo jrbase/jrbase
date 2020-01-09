@@ -3,7 +3,6 @@ package org.github.jrbase.process.hash
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.CmdProcess
-import org.github.jrbase.process.hash.HSetProcess
 import spock.lang.Specification
 
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8
@@ -28,7 +27,7 @@ class HSetProcessTest extends Specification {
         clientCmd.setRheaKVStore(rheaKVStore)
 
         expect:
-        message == cmdProcess.process(clientCmd)
+        cmdProcess.process(clientCmd) == message
         where:
         input          | args                                     | message
 

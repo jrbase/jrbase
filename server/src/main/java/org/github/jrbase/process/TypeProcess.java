@@ -39,6 +39,5 @@ public class TypeProcess implements CmdProcess {
             result.append("$").append(length).append("\r\n").append(redisDataType.getName()).append("\r\n");
         }
         return result.toString();
-
     }
 }
