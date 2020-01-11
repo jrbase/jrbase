@@ -12,6 +12,7 @@ task distributionAllPackage(type: Copy) {
 allprojects {
     apply plugin: "java"
     apply plugin: "groovy"
+    apply plugin: 'jacoco'
 
     version = rootProject.version
 
@@ -40,6 +41,7 @@ allprojects {
         testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-2"
         testRuntime "net.bytebuddy:byte-buddy:1.9.3"
     }
+
     test {
         testLogging {
             // Show that tests are run in the command-line output
@@ -48,3 +50,23 @@ allprojects {
     }
 }
 
+
+task codeCoverageReport(type: JacocoReport) {
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+    subprojects.each {
+        println(it)
+        sourceSets it.sourceSets.main
+    }
+
+    reports {
+        xml.enabled true
+        xml.destination file("${buildDir}/reports/jacoco/report.xml")
+        html.enabled false
+        csv.enabled false
+    }
+}
+
+codeCoverageReport.dependsOn {
+    subprojects*.test
+}
