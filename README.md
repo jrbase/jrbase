@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/jrbase/jrbase.svg?branch=master)](https://travis-ci.org/jrbase/jrbase)
-
+[![codecov](https://codecov.io/gh/jrbase/jrbase/branch/master/graph/badge.svg)](https://codecov.io/gh/jrbase/jrbase)
 [![CircleCI](https://circleci.com/gh/jrbase/jrbase.svg?style=svg)](https://circleci.com/gh/jrbase/jrbase)
 ## What is jrbase?
 
