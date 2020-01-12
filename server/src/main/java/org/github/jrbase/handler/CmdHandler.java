@@ -9,12 +9,12 @@ import org.github.jrbase.handler.connect.CommandHandler;
 import org.github.jrbase.handler.connect.EchoHandler;
 import org.github.jrbase.handler.connect.PingHandler;
 import org.github.jrbase.manager.CmdManager;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.github.jrbase.dataType.ServerCmd.*;
+import static org.github.jrbase.handler.CommandParse.parseMessageToClientCmd;
 
 public class CmdHandler {
 
@@ -106,51 +106,6 @@ public class CmdHandler {
         // *3\r\n$3\r\nset\r\n$3\r\nkey$5\r\nvalue\r\n).split("\r\n")
         final String[] redisClientCmdArr = message.split("\r\n");
         return parseMessageToClientCmd(redisClientCmdArr);
-    }
-
-    //             key   value
-    // 0  1  2  3  4  5  6
-    //*3 $3 set $1 a $1  b
-    private ClientCmd parseMessageToClientCmd(final String[] redisClientCmdArr) {
-        ClientCmd clientCmd = new ClientCmd();
-        clientCmd.setCmd("");
-        clientCmd.setKey("");
-        clientCmd.setArgs(new String[0]);
-
-        if (isHaveCmd(redisClientCmdArr.length)) {
-            clientCmd.setCmd(redisClientCmdArr[2]);
-            if (isHaveKey(redisClientCmdArr.length)) {
-                clientCmd.setKey(redisClientCmdArr[4]);
-                if (isHaveArgs(redisClientCmdArr.length)) {
-                    final String[] args = getArgs(redisClientCmdArr);
-                    clientCmd.setArgs(args);
-                }
-            }
-        }
-        return clientCmd;
-    }
-
-    @NotNull
-    String[] getArgs(final String[] redisClientCmdArr) {
-        final int argsCount = (redisClientCmdArr.length + 1 - 6) / 2;
-        String[] args = new String[argsCount];
-        int count = 0;
-        for (int i = 6; i < redisClientCmdArr.length; i = i + 2) {
-            args[count++] = redisClientCmdArr[i];
-        }
-        return args;
-    }
-
-    private boolean isHaveCmd(int length) {
-        return length >= 3;
-    }
-
-    private boolean isHaveKey(int length) {
-        return length > 4;
-    }
-
-    private boolean isHaveArgs(int length) {
-        return length > 6;
     }
 
     private void replyInfoToClient(ChannelHandlerContext ctx, String msg) {
