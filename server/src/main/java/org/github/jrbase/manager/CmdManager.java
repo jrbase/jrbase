@@ -34,8 +34,12 @@ public class CmdManager {
 
     public static Client getClient() {
         if (client == null) {
-            client = new Client();
-            client.init();
+            synchronized (CmdManager.class) {
+                if (client == null) {
+                    client = new Client();
+                    client.init();
+                }
+            }
         }
         return client;
     }
