@@ -3,6 +3,8 @@ package org.github.jrbase.dataType;
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.Channel;
 
+import java.util.Arrays;
+
 public class ClientCmd {
     private String cmd;
     private String key;
@@ -64,5 +66,14 @@ public class ClientCmd {
 
     public void setArgs(String[] args) {
         this.args = args;
+    }
+
+    @Override
+    public String toString() {
+        return "ClientCmd{" +
+                "cmd='" + cmd + '\'' +
+                ", key='" + key + '\'' +
+                ", args=" + Arrays.toString(args) +
+                '}';
     }
 }
