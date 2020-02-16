@@ -13,6 +13,7 @@ allprojects {
     apply plugin: "java"
     apply plugin: "groovy"
     apply plugin: 'jacoco'
+    apply plugin: com.github.jrbase.codelinecountplugin.CodeLineCountPlugin
 
     version = rootProject.version
 
@@ -37,7 +38,7 @@ allprojects {
         testImplementation "junit:junit:4.12"
         testImplementation "org.mockito:mockito-core:2.25.1"
 
-        compile "org.codehaus.groovy:groovy-all:2.4.15"
+        compile "org.codehaus.groovy:groovy-all:2.5.4"
         testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-2"
         testRuntime "net.bytebuddy:byte-buddy:1.9.3"
     }
