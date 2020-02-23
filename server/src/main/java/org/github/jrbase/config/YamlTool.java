@@ -21,24 +21,17 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
 /**
  *
  */
 public class YamlTool {
 
-    public static void main(final String[] args) {
-        final String filename = Paths.get("server", "config", "redis_client.yaml").toString();
-        readConfig(filename);
-    }
-
     public static RedisConfigurationOption readConfig(final String name) {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         final RedisConfigurationOption opts;
         try {
             opts = mapper.readValue(new File(name), RedisConfigurationOption.class);
-            System.out.println(opts);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -4,6 +4,7 @@ import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
+import org.github.jrbase.process.annotation.KeyCommand;
 import org.github.jrbase.utils.Tools;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,7 @@ import static org.github.jrbase.dataType.RedisDataType.HASHES;
 import static org.github.jrbase.utils.ToolsKeyValue.generateKeyValueMap;
 import static org.github.jrbase.utils.ToolsKeyValue.keyValueEventNumber;
 
+@KeyCommand
 public class HSetProcess implements CmdProcess {
 
     @Override

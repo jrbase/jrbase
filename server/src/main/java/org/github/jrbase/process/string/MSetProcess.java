@@ -4,11 +4,13 @@ import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
+import org.github.jrbase.process.annotation.KeyCommand;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 import static org.github.jrbase.dataType.RedisDataType.STRINGS;
 import static org.github.jrbase.utils.Tools.isEmptyBytes;
 
+@KeyCommand
 public class MSetProcess implements CmdProcess {
 
     @Override

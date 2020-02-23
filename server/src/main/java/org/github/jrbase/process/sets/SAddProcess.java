@@ -4,6 +4,7 @@ import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
+import org.github.jrbase.process.annotation.KeyCommand;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -16,7 +17,7 @@ import static org.github.jrbase.dataType.RedisDataType.SETS;
 import static org.github.jrbase.utils.Tools.isEmptyBytes;
 import static org.github.jrbase.utils.ToolsString.deleteLastChar;
 
-
+@KeyCommand
 public class SAddProcess implements CmdProcess {
 
     @Override

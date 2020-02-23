@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
+import org.github.jrbase.process.annotation.KeyCommand;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -17,6 +18,8 @@ import static org.github.jrbase.utils.ToolsKeyValue.generateKeyValueMap;
 /**
  * ZADD key [NX|XX] [CH] [INCR] score member [score member ...]
  */
+
+@KeyCommand
 public class ZAddProcess implements CmdProcess {
     // TODO: parse [NX|XX] [CH] [INCR]
     @Override

@@ -4,7 +4,6 @@ import com.alipay.sofa.jraft.rhea.client.RheaKVStore
 import io.netty.channel.Channel
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.dataType.Cmd
-import org.github.jrbase.process.CmdProcess
 import org.github.jrbase.process.string.GetProcess
 import org.github.jrbase.process.string.SetProcess
 import org.junit.Assert
@@ -13,15 +12,6 @@ import spock.lang.Specification
 import static org.github.jrbase.dataType.RedisDataType.STRINGS
 
 class CmdManagerTest extends Specification {
-
-
-    def "testCmdProcessManagerForgetRegisterCmdProcess"() {
-        when:
-        Map<Cmd, CmdProcess> cmdProcessManager = CmdManager.getCmdProcessManager()
-        Map<String, Cmd> lookup = Cmd.getLookup()
-        then:
-        cmdProcessManager.size() == lookup.size()
-    }
 
     def "testCmdProcessManagerForgetRegisterCmdProcess2"() {
         given:

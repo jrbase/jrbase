@@ -28,11 +28,16 @@ import org.github.jrbase.config.RedisConfigurationOption;
 import static org.github.jrbase.config.YamlTool.readConfig;
 
 /**
+ * first: to start kv server
  *
+ * @see org.github.jrbase.StartKvServers
+ * second: start the java redis server
  */
 public class JRBaseServer {
+
     // args[0] = server/config/redis_server.yaml
     public static void main(String[] args) throws Exception {
+
         RedisConfigurationOption redisConfigurationOption = new RedisConfigurationOption();
         if (args != null && args.length >= 1) {
             final String confFile = args[0];

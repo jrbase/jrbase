@@ -5,6 +5,7 @@ import com.alipay.sofa.jraft.rhea.util.ByteArray;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
+import org.github.jrbase.process.annotation.KeyCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Map;
 import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static org.github.jrbase.dataType.RedisDataType.STRINGS;
 
+@KeyCommand
 public class MGetProcess implements CmdProcess {
 
     @Override

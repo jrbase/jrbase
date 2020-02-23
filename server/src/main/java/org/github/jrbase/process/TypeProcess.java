@@ -4,10 +4,12 @@ import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.dataType.RedisDataType;
+import org.github.jrbase.process.annotation.KeyCommand;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static org.github.jrbase.dataType.RedisDataType.KEYS;
 
+@KeyCommand
 public class TypeProcess implements CmdProcess {
 
     @Override
