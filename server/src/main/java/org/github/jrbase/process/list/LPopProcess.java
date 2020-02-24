@@ -1,6 +1,6 @@
 package org.github.jrbase.process.list;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
+import org.github.jrbase.backend.BackendProxy;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -34,11 +34,11 @@ public class LPopProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
+        final BackendProxy backendProxy = clientCmd.getBackendProxy();
 
         String buildUpKey = clientCmd.getKey() + LISTS.getAbbreviation();
         //bGet
-        final byte[] bGetResult = rheaKVStore.bGet(buildUpKey);
+        final byte[] bGetResult = backendProxy.bGet(buildUpKey);
         if (isEmptyBytes(bGetResult)) {
             return REDIS_EMPTY_STRING;
         } else {
@@ -46,7 +46,7 @@ public class LPopProcess implements CmdProcess {
             final String[] getValueArr = resultStr.split(REDIS_LIST_DELIMITER);
             String buildUpValue = getLPopBuildUpValue(getValueArr);
             //bPut
-            rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue));
+            backendProxy.bPut(buildUpKey, writeUtf8(buildUpValue));
             // return left first value
             final String lPopValue = getValueArr[0];
             return ("$" + lPopValue.length() + "\r\n" + lPopValue + "\r\n");

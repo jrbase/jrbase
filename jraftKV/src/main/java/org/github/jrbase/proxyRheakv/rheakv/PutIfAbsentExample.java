@@ -41,15 +41,15 @@ public class PutIfAbsentExample {
         client.shutdown();
     }
 
-    public static void putIfAbsent(final RheaKVStore rheaKVStore) {
-        final CompletableFuture<byte[]> r1 = rheaKVStore.putIfAbsent(writeUtf8("putIfAbsent1"), writeUtf8("1"));
+    public static void putIfAbsent(final RheaKVStore backendProxy) {
+        final CompletableFuture<byte[]> r1 = backendProxy.putIfAbsent(writeUtf8("putIfAbsent1"), writeUtf8("1"));
         LOG.info("Async putIfAbsent, prev value={}", readUtf8(FutureHelper.get(r1)));
-        final CompletableFuture<byte[]> r2 = rheaKVStore.putIfAbsent("putIfAbsent1", writeUtf8("2"));
+        final CompletableFuture<byte[]> r2 = backendProxy.putIfAbsent("putIfAbsent1", writeUtf8("2"));
         LOG.info("Async putIfAbsent, prev value={}", readUtf8(FutureHelper.get(r2)));
 
-        final byte[] b1 = rheaKVStore.bPutIfAbsent(writeUtf8("putIfAbsent2"), writeUtf8("3"));
+        final byte[] b1 = backendProxy.bPutIfAbsent(writeUtf8("putIfAbsent2"), writeUtf8("3"));
         LOG.info("Sync putIfAbsent, prev value={}", readUtf8(b1));
-        final byte[] b2 = rheaKVStore.bPutIfAbsent(writeUtf8("putIfAbsent2"), writeUtf8("4"));
+        final byte[] b2 = backendProxy.bPutIfAbsent(writeUtf8("putIfAbsent2"), writeUtf8("4"));
         LOG.info("Sync putIfAbsent, prev value={}", readUtf8(b2));
     }
 }

@@ -1,6 +1,6 @@
 package org.github.jrbase.process.string;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
+import org.github.jrbase.backend.BackendProxy;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -30,19 +30,19 @@ public class MSetProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
+        final BackendProxy backendProxy = clientCmd.getBackendProxy();
 
         String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation();
         final String[] args = clientCmd.getArgs();
-        rheaKVStore.put(buildUpKey, writeUtf8(args[0]));
+        backendProxy.bPut(buildUpKey, writeUtf8(args[0]));
         // 1 key value, key value
         // 0  1    2    3    4
         int successCount = 1;
 
         for (int i = 1; i < args.length; i = i + 2) {
-            final byte[] buildUpArgKey = (args[i] + STRINGS.getAbbreviation()).getBytes();
+            final String buildUpArgKey = args[i] + STRINGS.getAbbreviation();
             final byte[] value = writeUtf8(args[i + 1]);
-            final byte[] bytes = rheaKVStore.bGetAndPut(buildUpArgKey, value);
+            final byte[] bytes = backendProxy.bGetAndPut(buildUpArgKey, value);
             if (isEmptyBytes(bytes)) {
                 successCount++;
             }

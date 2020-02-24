@@ -1,6 +1,7 @@
 package org.github.jrbase.process.list
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore
+
+import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.CmdProcess
 import spock.lang.Specification
@@ -20,18 +21,18 @@ class LRangeProcessTest extends Specification {
 
     def "processData"() {
         given:
-        RheaKVStore rheaKVStore = Mock()
-        clientCmd.setRheaKVStore(rheaKVStore)
+        final BackendProxy backendProxy = Mock()
+        clientCmd.setBackendProxy(backendProxy)
         String buildUpKey = clientCmd.getKey() + LISTS.getAbbreviation()
         clientCmd.setArgs(args as String[])
-        rheaKVStore.bGet(buildUpKey) >> input
+        backendProxy.bGet(buildUpKey) >> input
         expect:
         message == cmdProcess.process(clientCmd)
         where:
-        args        | input                | message
-        ["0", "-1"] | "abc,b,c".getBytes() | '*3\r\n$3\r\nabc\r\n$1\r\nb\r\n$1\r\nc\r\n'
-        ["0", "-1"] | null                 | REDIS_EMPTY_LIST
-        ["0", "-1"] | "".getBytes()        | REDIS_EMPTY_LIST
+        args        | input                                   | message
+        ["0", "-1"] | "abc,b,c".getBytes()                    | '*3\r\n$3\r\nabc\r\n$1\r\nb\r\n$1\r\nc\r\n'
+        ["0", "-1"] | null                                    | REDIS_EMPTY_LIST
+        ["0", "-1"] | "".getBytes()                           | REDIS_EMPTY_LIST
         ["0", "-1"] | "a".getBytes()       | '*1\r\n$1\r\na\r\n'
         ["0", "-1"] | toRedisListDelimiter("aa,b").getBytes() | '*2\r\n$2\r\naa\r\n$1\r\nb\r\n'
     }

@@ -42,9 +42,9 @@ public class DistributedLockExample {
         client.shutdown();
     }
 
-    public static void lock(final RheaKVStore rheaKVStore) {
+    public static void lock(final RheaKVStore backendProxy) {
         final String lockKey = "lock_example";
-        final DistributedLock<byte[]> lock = rheaKVStore.getDistributedLock(lockKey, 3, TimeUnit.SECONDS);
+        final DistributedLock<byte[]> lock = backendProxy.getDistributedLock(lockKey, 3, TimeUnit.SECONDS);
         if (lock.tryLock()) {
             try {
                 LOG.info("Lock success with: {}", lockKey);
@@ -56,10 +56,10 @@ public class DistributedLockExample {
         }
     }
 
-    public static void lockAndAutoKeepLease(final RheaKVStore rheaKVStore) {
+    public static void lockAndAutoKeepLease(final RheaKVStore backendProxy) {
         final ScheduledExecutorService watchdog = Executors.newSingleThreadScheduledExecutor();
         final String lockKey = "lock_example1";
-        final DistributedLock<byte[]> lock = rheaKVStore.getDistributedLock(lockKey, 3, TimeUnit.SECONDS, watchdog);
+        final DistributedLock<byte[]> lock = backendProxy.getDistributedLock(lockKey, 3, TimeUnit.SECONDS, watchdog);
         if (lock.tryLock()) {
             try {
                 LOG.info("Lock success with: {}", lockKey);

@@ -44,12 +44,12 @@ public class ScanExample {
     }
 
     @SuppressWarnings("unchecked")
-    public static void scan(final RheaKVStore rheaKVStore) {
+    public static void scan(final RheaKVStore backendProxy) {
         final List<byte[]> keys = Lists.newArrayList();
         for (int i = 0; i < 10; i++) {
             final byte[] bytes = writeUtf8("scan_demo_" + i);
             keys.add(bytes);
-            rheaKVStore.bPut(bytes, bytes);
+            backendProxy.bPut(bytes, bytes);
         }
 
         final byte[] firstKey = keys.get(0);
@@ -58,23 +58,23 @@ public class ScanExample {
         final String lastKeyString = readUtf8(lastKey);
 
         // async scan
-        final CompletableFuture<List<KVEntry>> f1 = rheaKVStore.scan(firstKey, lastKey);
-        final CompletableFuture<List<KVEntry>> f2 = rheaKVStore.scan(firstKey, lastKey, false);
-        final CompletableFuture<List<KVEntry>> f3 = rheaKVStore.scan(firstKeyString, lastKeyString);
-        final CompletableFuture<List<KVEntry>> f4 = rheaKVStore.scan(firstKeyString, lastKeyString, false);
+        final CompletableFuture<List<KVEntry>> f1 = backendProxy.scan(firstKey, lastKey);
+        final CompletableFuture<List<KVEntry>> f2 = backendProxy.scan(firstKey, lastKey, false);
+        final CompletableFuture<List<KVEntry>> f3 = backendProxy.scan(firstKeyString, lastKeyString);
+        final CompletableFuture<List<KVEntry>> f4 = backendProxy.scan(firstKeyString, lastKeyString, false);
         CompletableFuture.allOf(f1, f2, f3, f4).join();
-        for (final CompletableFuture<List<KVEntry>> f : new CompletableFuture[] { f1, f2, f3, f4 }) {
+        for (final CompletableFuture<List<KVEntry>> f : new CompletableFuture[]{f1, f2, f3, f4}) {
             for (final KVEntry kv : f.join()) {
                 LOG.info("Async scan: key={}, value={}", readUtf8(kv.getKey()), readUtf8(kv.getValue()));
             }
         }
 
         // sync scan
-        final List<KVEntry> l1 = rheaKVStore.bScan(firstKey, lastKey);
-        final List<KVEntry> l2 = rheaKVStore.bScan(firstKey, lastKey, false);
-        final List<KVEntry> l3 = rheaKVStore.bScan(firstKeyString, lastKeyString);
-        final List<KVEntry> l4 = rheaKVStore.bScan(firstKeyString, lastKeyString, false);
-        for (final List<KVEntry> l : new List[] { l1, l2, l3, l4 }) {
+        final List<KVEntry> l1 = backendProxy.bScan(firstKey, lastKey);
+        final List<KVEntry> l2 = backendProxy.bScan(firstKey, lastKey, false);
+        final List<KVEntry> l3 = backendProxy.bScan(firstKeyString, lastKeyString);
+        final List<KVEntry> l4 = backendProxy.bScan(firstKeyString, lastKeyString, false);
+        for (final List<KVEntry> l : new List[]{l1, l2, l3, l4}) {
             for (final KVEntry kv : l) {
                 LOG.info("Async scan: key={}, value={}", readUtf8(kv.getKey()), readUtf8(kv.getValue()));
             }

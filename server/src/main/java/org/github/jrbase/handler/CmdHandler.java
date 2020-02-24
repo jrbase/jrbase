@@ -2,6 +2,7 @@ package org.github.jrbase.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang.StringUtils;
+import org.github.jrbase.backend.JraftKVDecorator;
 import org.github.jrbase.config.RedisConfigurationOption;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisClientContext;
@@ -56,7 +57,7 @@ public class CmdHandler {
             } else {
                 //handle data command
                 clientCmd.setChannel(ctx.channel());
-                clientCmd.setRheaKVStore(CmdManager.getRheaKVStore());
+                clientCmd.setBackendProxy(new JraftKVDecorator(CmdManager.getRheaKVStore()));
                 CmdManager.process(clientCmd);
             }
         }

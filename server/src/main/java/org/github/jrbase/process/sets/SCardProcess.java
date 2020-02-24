@@ -1,6 +1,6 @@
 package org.github.jrbase.process.sets;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
+import org.github.jrbase.backend.BackendProxy;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -26,10 +26,10 @@ public class SCardProcess implements CmdProcess {
 
     @Override
     public String process(ClientCmd clientCmd) {
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
+        final BackendProxy backendProxy = clientCmd.getBackendProxy();
 
         String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation();
-        final byte[] bGetResult = rheaKVStore.bGet(buildUpKey);
+        final byte[] bGetResult = backendProxy.bGet(buildUpKey);
         if (isEmptyBytes(bGetResult)) {
             return REDIS_ZORE_INTEGER;
         } else {

@@ -1,6 +1,6 @@
 package org.github.jrbase.process.string;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
+import org.github.jrbase.backend.BackendProxy;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -33,10 +33,10 @@ public class SetBitProcess implements CmdProcess {
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
         //setbit key 2 1
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
+        final BackendProxy backendProxy = clientCmd.getBackendProxy();
 
         String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation();
-        final byte[] bytes = rheaKVStore.bGet(buildUpKey);
+        final byte[] bytes = backendProxy.bGet(buildUpKey);
         if (isEmptyBytes(bytes)) {
             return REDIS_ZORE_INTEGER;
         } else {
@@ -45,7 +45,7 @@ public class SetBitProcess implements CmdProcess {
 
             final int result = Tools.setBit(args[0], args[1], bytes);
             // update bytes
-            rheaKVStore.bPut(buildUpKey, bytes);
+            backendProxy.bPut(buildUpKey, bytes);
 
             if (result == -1) {
                 return ("-ERR bit offset is not an integer or out of range\r\n");

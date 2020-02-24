@@ -32,14 +32,14 @@ import java.util.List;
  */
 public class Client {
 
-    private final RheaKVStore rheaKVStore = new DefaultRheaKVStore();
+    private final RheaKVStore backendProxy = new DefaultRheaKVStore();
 
     public void init() {
         Long regionId = -1L;
         final List<RegionRouteTableOptions> regionRouteTableOptionsList = getRegionRouteTableOptions(regionId);
         final PlacementDriverOptions pdOpts = getPlacementDriverOptions(regionRouteTableOptionsList);
         final RheaKVStoreOptions opts = getRheaKVStoreOptions(pdOpts);
-        rheaKVStore.init(opts);
+        backendProxy.init(opts);
     }
 
     List<RegionRouteTableOptions> getRegionRouteTableOptions(Long regionId) {
@@ -64,10 +64,10 @@ public class Client {
     }
 
     public void shutdown() {
-        this.rheaKVStore.shutdown();
+        this.backendProxy.shutdown();
     }
 
     public RheaKVStore getRheaKVStore() {
-        return rheaKVStore;
+        return backendProxy;
     }
 }

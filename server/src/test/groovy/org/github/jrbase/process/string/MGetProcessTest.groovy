@@ -1,10 +1,10 @@
 package org.github.jrbase.process.string
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore
+
 import com.alipay.sofa.jraft.rhea.util.ByteArray
+import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.CmdProcess
-import org.github.jrbase.process.string.MGetProcess
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.RedisDataType.STRINGS
@@ -18,8 +18,8 @@ class MGetProcessTest extends Specification {
         clientCmd.setKey("a")
         clientCmd.setArgs(args as String[])
 
-        RheaKVStore rheaKVStore = Mock()
-        clientCmd.setRheaKVStore(rheaKVStore)
+        final BackendProxy backendProxy = Mock()
+        clientCmd.setBackendProxy(backendProxy)
 
         List<byte[]> keyList = new ArrayList<>()
         keyList.add((clientCmd.getKey() + STRINGS.getAbbreviation()).getBytes())
@@ -35,7 +35,7 @@ class MGetProcessTest extends Specification {
                     arg.getBytes())
         }
 
-        rheaKVStore.bMultiGet(keyList) >> multiGetResult
+        backendProxy.bMultiGet(keyList) >> multiGetResult
 
         expect:
         message == cmdProcess.process(clientCmd)

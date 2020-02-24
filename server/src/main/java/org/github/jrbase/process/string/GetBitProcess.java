@@ -1,6 +1,5 @@
 package org.github.jrbase.process.string;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.dataType.RedisDataType;
@@ -36,8 +35,7 @@ public class GetBitProcess implements CmdProcess {
         final String[] args = clientCmd.getArgs();
         final String position = args[0];
 
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
-        final byte[] bytes = rheaKVStore.bGet(clientCmd.getKey());
+        final byte[] bytes = clientCmd.getBackendProxy().bGet(clientCmd.getKey());
         StringBuilder result = new StringBuilder();
         if (isEmptyBytes(bytes)) {
             result.append(REDIS_EMPTY_STRING);

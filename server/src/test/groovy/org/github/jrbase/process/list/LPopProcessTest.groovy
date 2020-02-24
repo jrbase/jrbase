@@ -1,6 +1,7 @@
 package org.github.jrbase.process.list
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore
+
+import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.CmdProcess
 import org.github.jrbase.utils.ToolsString
@@ -24,15 +25,15 @@ class LPopProcessTest extends Specification {
 
     def "processData"() {
         given:
-        RheaKVStore rheaKVStore = Mock()
-        clientCmd.setRheaKVStore(rheaKVStore)
+        final BackendProxy backendProxy = Mock()
+        clientCmd.setBackendProxy(backendProxy)
         String buildUpKey = clientCmd.getKey() + LISTS.getAbbreviation()
-        rheaKVStore.bGet(buildUpKey) >> input
+        backendProxy.bGet(buildUpKey) >> input
         if (!isEmptyBytes(input)) {
             final String resultStr = readUtf8(input)
             final String[] valueArr = resultStr.split(REDIS_LIST_DELIMITER)
             String buildUpValue = ToolsString.getLPopBuildUpValue(valueArr)
-            rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue))
+            backendProxy.bPut(buildUpKey, writeUtf8(buildUpValue))
         }
         expect:
         message == cmdProcess.process(clientCmd)

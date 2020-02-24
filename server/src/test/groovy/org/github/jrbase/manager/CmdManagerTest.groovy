@@ -1,7 +1,8 @@
 package org.github.jrbase.manager
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore
+
 import io.netty.channel.Channel
+import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.dataType.Cmd
 import org.github.jrbase.process.string.GetProcess
@@ -48,10 +49,10 @@ class CmdManagerTest extends Specification {
         given:
         ClientCmd clientCmd = new ClientCmd("get")
         clientCmd.setKey("key")
-        final RheaKVStore rheaKVStore = Mock()
-        clientCmd.setRheaKVStore(rheaKVStore)
+        final BackendProxy backendProxy = Mock()
+        clientCmd.setBackendProxy(backendProxy)
         String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation()
-        rheaKVStore.bGet(buildUpKey) >> null
+        backendProxy.bGet(buildUpKey) >> null
 
         Channel channel = Mock()
         channel.writeAndFlush("\$-1\r\n")

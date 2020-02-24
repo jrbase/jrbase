@@ -1,9 +1,9 @@
 package org.github.jrbase.process.hash
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore
+
+import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.CmdProcess
-import org.github.jrbase.process.hash.HGetProcess
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING
@@ -18,15 +18,15 @@ class HGetProcessTest extends Specification {
         given:
         clientCmd.setKey("a")
         clientCmd.setArgs(["field1"] as String[])
-        RheaKVStore rheaKVStore = Mock()
+        BackendProxy backendProxy = Mock()
         def buildUpKey = clientCmd.getKey() + "f" + clientCmd.getArgs()[0] + HASHES.getAbbreviation()
-        rheaKVStore.bGet(buildUpKey) >> input
-        clientCmd.setRheaKVStore(rheaKVStore)
+        backendProxy.bGet(buildUpKey) >> input
+        clientCmd.setBackendProxy(backendProxy)
         expect:
         message == cmdProcess.process(clientCmd)
         where:
         input               | message
-        null | REDIS_EMPTY_STRING
+        null                | REDIS_EMPTY_STRING
         "value1".getBytes() | '$6\r\nvalue1\r\n'
     }
 

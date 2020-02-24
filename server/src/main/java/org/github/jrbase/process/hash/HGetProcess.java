@@ -1,6 +1,5 @@
 package org.github.jrbase.process.hash;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -31,10 +30,9 @@ public class HGetProcess implements CmdProcess {
     }
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         final String buildUpKey = clientCmd.getKey() + "f" + clientCmd.getArgs()[0] + HASHES.getAbbreviation();
-        final byte[] bytes = rheaKVStore.bGet(buildUpKey);
+        final byte[] bytes = clientCmd.getBackendProxy().bGet(buildUpKey);
         StringBuilder result = new StringBuilder();
         if (isEmptyBytes(bytes)) {
             result.append(REDIS_EMPTY_STRING);

@@ -1,6 +1,5 @@
 package org.github.jrbase.process.hash;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -30,12 +29,11 @@ public class HLenProcess implements CmdProcess {
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
         checkKeyType();
 
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
         // llen key
         // key is first arg
         //get hash length
         String mapCountKey = clientCmd.getKey() + HASHES.getAbbreviation();
-        final byte[] mapCountBytes = rheaKVStore.bGet(mapCountKey);
+        final byte[] mapCountBytes = clientCmd.getBackendProxy().bGet(mapCountKey);
         int length = Tools.byteArrayToInt(mapCountBytes);
         return ":" + length + "\r\n";
     }

@@ -41,27 +41,27 @@ public class DeleteExample {
         client.shutdown();
     }
 
-    public static void delete(final RheaKVStore rheaKVStore) {
-        rheaKVStore.bPut("delete_test", writeUtf8("1"));
-        LOG.info("Value={}", readUtf8(rheaKVStore.bGet("delete_test")));
-        final CompletableFuture<Boolean> f1 = rheaKVStore.delete(writeUtf8("delete_test"));
+    public static void delete(final RheaKVStore backendProxy) {
+        backendProxy.bPut("delete_test", writeUtf8("1"));
+        LOG.info("Value={}", readUtf8(backendProxy.bGet("delete_test")));
+        final CompletableFuture<Boolean> f1 = backendProxy.delete(writeUtf8("delete_test"));
         FutureHelper.get(f1);
-        LOG.info("Value={}", readUtf8(rheaKVStore.bGet("delete_test")));
+        LOG.info("Value={}", readUtf8(backendProxy.bGet("delete_test")));
 
-        rheaKVStore.bPut("delete_test", writeUtf8("1"));
-        LOG.info("Value={}", readUtf8(rheaKVStore.bGet("delete_test")));
-        final CompletableFuture<Boolean> f2 = rheaKVStore.delete("delete_test");
+        backendProxy.bPut("delete_test", writeUtf8("1"));
+        LOG.info("Value={}", readUtf8(backendProxy.bGet("delete_test")));
+        final CompletableFuture<Boolean> f2 = backendProxy.delete("delete_test");
         FutureHelper.get(f2);
-        LOG.info("Value={}", readUtf8(rheaKVStore.bGet("delete_test")));
+        LOG.info("Value={}", readUtf8(backendProxy.bGet("delete_test")));
 
-        rheaKVStore.bPut("delete_test", writeUtf8("1"));
-        LOG.info("Value={}", readUtf8(rheaKVStore.bGet("delete_test")));
-        rheaKVStore.bDelete(writeUtf8("delete_test"));
-        LOG.info("Value={}", readUtf8(rheaKVStore.bGet("delete_test")));
+        backendProxy.bPut("delete_test", writeUtf8("1"));
+        LOG.info("Value={}", readUtf8(backendProxy.bGet("delete_test")));
+        backendProxy.bDelete(writeUtf8("delete_test"));
+        LOG.info("Value={}", readUtf8(backendProxy.bGet("delete_test")));
 
-        rheaKVStore.bPut("delete_test", writeUtf8("1"));
-        LOG.info("Value={}", readUtf8(rheaKVStore.bGet("delete_test")));
-        rheaKVStore.bDelete("delete_test");
-        LOG.info("Value={}", readUtf8(rheaKVStore.bGet("delete_test")));
+        backendProxy.bPut("delete_test", writeUtf8("1"));
+        LOG.info("Value={}", readUtf8(backendProxy.bGet("delete_test")));
+        backendProxy.bDelete("delete_test");
+        LOG.info("Value={}", readUtf8(backendProxy.bGet("delete_test")));
     }
 }

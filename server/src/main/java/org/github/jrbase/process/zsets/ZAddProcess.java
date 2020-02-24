@@ -1,7 +1,7 @@
 package org.github.jrbase.process.zsets;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.apache.commons.lang.StringUtils;
+import org.github.jrbase.backend.BackendProxy;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -39,16 +39,16 @@ public class ZAddProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
+        final BackendProxy backendProxy = clientCmd.getBackendProxy();
 
         String buildUpKey = clientCmd.getKey() + SORTED_SETS.getAbbreviation();
-        final byte[] bytes = rheaKVStore.bGet(buildUpKey);
+        final byte[] bytes = backendProxy.bGet(buildUpKey);
         final String kvResult = readUtf8(bytes);
         final Map<String, String> KeyValueMap = generateKeyValueMap(clientCmd.getArgs());
 
         if (StringUtils.isEmpty(kvResult)) {
             String result = getKvBuildUpResult(KeyValueMap);
-            rheaKVStore.bPut(buildUpKey, result.getBytes());
+            backendProxy.bPut(buildUpKey, result.getBytes());
             return ":" + KeyValueMap.size() + "\r\n";
         } else {
             //update
@@ -62,7 +62,7 @@ public class ZAddProcess implements CmdProcess {
             }
             bGetKvMap.putAll(KeyValueMap);
             String result = getKvBuildUpResult(bGetKvMap);
-            rheaKVStore.bPut(buildUpKey, result.getBytes());
+            backendProxy.bPut(buildUpKey, result.getBytes());
             return ":" + resultCount + "\r\n";
 
         }

@@ -1,6 +1,5 @@
 package org.github.jrbase.process.list;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -33,11 +32,10 @@ public class LRangeProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
 
         String buildUpKey = clientCmd.getKey() + LISTS.getAbbreviation();
         //bGet
-        final byte[] bGetResult = rheaKVStore.bGet(buildUpKey);
+        final byte[] bGetResult = clientCmd.getBackendProxy().bGet(buildUpKey);
         if (isEmptyBytes(bGetResult)) {
             return REDIS_EMPTY_LIST;
         } else {     // update list values

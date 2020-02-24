@@ -1,9 +1,8 @@
 package org.github.jrbase.process.string
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore
+import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.CmdProcess
-import org.github.jrbase.process.string.GetBitProcess
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING
@@ -17,15 +16,15 @@ class GetBitProcessTest extends Specification {
     def "Process"() {
         clientCmd.setKey("a")
         clientCmd.setArgs(args as String[])
-        RheaKVStore rheaKVStore = Mock()
-        clientCmd.setRheaKVStore(rheaKVStore)
+        final BackendProxy backendProxy = Mock()
+        clientCmd.setBackendProxy(backendProxy)
         String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation()
-        rheaKVStore.bGet(buildUpKey) >> input
+        backendProxy.bGet(buildUpKey) >> input
         expect:
         message == cmdProcess.process(clientCmd)
         where:
-        args  | input | message
-        ['1'] | null  | REDIS_EMPTY_STRING
+        args  | input          | message
+        ['1'] | null           | REDIS_EMPTY_STRING
         ['1'] | "a".getBytes() | ':1\r\n'
         ['2'] | "a".getBytes() | ':1\r\n'
         ['3'] | "a".getBytes() | REDIS_ZORE_INTEGER

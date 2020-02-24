@@ -1,6 +1,6 @@
 package org.github.jrbase.process.sets;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
+import org.github.jrbase.backend.BackendProxy;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -37,36 +37,36 @@ public class SAddProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
+        final BackendProxy backendProxy = clientCmd.getBackendProxy();
 
         String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation();
-        final byte[] bytes = rheaKVStore.bGet(buildUpKey);
+        final byte[] bytes = backendProxy.bGet(buildUpKey);
 
         final String[] args = clientCmd.getArgs();
         Set<String> argsMembers = new HashSet<>(Arrays.asList(args));
 
         if (isEmptyBytes(bytes)) {
-            updateData(rheaKVStore, buildUpKey, argsMembers);
+            updateData(backendProxy, buildUpKey, argsMembers);
             return (":" + argsMembers.size() + "\r\n");
         } else {
             final String bGetSetsResult = readUtf8(bytes);
             final String[] getValueArr = bGetSetsResult.split(REDIS_LIST_DELIMITER);
             Set<String> bGetMembers = new HashSet<>(Arrays.asList(getValueArr));
             argsMembers.addAll(bGetMembers);
-            updateData(rheaKVStore, buildUpKey, argsMembers);
+            updateData(backendProxy, buildUpKey, argsMembers);
             int finalCount = argsMembers.size() - bGetMembers.size();
             return (":" + finalCount + "\r\n");
         }
 
     }
 
-    private void updateData(RheaKVStore rheaKVStore, String buildUpKey, Set<String> argsMembers) {
+    private void updateData(BackendProxy backendProxy, String buildUpKey, Set<String> argsMembers) {
         StringBuilder saddResult = new StringBuilder();
         for (String member : argsMembers) {
             saddResult.append(member).append(REDIS_LIST_DELIMITER);
         }
         deleteLastChar(saddResult);
-        rheaKVStore.bPut(buildUpKey, writeUtf8(saddResult.toString()));
+        backendProxy.bPut(buildUpKey, writeUtf8(saddResult.toString()));
     }
 
 

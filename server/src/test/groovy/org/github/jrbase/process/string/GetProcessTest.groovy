@@ -1,6 +1,7 @@
 package org.github.jrbase.process.string
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore
+
+import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.CmdProcess
 import spock.lang.Specification
@@ -15,11 +16,11 @@ class GetProcessTest extends Specification {
         given:
         CmdProcess cmdProcess = new GetProcess()
         ClientCmd clientCmd = new ClientCmd()
-        clientCmd.setKey("a") // the is import, "a" must same as clientCmd.getKey() in process: rheaKVStore.bGet(clientCmd.getKey())
-        RheaKVStore rheaKVStore = Mock()
-        clientCmd.setRheaKVStore(rheaKVStore)
+        clientCmd.setKey("a") // the is import, "a" must same as clientCmd.getKey() in process: backendProxy.bGet(clientCmd.getKey())
+        final BackendProxy backendProxy = Mock()
+        clientCmd.setBackendProxy(backendProxy)
         String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation()
-        rheaKVStore.bGet(buildUpKey) >> input
+        backendProxy.bGet(buildUpKey) >> input
         expect:
         message == cmdProcess.process(clientCmd)
         where:

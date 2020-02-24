@@ -1,6 +1,6 @@
 package org.github.jrbase.process.hash;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
+import org.github.jrbase.backend.BackendProxy;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -36,31 +36,31 @@ public class HSetProcess implements CmdProcess {
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
         // hset key field value
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
+        final BackendProxy backendProxy = clientCmd.getBackendProxy();
 
         //1 get mapCount
         String mapCountKey = clientCmd.getKey() + "h";
-        final byte[] mapCountBytes = rheaKVStore.bGet(mapCountKey);
+        final byte[] mapCountBytes = backendProxy.bGet(mapCountKey);
         final int originCount = Tools.byteArrayToInt(mapCountBytes);
         //2 put hset
         //3 get successCount
-        final int successCount = getSuccessCountUpdate(clientCmd, rheaKVStore);
+        final int successCount = getSuccessCountUpdate(clientCmd, backendProxy);
         int totalCount = originCount + successCount;
 
         //4 update totalCount
-        rheaKVStore.put(mapCountKey, Tools.intToByteArray(totalCount));
+        backendProxy.bPut(mapCountKey, Tools.intToByteArray(totalCount));
         return ":" + successCount + "\r\n";
 
         // another think,but cant't implement
         // kvList.add(new KVEntry(buildUpKey, writeUtf8(value)));
     }
 
-    private int getSuccessCountUpdate(ClientCmd clientCmd, RheaKVStore rheaKVStore) {
+    private int getSuccessCountUpdate(ClientCmd clientCmd, BackendProxy backendProxy) {
         int successCount = 0;
         final Map<String, String> keyValueMap = generateKeyValueMap(clientCmd.getArgs());
         for (String field : keyValueMap.keySet()) {
             String buildUpKey = getBuildUpKey(clientCmd.getKey(), field);
-            final byte[] bytes = rheaKVStore.bGetAndPut(buildUpKey, writeUtf8(keyValueMap.get(field)));
+            final byte[] bytes = backendProxy.bGetAndPut(buildUpKey, writeUtf8(keyValueMap.get(field)));
             successCount = bytes == null ? successCount + 1 : successCount;
         }
         return successCount;

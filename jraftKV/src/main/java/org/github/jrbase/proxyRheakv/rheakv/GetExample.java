@@ -40,17 +40,17 @@ public class GetExample {
         client.shutdown();
     }
 
-    public static void get(final RheaKVStore rheaKVStore) {
+    public static void get(final RheaKVStore backendProxy) {
         final byte[] key = writeUtf8("hello");
         final byte[] value = writeUtf8("world");
-        rheaKVStore.bPut(key, value);
+        backendProxy.bPut(key, value);
 
         // async get with bytes
-        final CompletableFuture<byte[]> f1 = rheaKVStore.get(key);
-        final CompletableFuture<byte[]> f2 = rheaKVStore.get(key, false);
+        final CompletableFuture<byte[]> f1 = backendProxy.get(key);
+        final CompletableFuture<byte[]> f2 = backendProxy.get(key, false);
         // async get with string
-        final CompletableFuture<byte[]> f3 = rheaKVStore.get("hello");
-        final CompletableFuture<byte[]> f4 = rheaKVStore.get("hello", false);
+        final CompletableFuture<byte[]> f3 = backendProxy.get("hello");
+        final CompletableFuture<byte[]> f4 = backendProxy.get("hello", false);
         CompletableFuture.allOf(f1, f2, f3, f4).join();
         LOG.info("Async get result={}", readUtf8(f1.join()));
         LOG.info("Async get result={}", readUtf8(f2.join()));
@@ -58,11 +58,11 @@ public class GetExample {
         LOG.info("Async get result={}", readUtf8(f4.join()));
 
         // sync get with bytes
-        final byte[] b1 = rheaKVStore.bGet(key);
-        final byte[] b2 = rheaKVStore.bGet(key, false);
+        final byte[] b1 = backendProxy.bGet(key);
+        final byte[] b2 = backendProxy.bGet(key, false);
         // sync get with string
-        final byte[] b3 = rheaKVStore.bGet("hello");
-        final byte[] b4 = rheaKVStore.bGet("hello", false);
+        final byte[] b3 = backendProxy.bGet("hello");
+        final byte[] b4 = backendProxy.bGet("hello", false);
         LOG.info("Sync get result={}", readUtf8(b1));
         LOG.info("Sync get result={}", readUtf8(b2));
         LOG.info("Sync get result={}", readUtf8(b3));

@@ -1,7 +1,8 @@
 package org.github.jrbase.process.zsets
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore
+
 import org.apache.commons.lang.StringUtils
+import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.CmdProcess
 import spock.lang.Specification
@@ -26,22 +27,22 @@ class ZAddProcessTest extends Specification {
     def "processData"() {
         given:
         clientCmd.setArgs(args as String[])
-        RheaKVStore rheaKVStore = Mock()
-        clientCmd.setRheaKVStore(rheaKVStore)
+        final BackendProxy backendProxy = Mock()
+        clientCmd.setBackendProxy(backendProxy)
         String buildUpKey = clientCmd.getKey() + SORTED_SETS.getAbbreviation()
         //
-        rheaKVStore.bGet(buildUpKey) >> originValue
+        backendProxy.bGet(buildUpKey) >> originValue
         final Map<String, String> KeyValueMap = generateKeyValueMap(clientCmd.getArgs())
         final String kvResult = readUtf8(originValue)
         if (StringUtils.isEmpty(kvResult)) {
             String result = ZAddProcess.getKvBuildUpResult(KeyValueMap)
-            rheaKVStore.bPut(buildUpKey, result.getBytes())
+            backendProxy.bPut(buildUpKey, result.getBytes())
         } else {
             final String[] arr = kvResult.split(REDIS_LIST_DELIMITER)
             final Map<String, String> bGetKvMap = generateKeyValueMap(arr)
             bGetKvMap.putAll(bGetKvMap)
             String result = ZAddProcess.getKvBuildUpResult(bGetKvMap)
-            rheaKVStore.bPut(buildUpKey, result.getBytes())
+            backendProxy.bPut(buildUpKey, result.getBytes())
         }
         expect:
         cmdProcess.process(clientCmd) == message
