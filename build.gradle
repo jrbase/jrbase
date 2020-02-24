@@ -1,4 +1,3 @@
-import com.github.jrbase.codelinecountplugin.CodeLineCountPlugin
 
 group 'org.github.jrbase'
 version '1.0.1'
@@ -14,7 +13,7 @@ allprojects {
     apply plugin: "java"
     apply plugin: "groovy"
     apply plugin: 'jacoco'
-    apply plugin: CodeLineCountPlugin
+    apply plugin: com.github.jrbase.codelinecountplugin.CodeLineCountPlugin
 
     version = rootProject.version
 
