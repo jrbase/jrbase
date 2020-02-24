@@ -5,6 +5,7 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
+import org.github.jrbase.process.annotation.KeyCommand;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -21,6 +22,7 @@ import static org.github.jrbase.utils.ToolsString.deleteLastChar;
  * spop key [count]
  * Removes and returns one or more random elements from the set value store at key.
  */
+@KeyCommand
 public class SPopProcess implements CmdProcess {
     @Override
     public String getCmdName() {

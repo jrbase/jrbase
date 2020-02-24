@@ -1,7 +1,15 @@
 package org.github.jrbase.process;
 
 import org.github.jrbase.dataType.ClientCmd;
+import org.github.jrbase.process.annotation.KeyCommand;
 
+/**
+ * add process key must implement CmdProcess
+ *
+ * @see KeyCommand
+ * getCmdName is key
+ * instance of class is value
+ */
 public interface CmdProcess {
     /**
      * @return get command name

@@ -10,4 +10,14 @@ class YamlToolTest extends Specification {
         redisConfigurationOption.getBind() == '127.0.0.1'
         redisConfigurationOption.getPort() == 6379
     }
+
+    def "ReadConfigErrorFile"() {
+        when:
+        YamlTool.readConfig("config/unknownFile.yaml")
+        then:
+        RuntimeException e = thrown()
+        e.message.contains("No such file or directory")
+
+    }
+
 }

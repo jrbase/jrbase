@@ -4,6 +4,7 @@ import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
+import org.github.jrbase.process.annotation.KeyCommand;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
@@ -13,7 +14,7 @@ import static org.github.jrbase.dataType.RedisDataType.LISTS;
 import static org.github.jrbase.utils.Tools.isEmptyBytes;
 import static org.github.jrbase.utils.ToolsString.getLPopBuildUpValue;
 
-
+@KeyCommand
 public class LPopProcess implements CmdProcess {
 
     @Override

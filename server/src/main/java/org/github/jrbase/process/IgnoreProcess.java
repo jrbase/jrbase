@@ -2,10 +2,13 @@ package org.github.jrbase.process;
 
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
+import org.github.jrbase.process.annotation.KeyCommand;
 
 /**
  * error command process class
  */
+
+@KeyCommand
 public class IgnoreProcess implements CmdProcess {
 
     @Override

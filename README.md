@@ -260,3 +260,5 @@ Scripting
 [redis commands](https://redis.io/commands/)
 
 [use tikv to build distrubuted redis service](https://pingcap.com/blog-cn/use-tikv-to-build-distributed-redis-service/)
+
+[reflections](https://code.google.com/archive/p/reflections/)

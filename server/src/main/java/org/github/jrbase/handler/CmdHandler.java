@@ -5,15 +5,13 @@ import org.apache.commons.lang.StringUtils;
 import org.github.jrbase.config.RedisConfigurationOption;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisClientContext;
-import org.github.jrbase.handler.connect.CommandHandler;
-import org.github.jrbase.handler.connect.EchoHandler;
-import org.github.jrbase.handler.connect.PingHandler;
+import org.github.jrbase.handler.annotation.ScanServerAnnotationConfigure;
 import org.github.jrbase.manager.CmdManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.github.jrbase.dataType.ServerCmd.*;
+import static org.github.jrbase.dataType.ServerCmd.AUTH;
 import static org.github.jrbase.handler.CommandParse.parseMessageToClientCmd;
 
 public class CmdHandler {
@@ -25,20 +23,19 @@ public class CmdHandler {
      */
     private final Map<ChannelHandlerContext, RedisClientContext> clientContext = new HashMap<>();
 
-    private final Map<String, ServerCmdHandler> serverCmdHandlerMap = new HashMap<>();
 
     private RedisConfigurationOption redisConfigurationOption;
 
     public CmdHandler(RedisConfigurationOption redisConfigurationOption) {
         this.redisConfigurationOption = redisConfigurationOption;
-        initHandlerMap();
+//        initHandlerMap();
     }
 
-    private void initHandlerMap() {
-        serverCmdHandlerMap.put(ECHO.getCmdName(), new EchoHandler());
-        serverCmdHandlerMap.put(PING.getCmdName(), new PingHandler());
-        serverCmdHandlerMap.put(COMMAND.getCmdName(), new CommandHandler());
-    }
+//    private void initHandlerMap() {
+//        serverCmdHandlerMap.put(ECHO.getCmdName(), new EchoHandler());
+//        serverCmdHandlerMap.put(PING.getCmdName(), new PingHandler());
+//        serverCmdHandlerMap.put(COMMAND.getCmdName(), new CommandHandler());
+////    }
 
     public void handleMsg(ChannelHandlerContext ctx, String message) {
 
@@ -51,7 +48,7 @@ public class CmdHandler {
         if (clientCmd.getCmd().isEmpty()) {
             replyErrorToClient(ctx, "empty command");
         } else {
-            final ServerCmdHandler serverCmdHandler = serverCmdHandlerMap.get(clientCmd.getCmd());
+            final ServerCmdHandler serverCmdHandler = ScanServerAnnotationConfigure.instance().get(clientCmd.getCmd());
             if (serverCmdHandler != null) {
                 //handle server command
                 final String cmdHandlerResult = serverCmdHandler.handle(clientCmd);

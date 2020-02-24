@@ -5,12 +5,14 @@ import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.dataType.RedisDataType;
 import org.github.jrbase.process.CmdProcess;
+import org.github.jrbase.process.annotation.KeyCommand;
 import org.github.jrbase.utils.Tools;
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING;
 import static org.github.jrbase.utils.Tools.checkArgs;
 import static org.github.jrbase.utils.Tools.isEmptyBytes;
 
+@KeyCommand
 public class GetBitProcess implements CmdProcess {
 
     @Override
