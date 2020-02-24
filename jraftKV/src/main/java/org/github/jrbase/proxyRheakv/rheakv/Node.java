@@ -28,22 +28,22 @@ public class Node {
 
     private final RheaKVStoreOptions options;
 
-    private RheaKVStore              rheaKVStore;
+    private RheaKVStore backendProxy;
 
     public Node(RheaKVStoreOptions options) {
         this.options = options;
     }
 
     public void start() {
-        this.rheaKVStore = new DefaultRheaKVStore();
-        this.rheaKVStore.init(this.options);
+        this.backendProxy = new DefaultRheaKVStore();
+        this.backendProxy.init(this.options);
     }
 
     public void stop() {
-        this.rheaKVStore.shutdown();
+        this.backendProxy.shutdown();
     }
 
     public RheaKVStore getRheaKVStore() {
-        return rheaKVStore;
+        return backendProxy;
     }
 }

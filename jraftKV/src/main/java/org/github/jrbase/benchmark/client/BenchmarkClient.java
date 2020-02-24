@@ -67,39 +67,39 @@ public class BenchmarkClient {
 
         final RheaKVStoreOptions opts = Yaml.readConfig(configPath);
         opts.setInitialServerList(initialServerList);
-        final RheaKVStore rheaKVStore = new DefaultRheaKVStore();
-        if (!rheaKVStore.init(opts)) {
+        final RheaKVStore backendProxy = new DefaultRheaKVStore();
+        if (!backendProxy.init(opts)) {
             LOG.error("Fail to init [RheaKVStore]");
             System.exit(-1);
         }
 
         final List<RegionRouteTableOptions> regionRouteTableOptionsList = opts.getPlacementDriverOptions()
-            .getRegionRouteTableOptionsList();
+                .getRegionRouteTableOptionsList();
 
-        rebalance(rheaKVStore, initialServerList, regionRouteTableOptionsList);
+        rebalance(backendProxy, initialServerList, regionRouteTableOptionsList);
 
-        rheaKVStore.bPut("org/github/jrbase/benchmark", BytesUtil.writeUtf8("org.github.jrbase.benchmark start at: " + new Date()));
-        LOG.info(BytesUtil.readUtf8(rheaKVStore.bGet("org/github/jrbase/benchmark")));
+        backendProxy.bPut("org/github/jrbase/benchmark", BytesUtil.writeUtf8("org.github.jrbase.benchmark start at: " + new Date()));
+        LOG.info(BytesUtil.readUtf8(backendProxy.bGet("org/github/jrbase/benchmark")));
 
         ConsoleReporter.forRegistry(KVMetrics.metricRegistry()) //
-            .build() //
-            .start(30, TimeUnit.SECONDS);
+                .build() //
+                .start(30, TimeUnit.SECONDS);
 
         LOG.info("Start org.github.jrbase.benchmark...");
-        startBenchmark(rheaKVStore, threads, writeRatio, readRatio, valueSize, regionRouteTableOptionsList);
+        startBenchmark(backendProxy, threads, writeRatio, readRatio, valueSize, regionRouteTableOptionsList);
     }
 
-    public static void startBenchmark(final RheaKVStore rheaKVStore, final int threads, final int writeRatio, final int readRatio,
+    public static void startBenchmark(final RheaKVStore backendProxy, final int threads, final int writeRatio, final int readRatio,
                                       final int valueSize, final List<RegionRouteTableOptions> regionRouteTableOptionsList) {
         for (int i = 0; i < threads; i++) {
-            final Thread t = new Thread(() -> doRequest(rheaKVStore, writeRatio, readRatio, valueSize, regionRouteTableOptionsList));
+            final Thread t = new Thread(() -> doRequest(backendProxy, writeRatio, readRatio, valueSize, regionRouteTableOptionsList));
             t.setDaemon(true);
             t.start();
         }
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
-    public static void doRequest(final RheaKVStore rheaKVStore, final int writeRatio, final int readRatio, final int valueSize,
+    public static void doRequest(final RheaKVStore backendProxy, final int writeRatio, final int readRatio, final int valueSize,
                                  final List<RegionRouteTableOptions> regionRouteTableOptionsList) {
         final int regionSize = regionRouteTableOptionsList.size();
         final ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -109,7 +109,7 @@ public class BenchmarkClient {
         int randomRegionIndex = 0;
         final byte[] valeBytes = new byte[valueSize];
         random.nextBytes(valeBytes);
-        for (;;) {
+        for (; ; ) {
             try {
                 slidingWindow.acquire();
             } catch (final Exception e) {
@@ -127,7 +127,7 @@ public class BenchmarkClient {
             if (Math.abs(i % sum) < writeRatio) {
                 // put
                 final Timer.Context putCtx = putTimer.time();
-                final CompletableFuture<Boolean> f = put(rheaKVStore, keyBytes, valeBytes);
+                final CompletableFuture<Boolean> f = put(backendProxy, keyBytes, valeBytes);
                 f.whenComplete((ignored, throwable) -> {
                     slidingWindow.release();
                     ctx.stop();
@@ -136,7 +136,7 @@ public class BenchmarkClient {
             } else {
                 // get
                 final Timer.Context getCtx = getTimer.time();
-                final CompletableFuture<byte[]> f = get(rheaKVStore, keyBytes);
+                final CompletableFuture<byte[]> f = get(backendProxy, keyBytes);
                 f.whenComplete((ignored, throwable) -> {
                     slidingWindow.release();
                     ctx.stop();
@@ -146,18 +146,18 @@ public class BenchmarkClient {
         }
     }
 
-    public static CompletableFuture<Boolean> put(final RheaKVStore rheaKVStore, final byte[] key, final byte[] value) {
-        return rheaKVStore.put(key, value);
+    public static CompletableFuture<Boolean> put(final RheaKVStore backendProxy, final byte[] key, final byte[] value) {
+        return backendProxy.put(key, value);
     }
 
-    public static CompletableFuture<byte[]> get(final RheaKVStore rheaKVStore, final byte[] key) {
-        return rheaKVStore.get(key);
+    public static CompletableFuture<byte[]> get(final RheaKVStore backendProxy, final byte[] key) {
+        return backendProxy.get(key);
     }
 
     // Because we use fake PD, so we need manual rebalance
-    public static void rebalance(final RheaKVStore rheaKVStore, final String initialServerList,
+    public static void rebalance(final RheaKVStore backendProxy, final String initialServerList,
                                  final List<RegionRouteTableOptions> regionRouteTableOptionsList) {
-        final PlacementDriverClient pdClient = rheaKVStore.getPlacementDriverClient();
+        final PlacementDriverClient pdClient = backendProxy.getPlacementDriverClient();
         final Configuration configuration = new Configuration();
         configuration.parse(initialServerList);
         final int serverSize = configuration.size();

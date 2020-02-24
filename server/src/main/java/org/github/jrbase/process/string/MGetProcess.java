@@ -1,6 +1,5 @@
 package org.github.jrbase.process.string;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import com.alipay.sofa.jraft.rhea.util.ByteArray;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
@@ -33,7 +32,6 @@ public class MGetProcess implements CmdProcess {
     }
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
         // key is first arg
         List<byte[]> keyList = new ArrayList<>();
         String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation();
@@ -44,7 +42,7 @@ public class MGetProcess implements CmdProcess {
         }
         // key, value
         // new ByteArray("key".getBytes()), "value".getBytes()
-        final Map<ByteArray, byte[]> multiGetResult = rheaKVStore.bMultiGet(keyList);
+        final Map<ByteArray, byte[]> multiGetResult = clientCmd.getBackendProxy().bMultiGet(keyList);
 
         StringBuilder result = new StringBuilder();
         result.append('*').append(keyList.size()).append("\r\n");

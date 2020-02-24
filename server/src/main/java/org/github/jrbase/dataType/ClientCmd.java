@@ -1,7 +1,7 @@
 package org.github.jrbase.dataType;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.Channel;
+import org.github.jrbase.backend.BackendProxy;
 
 import java.util.Arrays;
 
@@ -10,7 +10,7 @@ public class ClientCmd {
     private String key;
     private String[] args;
     private Channel channel;
-    private RheaKVStore rheaKVStore;
+    private BackendProxy backendProxy;
 
     public ClientCmd() {
 
@@ -24,12 +24,12 @@ public class ClientCmd {
         return channel;
     }
 
-    public RheaKVStore getRheaKVStore() {
-        return rheaKVStore;
+    public BackendProxy getBackendProxy() {
+        return backendProxy;
     }
 
-    public void setRheaKVStore(RheaKVStore rheaKVStore) {
-        this.rheaKVStore = rheaKVStore;
+    public void setBackendProxy(BackendProxy backendProxy) {
+        this.backendProxy = backendProxy;
     }
 
     public int getArgLength() {

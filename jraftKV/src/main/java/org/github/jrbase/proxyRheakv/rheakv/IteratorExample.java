@@ -44,12 +44,12 @@ public class IteratorExample {
     }
 
     @SuppressWarnings("unchecked")
-    public static void iterator(final RheaKVStore rheaKVStore) {
+    public static void iterator(final RheaKVStore backendProxy) {
         final List<byte[]> keys = Lists.newArrayList();
         for (int i = 0; i < 10; i++) {
             final byte[] bytes = writeUtf8("iterator_demo_" + i);
             keys.add(bytes);
-            rheaKVStore.bPut(bytes, bytes);
+            backendProxy.bPut(bytes, bytes);
         }
 
         final byte[] firstKey = keys.get(0);
@@ -57,12 +57,12 @@ public class IteratorExample {
         final String firstKeyString = readUtf8(firstKey);
         final String lastKeyString = readUtf8(lastKey);
         //bufSize is max key size @see scan(limit)
-        final RheaIterator<KVEntry> it1 = rheaKVStore.iterator(firstKey, lastKey, 5);
-        final RheaIterator<KVEntry> it2 = rheaKVStore.iterator(firstKey, lastKey, 6, false);
-        final RheaIterator<KVEntry> it3 = rheaKVStore.iterator(firstKeyString, lastKeyString, 5);
-        final RheaIterator<KVEntry> it4 = rheaKVStore.iterator(firstKeyString, lastKeyString, 6, false);
+        final RheaIterator<KVEntry> it1 = backendProxy.iterator(firstKey, lastKey, 5);
+        final RheaIterator<KVEntry> it2 = backendProxy.iterator(firstKey, lastKey, 6, false);
+        final RheaIterator<KVEntry> it3 = backendProxy.iterator(firstKeyString, lastKeyString, 5);
+        final RheaIterator<KVEntry> it4 = backendProxy.iterator(firstKeyString, lastKeyString, 6, false);
 
-        for (final RheaIterator<KVEntry> it : new RheaIterator[] { it1, it2, it3, it4 }) {
+        for (final RheaIterator<KVEntry> it : new RheaIterator[]{it1, it2, it3, it4}) {
             while (it.hasNext()) {
                 final KVEntry kv = it.next();
                 LOG.info("Sync iterator: key={}, value={}", readUtf8(kv.getKey()), readUtf8(kv.getValue()));

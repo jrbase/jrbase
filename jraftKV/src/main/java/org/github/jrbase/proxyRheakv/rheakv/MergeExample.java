@@ -38,21 +38,21 @@ public class MergeExample {
         client.shutdown();
     }
 
-    public static void merge(final RheaKVStore rheaKVStore) {
-        final CompletableFuture<Boolean> f1 = rheaKVStore.merge("merge_example", "1");
-        final CompletableFuture<Boolean> f2 = rheaKVStore.merge("merge_example", "2");
-        final CompletableFuture<Boolean> f3 = rheaKVStore.merge("merge_example", "3");
-        final CompletableFuture<Boolean> f4 = rheaKVStore.merge("merge_example", "4");
-        final CompletableFuture<Boolean> f5 = rheaKVStore.merge("merge_example", "5");
+    public static void merge(final RheaKVStore backendProxy) {
+        final CompletableFuture<Boolean> f1 = backendProxy.merge("merge_example", "1");
+        final CompletableFuture<Boolean> f2 = backendProxy.merge("merge_example", "2");
+        final CompletableFuture<Boolean> f3 = backendProxy.merge("merge_example", "3");
+        final CompletableFuture<Boolean> f4 = backendProxy.merge("merge_example", "4");
+        final CompletableFuture<Boolean> f5 = backendProxy.merge("merge_example", "5");
         // wait for all merge operate to complete then to bGet the key(merge_example)
         CompletableFuture.allOf(f1, f2, f3, f4, f5).join();
-        LOG.info("Merge result is: {}", readUtf8(rheaKVStore.bGet("merge_example")));
+        LOG.info("Merge result is: {}", readUtf8(backendProxy.bGet("merge_example")));
 
-        rheaKVStore.bMerge("merge_example1", "1");
-        rheaKVStore.bMerge("merge_example1", "2");
-        rheaKVStore.bMerge("merge_example1", "3");
-        rheaKVStore.bMerge("merge_example1", "4");
-        rheaKVStore.bMerge("merge_example1", "5");
-        LOG.info("Merge result is: {}", readUtf8(rheaKVStore.bGet("merge_example1")));
+        backendProxy.bMerge("merge_example1", "1");
+        backendProxy.bMerge("merge_example1", "2");
+        backendProxy.bMerge("merge_example1", "3");
+        backendProxy.bMerge("merge_example1", "4");
+        backendProxy.bMerge("merge_example1", "5");
+        LOG.info("Merge result is: {}", readUtf8(backendProxy.bGet("merge_example1")));
     }
 }

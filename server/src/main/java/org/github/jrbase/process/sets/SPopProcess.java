@@ -1,7 +1,7 @@
 package org.github.jrbase.process.sets;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.apache.commons.lang.math.RandomUtils;
+import org.github.jrbase.backend.BackendProxy;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -36,11 +36,11 @@ public class SPopProcess implements CmdProcess {
 
     @Override
     public String process(ClientCmd clientCmd) {
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
+        final BackendProxy backendProxy = clientCmd.getBackendProxy();
 
         String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation();
         //bGet
-        final byte[] bGetResult = rheaKVStore.bGet(buildUpKey);
+        final byte[] bGetResult = backendProxy.bGet(buildUpKey);
         final String bGetResultStr = readUtf8(bGetResult);
         //1 no key
         if (isEmpty(bGetResultStr)) {
@@ -51,28 +51,28 @@ public class SPopProcess implements CmdProcess {
             if (args.length > 1) {
                 return "-ERR syntax error\r\n";
             } else if (args.length == 1) {  //3 have count argument
-                return handleCountArgument(rheaKVStore, buildUpKey, bGetResultStr, args);
+                return handleCountArgument(backendProxy, buildUpKey, bGetResultStr, args);
             } else {// 4 have no count argument
-                return handlePopOneSet(rheaKVStore, buildUpKey, bGetResultStr);
+                return handlePopOneSet(backendProxy, buildUpKey, bGetResultStr);
             }
         }
     }
 
 
     @NotNull
-    private String handlePopOneSet(RheaKVStore rheaKVStore, String buildUpKey, String bGetResultStr) {
+    private String handlePopOneSet(BackendProxy backendProxy, String buildUpKey, String bGetResultStr) {
         final String[] getValueArr = bGetResultStr.split(REDIS_LIST_DELIMITER);
         final int randomNum = RandomUtils.nextInt(getValueArr.length);
         StringBuilder sPopSetResult = getPopUpdateResult(getValueArr, randomNum);
         //set
-        rheaKVStore.bPut(buildUpKey, writeUtf8(sPopSetResult.toString()));
+        backendProxy.bPut(buildUpKey, writeUtf8(sPopSetResult.toString()));
         //pop
         String randomPopValue = GetRandomPopValue(getValueArr, randomNum);
         return ("*1\r\n$" + randomPopValue.length() + "\r\n" + randomPopValue + "\r\n");
     }
 
     @NotNull
-    private String handleCountArgument(RheaKVStore rheaKVStore, String buildUpKey, String bGetResultStr, String[] args) {
+    private String handleCountArgument(BackendProxy backendProxy, String buildUpKey, String bGetResultStr, String[] args) {
         int count;
         try {
             count = Integer.parseInt(args[0]);
@@ -84,7 +84,7 @@ public class SPopProcess implements CmdProcess {
         // 5 return all data
         if (count >= getValueArr.length) {
             //set
-            rheaKVStore.bPut(buildUpKey, writeUtf8(""));
+            backendProxy.bPut(buildUpKey, writeUtf8(""));
             //pop
             return getPopResult(Arrays.asList(getValueArr));
         } else {//6 random return count values
@@ -94,7 +94,7 @@ public class SPopProcess implements CmdProcess {
             getPopListAndUpdateList(getValueArr, randomSets, popList, updateList);
             //set
             final StringBuilder updateResult = getUpdateData(updateList);
-            rheaKVStore.bPut(buildUpKey, writeUtf8(updateResult.toString()));
+            backendProxy.bPut(buildUpKey, writeUtf8(updateResult.toString()));
             //pop
             return getPopResult(popList);
         }

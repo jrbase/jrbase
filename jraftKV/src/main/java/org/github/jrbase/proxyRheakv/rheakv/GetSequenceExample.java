@@ -40,26 +40,26 @@ public class GetSequenceExample {
         client.shutdown();
     }
 
-    public static void getSequence(final RheaKVStore rheaKVStore) {
+    public static void getSequence(final RheaKVStore backendProxy) {
         final byte[] key = writeUtf8("sequence");
-        final CompletableFuture<Sequence> sequence = rheaKVStore.getSequence(key, 10);
+        final CompletableFuture<Sequence> sequence = backendProxy.getSequence(key, 10);
 
         // async
-        final CompletableFuture<Sequence> f1 = rheaKVStore.getSequence(key, 20);
-        final CompletableFuture<Sequence> f2 = rheaKVStore.getSequence("sequence", 30);
+        final CompletableFuture<Sequence> f1 = backendProxy.getSequence(key, 20);
+        final CompletableFuture<Sequence> f2 = backendProxy.getSequence("sequence", 30);
         CompletableFuture.allOf(f1, f2).join();
         LOG.info("Async getSequence result={}", f1.join());
         LOG.info("Async getSequence result={}", f2.join());
 
-        final CompletableFuture<Boolean> f3 = rheaKVStore.resetSequence(key);
+        final CompletableFuture<Boolean> f3 = backendProxy.resetSequence(key);
         f3.join();
 
         // sync
-        final Sequence b1 = rheaKVStore.bGetSequence(key, 40);
-        final Sequence b2 = rheaKVStore.bGetSequence("sequence", 50);
+        final Sequence b1 = backendProxy.bGetSequence(key, 40);
+        final Sequence b2 = backendProxy.bGetSequence("sequence", 50);
         LOG.info("Sync getSequence result={}", b1);
         LOG.info("Sync getSequence result={}", b2);
 
-        rheaKVStore.bResetSequence(key);
+        backendProxy.bResetSequence(key);
     }
 }

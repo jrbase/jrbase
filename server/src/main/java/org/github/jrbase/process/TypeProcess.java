@@ -1,6 +1,5 @@
 package org.github.jrbase.process;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.dataType.RedisDataType;
@@ -29,9 +28,8 @@ public class TypeProcess implements CmdProcess {
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
         // no args
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
         String buildUpKey = clientCmd.getKey() + KEYS.getAbbreviation();
-        final byte[] getValue = rheaKVStore.bGet(buildUpKey);
+        final byte[] getValue = clientCmd.getBackendProxy().bGet(buildUpKey);
         StringBuilder result = new StringBuilder();
         if (getValue == null) {
             result.append("$").append(RedisDataType.NONE.getName().length()).append("\r\n").append(RedisDataType.NONE.getName()).append("\r\n");

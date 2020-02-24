@@ -1,9 +1,9 @@
 package org.github.jrbase.process.string
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore
+
+import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.process.CmdProcess
-import org.github.jrbase.process.string.SetBitProcess
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
@@ -16,10 +16,10 @@ class SetBitProcessTest extends Specification {
     def "Process"() {
         clientCmd.setKey("a")
         clientCmd.setArgs(args as String[])
-        RheaKVStore rheaKVStore = Mock()
-        clientCmd.setRheaKVStore(rheaKVStore)
+        final BackendProxy backendProxy = Mock()
+        clientCmd.setBackendProxy(backendProxy)
         String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation()
-        rheaKVStore.bGet(buildUpKey) >> input
+        backendProxy.bGet(buildUpKey) >> input
         expect:
         message == cmdProcess.process(clientCmd)
         where:

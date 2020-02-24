@@ -41,34 +41,34 @@ public class CompareAndPutExample {
         client.shutdown();
     }
 
-    private static void put(final RheaKVStore rheaKVStore) {
-        final CompletableFuture<Boolean> r1 = rheaKVStore.put("compareAndPut", writeUtf8("compareAndPutExpect"));
+    private static void put(final RheaKVStore backendProxy) {
+        final CompletableFuture<Boolean> r1 = backendProxy.put("compareAndPut", writeUtf8("compareAndPutExpect"));
         if (FutureHelper.get(r1)) {
-            LOG.info("Async put compareAndPut {} success.", readUtf8(rheaKVStore.bGet("compareAndPut")));
+            LOG.info("Async put compareAndPut {} success.", readUtf8(backendProxy.bGet("compareAndPut")));
         }
 
-        final CompletableFuture<Boolean> f1 = rheaKVStore.compareAndPut(writeUtf8("compareAndPut"),
-            writeUtf8("compareAndPutExpect"), writeUtf8("compareAndPutUpdate"));
+        final CompletableFuture<Boolean> f1 = backendProxy.compareAndPut(writeUtf8("compareAndPut"),
+                writeUtf8("compareAndPutExpect"), writeUtf8("compareAndPutUpdate"));
         if (FutureHelper.get(f1)) {
-            LOG.info("Compare compareAndPutExpect and set {} success.", readUtf8(rheaKVStore.bGet("compareAndPut")));
+            LOG.info("Compare compareAndPutExpect and set {} success.", readUtf8(backendProxy.bGet("compareAndPut")));
         }
 
-        final CompletableFuture<Boolean> f2 = rheaKVStore.compareAndPut("compareAndPut",
-            writeUtf8("compareAndPutUpdate"), writeUtf8("compareAndPutUpdate2"));
+        final CompletableFuture<Boolean> f2 = backendProxy.compareAndPut("compareAndPut",
+                writeUtf8("compareAndPutUpdate"), writeUtf8("compareAndPutUpdate2"));
         if (FutureHelper.get(f2)) {
-            LOG.info("Compare compareAndPutUpdate and set {} success.", readUtf8(rheaKVStore.bGet("compareAndPut")));
+            LOG.info("Compare compareAndPutUpdate and set {} success.", readUtf8(backendProxy.bGet("compareAndPut")));
         }
 
-        final Boolean b1 = rheaKVStore.bCompareAndPut(writeUtf8("compareAndPut1"), writeUtf8("compareAndPutUpdate2"),
-            writeUtf8("compareAndPutUpdate3"));
+        final Boolean b1 = backendProxy.bCompareAndPut(writeUtf8("compareAndPut1"), writeUtf8("compareAndPutUpdate2"),
+                writeUtf8("compareAndPutUpdate3"));
         if (b1) {
-            LOG.info("Compare compareAndPutUpdate2 and set {} success.", readUtf8(rheaKVStore.bGet("compareAndPut")));
+            LOG.info("Compare compareAndPutUpdate2 and set {} success.", readUtf8(backendProxy.bGet("compareAndPut")));
         }
 
-        final Boolean b2 = rheaKVStore.bCompareAndPut(writeUtf8("compareAndPut1"), writeUtf8("compareAndPutUpdate3"),
-            writeUtf8("compareAndPutUpdate4"));
+        final Boolean b2 = backendProxy.bCompareAndPut(writeUtf8("compareAndPut1"), writeUtf8("compareAndPutUpdate3"),
+                writeUtf8("compareAndPutUpdate4"));
         if (b2) {
-            LOG.info("Compare compareAndPutUpdate3 and set {} success.", readUtf8(rheaKVStore.bGet("compareAndPut")));
+            LOG.info("Compare compareAndPutUpdate3 and set {} success.", readUtf8(backendProxy.bGet("compareAndPut")));
         }
     }
 }

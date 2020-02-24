@@ -1,6 +1,6 @@
 package org.github.jrbase.process.list;
 
-import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
+import org.github.jrbase.backend.BackendProxy;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.process.CmdProcess;
@@ -34,23 +34,23 @@ public class RPushProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        final RheaKVStore rheaKVStore = clientCmd.getRheaKVStore();
+        final BackendProxy backendProxy = clientCmd.getBackendProxy();
 
         String buildUpKey = clientCmd.getKey() + LISTS.getAbbreviation();
         //bGet
-        final byte[] bGetResult = rheaKVStore.bGet(buildUpKey);
+        final byte[] bGetResult = backendProxy.bGet(buildUpKey);
         if (isEmptyBytes(bGetResult)) {
             //only set
             StringBuilder buildUpValue = getRightBuildUpArgsValue(clientCmd.getArgs());
             //bPut
-            rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue.toString()));
+            backendProxy.bPut(buildUpKey, writeUtf8(buildUpValue.toString()));
             return (":" + clientCmd.getArgLength() + "\r\n");
         } else {     // update list values
             final String resultStr = readUtf8(bGetResult);
             final String[] getValueArr = resultStr.split(REDIS_LIST_DELIMITER);
             String buildUpValue = getRightBuildUpValue(clientCmd.getArgs(), getValueArr);
             //bPut
-            rheaKVStore.bPut(buildUpKey, writeUtf8(buildUpValue));
+            backendProxy.bPut(buildUpKey, writeUtf8(buildUpValue));
             int allListLength = getValueArr.length + clientCmd.getArgLength();
             return (":" + allListLength + "\r\n");
         }
