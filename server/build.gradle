@@ -5,6 +5,9 @@ dependencies {
     compile "io.netty:netty-all:4.0.32.Final"
     compile project(":jraftKV")
     compile 'org.reflections:reflections:0.9.9-RC1'
+    compile 'org.tikv:tikv-client-java:2.0-SNAPSHOT'
+    testCompile 'org.apache.commons:commons-lang3:3.9'
+
 }
 
 task fatJar(type: Jar) {
