@@ -6,5 +6,3 @@ build/
 log
 raft_data
 rhea_db
-/tikvServer/logs/
-/tikvServer/data/
