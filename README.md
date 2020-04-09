@@ -3,15 +3,14 @@
 [![CircleCI](https://circleci.com/gh/jrbase/jrbase.svg?style=svg)](https://circleci.com/gh/jrbase/jrbase)
 ## What is jrbase?
 
-`jrbase` is a distributed NoSQL database similar to Redis.
+jrbase is a Distributed NoSQL database like redis.
 
-`jrbase` implement redis server protocol, powered by `custom kv server` or [jraft-rheakv](https://github.com/sofastack/sofa-jraft/tree/master/jraft-rheakv) backend.
+jrbase implement redis server protocol, powered by [jraft-rheakv](https://github.com/sofastack/sofa-jraft/tree/master/jraft-rheakv) backend.
 
 ## Architecture
 ![Architecture](./wiki/images/architecture.png)
-![Architecture](./wiki/images/architecture2.png)
 
-### Plan supported commands
+### plan supported commands
 
 ```
 Strings
@@ -257,18 +256,9 @@ Scripting
 ```
 
 
-## Related Links
+## Others Links
 [redis commands](https://redis.io/commands/)
-
-[A persistent key-value store for fast storage environments](https://rocksdb.org/)
-
-[The Raft Consensus Algorithm](https://raft.github.io/)
-
-[6.824 Schedule: Spring 2020](https://pdos.csail.mit.edu/6.824/schedule.html)
-
-[CMU 15-721](https://15721.courses.cs.cmu.edu/spring2020/)
 
 [use tikv to build distrubuted redis service](https://pingcap.com/blog-cn/use-tikv-to-build-distributed-redis-service/)
 
 [reflections](https://code.google.com/archive/p/reflections/)
-
