@@ -17,6 +17,8 @@ import static org.github.jrbase.handler.CommandParse.parseMessageToClientCmd;
 
 public class CmdHandler {
 
+    private CmdManager cmdManager;
+
     private static final String REPLY_OK = "OK";
 
     private static ScanServerAnnotationConfigure scanServerAnnotationConfigure = new ScanServerAnnotationConfigure();
@@ -31,6 +33,7 @@ public class CmdHandler {
 
     public CmdHandler(RedisConfigurationOption redisConfigurationOption) {
         this.redisConfigurationOption = redisConfigurationOption;
+        this.cmdManager = new CmdManager();
 //        initHandlerMap();
     }
 
@@ -59,9 +62,8 @@ public class CmdHandler {
             } else {
                 //handle data command
                 clientCmd.setChannel(ctx.channel());
-                clientCmd.setBackendProxy(new JraftKVDecorator(CmdManager.getRheaKVStore()));
-                System.out.println("currentThread: " + Thread.currentThread().getName());
-                CmdManager.process(clientCmd);
+                clientCmd.setBackendProxy(new JraftKVDecorator(cmdManager.getRheaKVStore()));
+                cmdManager.process(clientCmd);
             }
         }
 

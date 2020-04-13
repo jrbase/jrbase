@@ -13,33 +13,20 @@ import static org.github.jrbase.utils.Tools.isCorrectKey;
 
 public class CmdManager {
 
-    private final Object lock = new Object();
+    private static Client client = new Client();
 
-    private CmdManager() {
-        throw new UnsupportedOperationException();
+
+    public CmdManager() {
+        client.init();
+    }
+
+    public RheaKVStore getRheaKVStore() {
+        return client.getRheaKVStore();
     }
 
     private static ScanAnnotationConfigure scanAnnotationConfigure = new ScanAnnotationConfigure();
 
-    private static Client client = null;
-
-    public static Client getClient() {
-        if (client == null) {
-            synchronized (CmdManager.class) {
-                if (client == null) {
-                    client = new Client();
-                    client.init();
-                }
-            }
-        }
-        return client;
-    }
-
-    public static RheaKVStore getRheaKVStore() {
-        return getClient().getRheaKVStore();
-    }
-
-    public static void process(ClientCmd clientCmd) {
+    public void process(ClientCmd clientCmd) {
         CmdProcess cmdProcess;
         cmdProcess = clientCmdToCmdProcess(clientCmd);
         if (cmdProcess == null) {
@@ -64,11 +51,11 @@ public class CmdManager {
         channel.writeAndFlush("-ERR wrong number of arguments for '" + clientCmd.getCmd() + "' command\r\n");
     }
 
-    public static CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
+    public CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
         return scanAnnotationConfigure.get(clientCmd.getCmd());
     }
 
-    public static void shutdown() {
+    public void shutdown() {
         if (client != null) {
             client.shutdown();
         }
