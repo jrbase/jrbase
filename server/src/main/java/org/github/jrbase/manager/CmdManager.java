@@ -15,7 +15,6 @@ public class CmdManager {
 
     private static Client client = new Client();
 
-
     public CmdManager() {
         client.init();
     }

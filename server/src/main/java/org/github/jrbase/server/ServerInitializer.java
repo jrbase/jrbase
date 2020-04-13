@@ -6,15 +6,16 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import org.github.jrbase.config.RedisConfigurationOption;
+import org.github.jrbase.handler.CmdHandler;
 
 /**
  * Creates a newly configured {@link ChannelPipeline} for a new channel.
  */
 public class ServerInitializer extends ChannelInitializer<SocketChannel> {
-    private RedisConfigurationOption redisConfigurationOption;
+    private CmdHandler cmdHandler;
 
     public ServerInitializer(RedisConfigurationOption redisConfigurationOption) {
-        this.redisConfigurationOption = redisConfigurationOption;
+        this.cmdHandler = new CmdHandler(redisConfigurationOption);
     }
 
     @Override
@@ -25,6 +26,6 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new StringEncoder());
 
         // and then business logic.
-        pipeline.addLast(new ServerHandler(redisConfigurationOption));
+        pipeline.addLast(new ServerHandler(cmdHandler));
     }
 }

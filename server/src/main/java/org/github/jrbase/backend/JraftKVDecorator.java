@@ -5,8 +5,6 @@ import com.alipay.sofa.jraft.rhea.util.ByteArray;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class JraftKVDecorator implements BackendProxy {
 
@@ -33,12 +31,7 @@ public class JraftKVDecorator implements BackendProxy {
 
     @Override
     public byte[] bGetAndPut(String key, byte[] value) {
-        final CompletableFuture<byte[]> andPut = delegate.getAndPut(key, value);
-        try {
-            return andPut.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return new byte[0];
+        // TODO: add async method
+        return delegate.bGetAndPut(key, value);
     }
 }
