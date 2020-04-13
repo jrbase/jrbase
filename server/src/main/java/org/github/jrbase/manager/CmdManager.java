@@ -13,32 +13,23 @@ import static org.github.jrbase.utils.Tools.isCorrectKey;
 
 public class CmdManager {
 
-    private CmdManager() {
-        throw new UnsupportedOperationException();
+    private static Client client = new Client();
+
+    public CmdManager() {
+        client.init();
     }
 
-    private static Client client = null;
-
-    public static Client getClient() {
-        if (client == null) {
-            synchronized (CmdManager.class) {
-                if (client == null) {
-                    client = new Client();
-                    client.init();
-                }
-            }
-        }
-        return client;
+    public RheaKVStore getRheaKVStore() {
+        return client.getRheaKVStore();
     }
 
-    public static RheaKVStore getRheaKVStore() {
-        return getClient().getRheaKVStore();
-    }
+    private static ScanAnnotationConfigure scanAnnotationConfigure = new ScanAnnotationConfigure();
 
-    public static void process(ClientCmd clientCmd) {
-        CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
+    public void process(ClientCmd clientCmd) {
+        CmdProcess cmdProcess;
+        cmdProcess = clientCmdToCmdProcess(clientCmd);
         if (cmdProcess == null) {
-            cmdProcess = ScanAnnotationConfigure.instance().get(Cmd.OTHER.getCmdName());
+            cmdProcess = scanAnnotationConfigure.get(Cmd.OTHER.getCmdName());
         }
         // check key
         if (!isCorrectKey(clientCmd.getKey())) {
@@ -50,7 +41,6 @@ public class CmdManager {
             sendWrongArgumentMessage(clientCmd);
             return;
         }
-
         final String message = cmdProcess.process(clientCmd);
         clientCmd.getChannel().writeAndFlush(message);
     }
@@ -60,11 +50,11 @@ public class CmdManager {
         channel.writeAndFlush("-ERR wrong number of arguments for '" + clientCmd.getCmd() + "' command\r\n");
     }
 
-    public static CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
-        return ScanAnnotationConfigure.instance().get(clientCmd.getCmd());
+    public CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
+        return scanAnnotationConfigure.get(clientCmd.getCmd());
     }
 
-    public static void shutdown() {
+    public void shutdown() {
         if (client != null) {
             client.shutdown();
         }

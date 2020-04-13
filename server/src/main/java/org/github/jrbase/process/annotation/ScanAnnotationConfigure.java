@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class ScanAnnotationConfigure {
-    private static ScanAnnotationConfigure scanAnnotationConfigure;
+
 
     private final static Map<String, CmdProcess> cmdProcessManager = new HashMap<>();
 
@@ -20,20 +20,11 @@ public class ScanAnnotationConfigure {
         return cmdProcessManager.size();
     }
 
-    public static ScanAnnotationConfigure instance() {
-        if (scanAnnotationConfigure == null) {
-            synchronized (ScanAnnotationConfigure.class) {
-                if (scanAnnotationConfigure == null) {
-                    scanAnnotationConfigure = new ScanAnnotationConfigure();
-                    scanAnnotationConfigure.doScan();
-                }
-            }
-        }
-        return scanAnnotationConfigure;
+    public ScanAnnotationConfigure() {
+        this.doScan();
     }
 
     private void doScan() {
-
         String packageName = "org.github.jrbase.process";
         Reflections reflections = new Reflections(packageName);
 

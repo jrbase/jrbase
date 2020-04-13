@@ -13,6 +13,7 @@ import spock.lang.Specification
 import static org.github.jrbase.dataType.RedisDataType.STRINGS
 
 class CmdManagerTest extends Specification {
+    CmdManager cmdManager = new CmdManager()
 
     def "testCmdProcessManagerForgetRegisterCmdProcess2"() {
         given:
@@ -20,14 +21,14 @@ class CmdManagerTest extends Specification {
         def keys = Cmd.getLookup().values()
         keys.forEach({ cmd ->
             clientCmd.setCmd(cmd.cmdName)
-            def cmdProcess = CmdManager.clientCmdToCmdProcess(clientCmd)
+            def cmdProcess = cmdManager.clientCmdToCmdProcess(clientCmd)
             Assert.assertNotNull("you forget register command: " + clientCmd.getCmd(), cmdProcess)
         })
     }
 
     def "ClientCmdToCmdProcess0"() {
         expect:
-        CmdManager.clientCmdToCmdProcess(new ClientCmd(input)) == output
+        cmdManager.clientCmdToCmdProcess(new ClientCmd(input)) == output
 
         where:
         input     | output
@@ -37,7 +38,7 @@ class CmdManagerTest extends Specification {
 
     def "ClientCmdToCmdProcess"() {
         expect:
-        CmdManager.clientCmdToCmdProcess(new ClientCmd(input)).getClass().getSimpleName() == output
+        cmdManager.clientCmdToCmdProcess(new ClientCmd(input)).getClass().getSimpleName() == output
 
         where:
         input | output
@@ -59,7 +60,7 @@ class CmdManagerTest extends Specification {
         clientCmd.setChannel(channel)
         clientCmd.setArgs([] as String[])
         when:
-        CmdManager.process(clientCmd)
+        cmdManager.process(clientCmd)
         then:
         1 * clientCmd.getChannel().writeAndFlush(_)
     }
@@ -74,7 +75,7 @@ class CmdManagerTest extends Specification {
         clientCmd.setChannel(channel)
 
         when:
-        CmdManager.process(clientCmd)
+        cmdManager.process(clientCmd)
         then:
         1 * channel.writeAndFlush('-ERR wrong number of arguments for \'\' command\r\n')
     }
@@ -89,7 +90,7 @@ class CmdManagerTest extends Specification {
         clientCmd.setChannel(channel)
 
         when:
-        CmdManager.process(clientCmd)
+        cmdManager.process(clientCmd)
         then:
         1 * channel.writeAndFlush('-ERR wrong number of arguments for \'123\' command\r\n')
     }
@@ -104,7 +105,7 @@ class CmdManagerTest extends Specification {
         clientCmd.setChannel(channel)
 
         when:
-        CmdManager.process(clientCmd)
+        cmdManager.process(clientCmd)
         then:
         1 * channel.writeAndFlush('-ERR wrong number of arguments for \'get\' command\r\n')
     }
@@ -119,7 +120,7 @@ class CmdManagerTest extends Specification {
         clientCmd.setChannel(channel)
 
         when:
-        CmdManager.process(clientCmd)
+        cmdManager.process(clientCmd)
         then:
         1 * channel.writeAndFlush('-ERR wrong number of arguments for \'set\' command\r\n')
     }

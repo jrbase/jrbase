@@ -31,6 +31,7 @@ public class JraftKVDecorator implements BackendProxy {
 
     @Override
     public byte[] bGetAndPut(String key, byte[] value) {
+        // TODO: add async method
         return delegate.bGetAndPut(key, value);
     }
 }

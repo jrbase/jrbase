@@ -6,25 +6,16 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import org.github.jrbase.config.RedisConfigurationOption;
-import org.github.jrbase.thread.MyThreadFactory;
-
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import org.github.jrbase.handler.CmdHandler;
 
 /**
  * Creates a newly configured {@link ChannelPipeline} for a new channel.
  */
 public class ServerInitializer extends ChannelInitializer<SocketChannel> {
-    private RedisConfigurationOption redisConfigurationOption;
-
-    private final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 1,
-            5L, TimeUnit.MINUTES,
-            new LinkedBlockingQueue<>(), new MyThreadFactory(), new ThreadPoolExecutor.AbortPolicy());
-
+    private CmdHandler cmdHandler;
 
     public ServerInitializer(RedisConfigurationOption redisConfigurationOption) {
-        this.redisConfigurationOption = redisConfigurationOption;
+        this.cmdHandler = new CmdHandler(redisConfigurationOption);
     }
 
     @Override
@@ -35,6 +26,6 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new StringEncoder());
 
         // and then business logic.
-        pipeline.addLast(new ServerHandler(redisConfigurationOption, threadPoolExecutor));
+        pipeline.addLast(new ServerHandler(cmdHandler));
     }
 }

@@ -5,18 +5,19 @@ import spock.lang.Specification
 
 class ScanServerAnnotationConfigureTest extends Specification {
 
+    ScanAnnotationConfigure scanAnnotationConfigure = new ScanAnnotationConfigure()
     def "ScanAnnotationConfigure"() {
         when:
-        CmdProcess cmdProcess = ScanAnnotationConfigure.instance().get("hget")
+        CmdProcess cmdProcess = scanAnnotationConfigure.get("hget")
         then:
         cmdProcess.getCmdName() == "hget"
-        ScanAnnotationConfigure.instance().getCount() == 20
+        scanAnnotationConfigure.getCount() == 20
     }
 
     def "testAnnotationSingleton"() {
         when:
-        CmdProcess cmdProcess = ScanAnnotationConfigure.instance().get("get")
-        CmdProcess cmdProcess2 = ScanAnnotationConfigure.instance().get("get")
+        CmdProcess cmdProcess = scanAnnotationConfigure.get("get")
+        CmdProcess cmdProcess2 = scanAnnotationConfigure.get("get")
         then:
         cmdProcess == cmdProcess2
     }

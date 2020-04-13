@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class ScanServerAnnotationConfigure {
-    private static ScanServerAnnotationConfigure scanServerAnnotationConfigure;
 
     private final static Map<String, ServerCmdHandler> serverCmdHandlerHashMap = new HashMap<>();
 
@@ -20,20 +19,11 @@ public class ScanServerAnnotationConfigure {
         return serverCmdHandlerHashMap.size();
     }
 
-    public static ScanServerAnnotationConfigure instance() {
-        if (scanServerAnnotationConfigure == null) {
-            synchronized (ScanServerAnnotationConfigure.class) {
-                if (scanServerAnnotationConfigure == null) {
-                    scanServerAnnotationConfigure = new ScanServerAnnotationConfigure();
-                    scanServerAnnotationConfigure.doScan();
-                }
-            }
-        }
-        return scanServerAnnotationConfigure;
+    public ScanServerAnnotationConfigure() {
+        this.doScan();
     }
 
     private void doScan() {
-
         String packageName = "org.github.jrbase.handler";
         Reflections reflections = new Reflections(packageName);
 

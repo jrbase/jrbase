@@ -17,7 +17,11 @@ import static org.github.jrbase.handler.CommandParse.parseMessageToClientCmd;
 
 public class CmdHandler {
 
+    private CmdManager cmdManager;
+
     private static final String REPLY_OK = "OK";
+
+    private static ScanServerAnnotationConfigure scanServerAnnotationConfigure = new ScanServerAnnotationConfigure();
 
     /**
      * save session login status to HashMap<ChannelHandlerContext, RedisClientContext>
@@ -29,6 +33,7 @@ public class CmdHandler {
 
     public CmdHandler(RedisConfigurationOption redisConfigurationOption) {
         this.redisConfigurationOption = redisConfigurationOption;
+        this.cmdManager = new CmdManager();
 //        initHandlerMap();
     }
 
@@ -49,7 +54,7 @@ public class CmdHandler {
         if (clientCmd.getCmd().isEmpty()) {
             replyErrorToClient(ctx, "empty command");
         } else {
-            final ServerCmdHandler serverCmdHandler = ScanServerAnnotationConfigure.instance().get(clientCmd.getCmd());
+            final ServerCmdHandler serverCmdHandler = scanServerAnnotationConfigure.get(clientCmd.getCmd());
             if (serverCmdHandler != null) {
                 //handle server command
                 final String cmdHandlerResult = serverCmdHandler.handle(clientCmd);
@@ -57,8 +62,8 @@ public class CmdHandler {
             } else {
                 //handle data command
                 clientCmd.setChannel(ctx.channel());
-                clientCmd.setBackendProxy(new JraftKVDecorator(CmdManager.getRheaKVStore()));
-                CmdManager.process(clientCmd);
+                clientCmd.setBackendProxy(new JraftKVDecorator(cmdManager.getRheaKVStore()));
+                cmdManager.process(clientCmd);
             }
         }
 
