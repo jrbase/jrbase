@@ -13,9 +13,13 @@ import static org.github.jrbase.utils.Tools.isCorrectKey;
 
 public class CmdManager {
 
+    private final Object lock = new Object();
+
     private CmdManager() {
         throw new UnsupportedOperationException();
     }
+
+    private static ScanAnnotationConfigure scanAnnotationConfigure = new ScanAnnotationConfigure();
 
     private static Client client = null;
 
@@ -36,9 +40,10 @@ public class CmdManager {
     }
 
     public static void process(ClientCmd clientCmd) {
-        CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
+        CmdProcess cmdProcess;
+        cmdProcess = clientCmdToCmdProcess(clientCmd);
         if (cmdProcess == null) {
-            cmdProcess = ScanAnnotationConfigure.instance().get(Cmd.OTHER.getCmdName());
+            cmdProcess = scanAnnotationConfigure.get(Cmd.OTHER.getCmdName());
         }
         // check key
         if (!isCorrectKey(clientCmd.getKey())) {
@@ -50,7 +55,6 @@ public class CmdManager {
             sendWrongArgumentMessage(clientCmd);
             return;
         }
-
         final String message = cmdProcess.process(clientCmd);
         clientCmd.getChannel().writeAndFlush(message);
     }
@@ -61,7 +65,7 @@ public class CmdManager {
     }
 
     public static CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
-        return ScanAnnotationConfigure.instance().get(clientCmd.getCmd());
+        return scanAnnotationConfigure.get(clientCmd.getCmd());
     }
 
     public static void shutdown() {

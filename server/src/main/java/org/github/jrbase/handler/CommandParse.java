@@ -11,6 +11,7 @@ public class CommandParse {
      * array:       ['*3', '$3', 'set', '$3', 'key', '$5', 'value']
      */
     public static ClientCmd parseMessageToClientCmd(final String[] redisClientCmdArr) {
+        //TODO: ClientCmd Memory Pool Manage
         ClientCmd clientCmd = new ClientCmd();
         clientCmd.setCmd("");
         clientCmd.setKey("");

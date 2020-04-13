@@ -5,7 +5,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.github.jrbase.config.RedisConfigurationOption;
 import org.github.jrbase.handler.CmdHandler;
 
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Logger;
 
 
@@ -15,12 +14,10 @@ import java.util.logging.Logger;
 public class ServerHandler extends SimpleChannelInboundHandler<String> {
 
     private CmdHandler cmdHandler;
-    private ThreadPoolExecutor threadPoolExecutor;
 
-    public ServerHandler(RedisConfigurationOption redisConfigurationOption, ThreadPoolExecutor threadPoolExecutor) {
+    public ServerHandler(RedisConfigurationOption redisConfigurationOption) {
 
         this.cmdHandler = new CmdHandler(redisConfigurationOption);
-        this.threadPoolExecutor = threadPoolExecutor;
     }
 
     private static final Logger logger = Logger.getLogger(JRBaseServer.class.getName());
@@ -33,7 +30,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) {
-        threadPoolExecutor.execute(() -> cmdHandler.handleMsg(ctx, msg));
+        cmdHandler.handleMsg(ctx, msg);
     }
 
     @Override

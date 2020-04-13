@@ -19,6 +19,8 @@ public class CmdHandler {
 
     private static final String REPLY_OK = "OK";
 
+    private static ScanServerAnnotationConfigure scanServerAnnotationConfigure = new ScanServerAnnotationConfigure();
+
     /**
      * save session login status to HashMap<ChannelHandlerContext, RedisClientContext>
      */
@@ -49,7 +51,7 @@ public class CmdHandler {
         if (clientCmd.getCmd().isEmpty()) {
             replyErrorToClient(ctx, "empty command");
         } else {
-            final ServerCmdHandler serverCmdHandler = ScanServerAnnotationConfigure.instance().get(clientCmd.getCmd());
+            final ServerCmdHandler serverCmdHandler = scanServerAnnotationConfigure.get(clientCmd.getCmd());
             if (serverCmdHandler != null) {
                 //handle server command
                 final String cmdHandlerResult = serverCmdHandler.handle(clientCmd);
@@ -58,6 +60,7 @@ public class CmdHandler {
                 //handle data command
                 clientCmd.setChannel(ctx.channel());
                 clientCmd.setBackendProxy(new JraftKVDecorator(CmdManager.getRheaKVStore()));
+                System.out.println("currentThread: " + Thread.currentThread().getName());
                 CmdManager.process(clientCmd);
             }
         }

@@ -256,6 +256,9 @@ Scripting
 
 ```
 
+## redis-benchmark
+`redis-benchmark -t get,set -n 100000 -q`
+
 
 ## Related Links
 [redis commands](https://redis.io/commands/)
