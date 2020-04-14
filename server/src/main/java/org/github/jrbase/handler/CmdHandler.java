@@ -17,24 +17,29 @@ import static org.github.jrbase.handler.CommandParse.parseMessageToClientCmd;
 
 public class CmdHandler {
 
-    private CmdManager cmdManager;
+    private static CmdHandler singleInstance;
+    private CmdManager cmdManager = CmdManager.newSingleInstance();
 
     private static final String REPLY_OK = "OK";
 
-    private static ScanServerAnnotationConfigure scanServerAnnotationConfigure = new ScanServerAnnotationConfigure();
+    private static ScanServerAnnotationConfigure scanServerAnnotationConfigure = ScanServerAnnotationConfigure.newSingleInstance();
 
     /**
      * save session login status to HashMap<ChannelHandlerContext, RedisClientContext>
      */
     private final Map<ChannelHandlerContext, RedisClientContext> clientContext = new HashMap<>();
 
-
     private RedisConfigurationOption redisConfigurationOption;
 
-    public CmdHandler(RedisConfigurationOption redisConfigurationOption) {
-        this.redisConfigurationOption = redisConfigurationOption;
-        this.cmdManager = new CmdManager();
-//        initHandlerMap();
+    private CmdHandler() {
+    }
+
+    public static CmdHandler newSingleInstance(RedisConfigurationOption redisConfigurationOption) {
+        if (singleInstance == null) {
+            singleInstance = new CmdHandler();
+            singleInstance.redisConfigurationOption = redisConfigurationOption;
+        }
+        return singleInstance;
     }
 
 //    private void initHandlerMap() {

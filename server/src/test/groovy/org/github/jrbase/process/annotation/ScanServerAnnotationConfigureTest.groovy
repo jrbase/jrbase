@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 class ScanServerAnnotationConfigureTest extends Specification {
 
-    ScanAnnotationConfigure scanAnnotationConfigure = new ScanAnnotationConfigure()
+    ScanAnnotationConfigure scanAnnotationConfigure = ScanAnnotationConfigure.newSingleInstance()
     def "ScanAnnotationConfigure"() {
         when:
         CmdProcess cmdProcess = scanAnnotationConfigure.get("hget")

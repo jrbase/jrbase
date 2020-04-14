@@ -15,7 +15,7 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
     private CmdHandler cmdHandler;
 
     public ServerInitializer(RedisConfigurationOption redisConfigurationOption) {
-        this.cmdHandler = new CmdHandler(redisConfigurationOption);
+        this.cmdHandler = CmdHandler.newSingleInstance(redisConfigurationOption);
     }
 
     @Override

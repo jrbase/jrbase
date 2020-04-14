@@ -13,7 +13,8 @@ import spock.lang.Specification
 import static org.github.jrbase.dataType.RedisDataType.STRINGS
 
 class CmdManagerTest extends Specification {
-    CmdManager cmdManager = new CmdManager()
+
+    CmdManager cmdManager = CmdManager.newSingleInstance()
 
     def "testCmdProcessManagerForgetRegisterCmdProcess2"() {
         given:

@@ -4,7 +4,7 @@ import org.github.jrbase.handler.ServerCmdHandler
 import spock.lang.Specification
 
 class ScanServerAnnotationConfigureTest extends Specification {
-    ScanServerAnnotationConfigure scanServerAnnotationConfigure = new ScanServerAnnotationConfigure()
+    ScanServerAnnotationConfigure scanServerAnnotationConfigure = ScanServerAnnotationConfigure.newSingleInstance()
 
     def "ScanServerAnnotationConfigure"() {
         when:

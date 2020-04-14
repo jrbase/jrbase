@@ -5,7 +5,8 @@ import spock.lang.Specification
 
 class CmdHandlerTest extends Specification {
 
-    private CmdHandler cmdHandler = new CmdHandler()
+    private CmdHandler cmdHandler = CmdHandler.newSingleInstance()
+
     @Shared
     private final static command = '*1\r\n\$7\r\nCOMMAND'
     private final static setCmd = '*3\r\n\$3\r\nset\r\n$1\r\na\r\na\r\nb'

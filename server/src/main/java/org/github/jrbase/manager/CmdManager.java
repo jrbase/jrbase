@@ -14,16 +14,23 @@ import static org.github.jrbase.utils.Tools.isCorrectKey;
 public class CmdManager {
 
     private static Client client = new Client();
+    private static ScanAnnotationConfigure scanAnnotationConfigure = ScanAnnotationConfigure.newSingleInstance();
+    private static CmdManager singleInstance;
 
-    public CmdManager() {
-        client.init();
+    private CmdManager() {
+    }
+
+    public static CmdManager newSingleInstance() {
+        if (singleInstance == null) {
+            singleInstance = new CmdManager();
+            client.init();
+        }
+        return singleInstance;
     }
 
     public RheaKVStore getRheaKVStore() {
         return client.getRheaKVStore();
     }
-
-    private static ScanAnnotationConfigure scanAnnotationConfigure = new ScanAnnotationConfigure();
 
     public void process(ClientCmd clientCmd) {
         CmdProcess cmdProcess;
