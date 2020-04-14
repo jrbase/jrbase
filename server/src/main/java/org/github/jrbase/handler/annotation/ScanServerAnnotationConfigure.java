@@ -9,7 +9,17 @@ import java.util.Set;
 
 public class ScanServerAnnotationConfigure {
 
+    private static ScanServerAnnotationConfigure singleInstance;
+
     private final static Map<String, ServerCmdHandler> serverCmdHandlerHashMap = new HashMap<>();
+
+    public static ScanServerAnnotationConfigure newSingleInstance() {
+        if (singleInstance == null) {
+            singleInstance = new ScanServerAnnotationConfigure();
+            singleInstance.doScan();
+        }
+        return singleInstance;
+    }
 
     public ServerCmdHandler get(String key) {
         return serverCmdHandlerHashMap.get(key);
@@ -19,8 +29,7 @@ public class ScanServerAnnotationConfigure {
         return serverCmdHandlerHashMap.size();
     }
 
-    public ScanServerAnnotationConfigure() {
-        this.doScan();
+    private ScanServerAnnotationConfigure() {
     }
 
     private void doScan() {

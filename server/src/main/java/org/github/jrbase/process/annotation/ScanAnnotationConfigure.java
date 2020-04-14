@@ -9,8 +9,16 @@ import java.util.Set;
 
 public class ScanAnnotationConfigure {
 
-
     private final static Map<String, CmdProcess> cmdProcessManager = new HashMap<>();
+    private static ScanAnnotationConfigure singleInstance;
+
+    public static ScanAnnotationConfigure newSingleInstance() {
+        if (singleInstance == null) {
+            singleInstance = new ScanAnnotationConfigure();
+            singleInstance.doScan();
+        }
+        return singleInstance;
+    }
 
     public CmdProcess get(String key) {
         return cmdProcessManager.get(key);
@@ -20,8 +28,7 @@ public class ScanAnnotationConfigure {
         return cmdProcessManager.size();
     }
 
-    public ScanAnnotationConfigure() {
-        this.doScan();
+    private ScanAnnotationConfigure() {
     }
 
     private void doScan() {
