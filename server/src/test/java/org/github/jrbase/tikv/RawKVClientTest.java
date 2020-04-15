@@ -90,7 +90,9 @@ public class RawKVClientTest {
 
   @Test
   public void simpleTest() {
-    if (!initialized) return;
+    if (!initialized) {
+      return;
+    }
     ByteString key = rawKey("key");
     ByteString key1 = rawKey("key1");
     ByteString key2 = rawKey("key2");
@@ -126,7 +128,9 @@ public class RawKVClientTest {
 
   @Test
   public void validate() {
-    if (!initialized) return;
+    if (!initialized) {
+      return;
+    }
     baseTest(100, 100, 100, 100, false, false);
     baseTest(100, 100, 100, 100, false, true);
   }
@@ -135,7 +139,9 @@ public class RawKVClientTest {
    * Example of benchmarking base test
    */
   public void benchmark() {
-    if (!initialized) return;
+    if (!initialized) {
+      return;
+    }
     baseTest(TEST_CASES, TEST_CASES, 200, 5000, true, false);
     baseTest(TEST_CASES, TEST_CASES, 200, 5000, true, true);
   }
@@ -197,7 +203,9 @@ public class RawKVClientTest {
       int i = cnt;
       completionService.submit(
               () -> {
-                for (int j = 0; j < base; j++) checkDelete(remainingKeys.get(i * base + j).getKey());
+                for (int j = 0; j < base; j++) {
+                  checkDelete(remainingKeys.get(i * base + j).getKey());
+                }
                 return null;
               });
     }

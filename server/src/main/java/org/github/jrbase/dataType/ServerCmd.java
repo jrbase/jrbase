@@ -14,7 +14,7 @@ public enum ServerCmd {
     //Other
     UNKNOWN("other");
 
-    final private String cmdName;
+    private final String cmdName;
 
     ServerCmd(String cmdName) {
         this.cmdName = cmdName;
