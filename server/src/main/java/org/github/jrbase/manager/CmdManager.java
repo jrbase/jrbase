@@ -49,7 +49,9 @@ public class CmdManager {
             return;
         }
         final String message = cmdProcess.process(clientCmd);
-        clientCmd.getChannel().writeAndFlush(message);
+        if (!message.isEmpty()) {
+            clientCmd.getChannel().writeAndFlush(message);
+        }
     }
 
     static void sendWrongArgumentMessage(ClientCmd clientCmd) {

@@ -37,8 +37,9 @@ public class ScanAnnotationConfigure {
 
         Set<Class<?>> allClasses =
                 reflections.getTypesAnnotatedWith(KeyCommand.class);
-
         for (Class<?> clazz : allClasses) {
+            System.out.println(clazz.getName());
+
             try {
                 final CmdProcess cmdProcess = (CmdProcess) clazz.newInstance();
                 cmdProcessManager.put(cmdProcess.getCmdName(), cmdProcess);

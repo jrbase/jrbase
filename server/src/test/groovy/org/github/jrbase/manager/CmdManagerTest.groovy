@@ -8,6 +8,7 @@ import org.github.jrbase.dataType.Cmd
 import org.github.jrbase.process.string.GetProcess
 import org.github.jrbase.process.string.SetProcess
 import org.junit.Assert
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.RedisDataType.STRINGS
@@ -47,6 +48,8 @@ class CmdManagerTest extends Specification {
         'get' | GetProcess.getSimpleName()
     }
 
+    //TODO: async test
+    @Ignore
     def "processSuccess"() {
         given:
         ClientCmd clientCmd = new ClientCmd("get")
