@@ -35,7 +35,7 @@ public enum Cmd {
     // others
     OTHER("other");
 
-    final private String cmdName;
+    private final String cmdName;
 
     Cmd(String cmdName) {
         this.cmdName = cmdName;

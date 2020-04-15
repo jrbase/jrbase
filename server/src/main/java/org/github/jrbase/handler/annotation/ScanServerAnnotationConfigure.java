@@ -11,7 +11,7 @@ public class ScanServerAnnotationConfigure {
 
     private static ScanServerAnnotationConfigure singleInstance;
 
-    private final static Map<String, ServerCmdHandler> serverCmdHandlerHashMap = new HashMap<>();
+    private static final Map<String, ServerCmdHandler> serverCmdHandlerHashMap = new HashMap<>();
 
     public static ScanServerAnnotationConfigure newSingleInstance() {
         if (singleInstance == null) {

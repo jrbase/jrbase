@@ -21,10 +21,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
     private static final Logger logger = Logger.getLogger(JRBaseServer.class.getName());
 
 
-    @Override
+  /*  @Override
     public void channelActive(final ChannelHandlerContext ctx) {
 
-    }
+    }*/
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) {
