@@ -4,7 +4,7 @@ apply plugin: 'distribution'
 dependencies {
     compile "io.netty:netty-all:4.0.32.Final"
     compile project(":jraftKV")
-    compile 'org.reflections:reflections:0.9.9-RC1'
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.12'
 //    compile 'org.tikv:tikv-client-java:2.0-SNAPSHOT'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'org.apache.commons:commons-lang3:3.9'
