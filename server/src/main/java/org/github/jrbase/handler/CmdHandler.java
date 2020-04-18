@@ -2,27 +2,36 @@ package org.github.jrbase.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang.StringUtils;
-import org.github.jrbase.backend.JraftKVDecorator;
 import org.github.jrbase.config.RedisConfigurationOption;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.RedisClientContext;
+import org.github.jrbase.database.Database;
 import org.github.jrbase.handler.annotation.ScanServerAnnotationConfigure;
 import org.github.jrbase.manager.CmdManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.github.jrbase.dataType.ServerCmd.AUTH;
 import static org.github.jrbase.handler.CommandParse.parseMessageToClientCmd;
 
 public class CmdHandler {
+    private static final List<Database> Databases = new ArrayList<>(1);
 
     private static CmdHandler singleInstance;
-    private CmdManager cmdManager = CmdManager.newSingleInstance();
+    private final CmdManager cmdManager = CmdManager.newSingleInstance();
+
+    public static Database getDefaultDB() {
+        return Databases.get(0);
+    }
+
+    private final int defaultDB = 0;
 
     private static final String REPLY_OK = "OK";
 
-    private static ScanServerAnnotationConfigure scanServerAnnotationConfigure = ScanServerAnnotationConfigure.newSingleInstance();
+    private static final ScanServerAnnotationConfigure scanServerAnnotationConfigure = ScanServerAnnotationConfigure.newSingleInstance();
 
     /**
      * save session login status to HashMap<ChannelHandlerContext, RedisClientContext>
@@ -32,6 +41,9 @@ public class CmdHandler {
     private RedisConfigurationOption redisConfigurationOption;
 
     private CmdHandler() {
+        for (int i = 0; i < 16; i++) {
+            Databases.add(new Database(i));
+        }
     }
 
     public static CmdHandler newSingleInstance(RedisConfigurationOption redisConfigurationOption) {
@@ -51,7 +63,8 @@ public class CmdHandler {
     public void handleMsg(ChannelHandlerContext ctx, String message) {
 
         final ClientCmd clientCmd = parseMessage(message);
-
+        final Database database = Databases.get(defaultDB);
+        clientCmd.setDb(database);
         if (checkRequirePassword(ctx, clientCmd)) {
             return;
         }
@@ -67,7 +80,6 @@ public class CmdHandler {
             } else {
                 //handle data command
                 clientCmd.setChannel(ctx.channel());
-                clientCmd.setBackendProxy(new JraftKVDecorator(cmdManager.getRheaKVStore()));
                 cmdManager.process(clientCmd);
             }
         }
@@ -110,6 +122,21 @@ public class CmdHandler {
         return redisConfigurationOption.getRequirePass().equals(clientCmd.getKey());
     }
 
+    // TODO: handle multi command in a message
+    // redis-benchmark -a 123456 -t get -n 1
+
+    /**
+     * *2
+     * $4
+     * AUTH
+     * $6
+     * 123456
+     * *2
+     * $3
+     * GET
+     * $16
+     * key:__rand_int__
+     */
     ClientCmd parseMessage(String message) {
         // *3\r\n$3\r\nset\r\n$3\r\nkey$5\r\nvalue\r\n).split("\r\n")
         final String[] redisClientCmdArr = message.split("\r\n");

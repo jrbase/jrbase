@@ -3,15 +3,16 @@ package org.github.jrbase.process.annotation
 import org.github.jrbase.process.CmdProcess
 import spock.lang.Specification
 
-class ScanServerAnnotationConfigureTest extends Specification {
+class ScanAnnotationConfigureTest extends Specification {
 
     ScanAnnotationConfigure scanAnnotationConfigure = ScanAnnotationConfigure.newSingleInstance()
+
     def "ScanAnnotationConfigure"() {
         when:
         CmdProcess cmdProcess = scanAnnotationConfigure.get("hget")
         then:
         cmdProcess.getCmdName() == "hget"
-        scanAnnotationConfigure.getCount() == 20
+        scanAnnotationConfigure.getCount() == 21
     }
 
     def "testAnnotationSingleton"() {

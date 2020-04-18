@@ -4,41 +4,51 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.github.jrbase.dataType.RedisDataType.*;
+
 public enum Cmd {
     // Keys
-    TYPE("type"),
+    TYPE("type", KEYS),
+    EXPIRE("expire", KEYS),
     // Strings
-    SET("set"),
-    GET("get"),
-    MSET("mset"),
-    MGET("mget"),
-    GETBIT("getbit"),
-    SETBIT("setbit"),
+    SET("set", STRINGS),
+    GET("get", STRINGS),
+    MSET("mset", STRINGS),
+    MGET("mget", STRINGS),
+    GETBIT("getbit", STRINGS),
+    SETBIT("setbit", STRINGS),
     // Hashes
-    HSET("hset"),
-    HGET("hget"),
-    HLEN("hlen"),
+    HSET("hset", HASHES),
+    HGET("hget", HASHES),
+    HLEN("hlen", HASHES),
     // Lists
-    LPUSH("lpush"),
-    LPOP("lpop"),
-    LRANGE("lrange"),
-    RPUSH("rpush"),
-    RPOP("rpop"),
+    LPUSH("lpush", LISTS),
+    LPOP("lpop", LISTS),
+    LRANGE("lrange", LISTS),
+    RPUSH("rpush", LISTS),
+    RPOP("rpop", LISTS),
     //Sets
-    SADD("sadd"),
-    SPOP("spop"),
-    SCARD("scard"),
+    SADD("sadd", SETS),
+    SPOP("spop", SETS),
+    SCARD("scard", SETS),
 
     //Sets
-    ZADD("zadd"),
+    ZADD("zadd", SORTED_SETS),
 
     // others
-    OTHER("other");
+    OTHER("other", NONE);
 
     private final String cmdName;
 
-    Cmd(String cmdName) {
+    public RedisDataType getType() {
+        return type;
+    }
+
+    private final RedisDataType type;
+
+    Cmd(String cmdName, RedisDataType type) {
         this.cmdName = cmdName;
+        this.type = type;
     }
 
     public String getCmdName() {

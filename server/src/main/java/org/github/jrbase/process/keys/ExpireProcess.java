@@ -1,47 +1,41 @@
-package org.github.jrbase.process.string;
+package org.github.jrbase.process.keys;
 
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.database.RedisValue;
-import org.github.jrbase.database.StringRedisValue;
 import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.process.annotation.KeyCommand;
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ONE_INTEGER;
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER;
-import static org.github.jrbase.utils.Tools.checkArgs;
 
 @KeyCommand
-public class SetProcess implements CmdProcess {
+public class ExpireProcess implements CmdProcess {
 
     @Override
     public String getCmdName() {
-        return Cmd.SET.getCmdName();
+        return Cmd.EXPIRE.getCmdName();
     }
 
     @Override
     public boolean isCorrectArguments(ClientCmd clientCmd) {
-        return checkArgs(1, clientCmd.getArgLength());
+        return clientCmd.getArgLength() == 1;
     }
 
     @Override
     public String process(ClientCmd clientCmd) {
-        return requestKVAndReplyClient(clientCmd);
-    }
-
-
-    public String requestKVAndReplyClient(ClientCmd clientCmd) {
-
+        //set key currentTime + args[0]ms
         final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());
         if (redisValue == null) {
-            final StringRedisValue addStringRedisValue = new StringRedisValue();
-            addStringRedisValue.setValue(clientCmd.getArgs()[0]);
-            clientCmd.getDb().getTable().put(clientCmd.getKey(), addStringRedisValue);
-            return REDIS_ONE_INTEGER;
+            return REDIS_ZORE_INTEGER;
         }
-        ((StringRedisValue) redisValue).setValue(clientCmd.getArgs()[0]);
+        final String second = clientCmd.getArgs()[0];
+        final int s = Integer.parseInt(second);
+        final int ms = s * 1000;
+        final long valueMs = System.currentTimeMillis() + ms;
+        redisValue.setExpire(valueMs);
         clientCmd.getDb().getTable().put(clientCmd.getKey(), redisValue);
-        return REDIS_ZORE_INTEGER;
-    }
+        return REDIS_ONE_INTEGER;
 
+    }
 }

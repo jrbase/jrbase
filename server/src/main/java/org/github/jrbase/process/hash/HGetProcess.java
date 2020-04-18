@@ -2,14 +2,13 @@ package org.github.jrbase.process.hash;
 
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
+import org.github.jrbase.database.HashRedisValue;
+import org.github.jrbase.database.RedisValue;
 import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.process.annotation.KeyCommand;
 
-import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING;
-import static org.github.jrbase.dataType.RedisDataType.HASHES;
 import static org.github.jrbase.utils.Tools.checkArgs;
-import static org.github.jrbase.utils.Tools.isEmptyBytes;
 
 @KeyCommand
 public class HGetProcess implements CmdProcess {
@@ -31,15 +30,14 @@ public class HGetProcess implements CmdProcess {
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
 
-        final String buildUpKey = clientCmd.getKey() + "f" + clientCmd.getArgs()[0] + HASHES.getAbbreviation();
-        final byte[] bytes = clientCmd.getBackendProxy().bGet(buildUpKey);
-        StringBuilder result = new StringBuilder();
-        if (isEmptyBytes(bytes)) {
-            result.append(REDIS_EMPTY_STRING);
-        } else {
-            final int length = bytes.length;
-            result.append("$").append(length).append("\r\n").append(readUtf8(bytes)).append("\r\n");
+        final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());
+        if (redisValue == null) {
+            return REDIS_EMPTY_STRING;
         }
+        StringBuilder result = new StringBuilder();
+        final String value = ((HashRedisValue) redisValue).getHash().get(clientCmd.getArgs()[0]);
+        final int length = value.length();
+        result.append("$").append(length).append("\r\n").append(value).append("\r\n");
         return result.toString();
     }
 

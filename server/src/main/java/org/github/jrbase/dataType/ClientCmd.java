@@ -2,6 +2,7 @@ package org.github.jrbase.dataType;
 
 import io.netty.channel.Channel;
 import org.github.jrbase.backend.BackendProxy;
+import org.github.jrbase.database.Database;
 
 import java.util.Arrays;
 
@@ -11,6 +12,16 @@ public class ClientCmd {
     private String[] args;
     private Channel channel;
     private BackendProxy backendProxy;
+
+    private Database db;
+
+    public Database getDb() {
+        return db;
+    }
+
+    public void setDb(Database db) {
+        this.db = db;
+    }
 
     public ClientCmd() {
 

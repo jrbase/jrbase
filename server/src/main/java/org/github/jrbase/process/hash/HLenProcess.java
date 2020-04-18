@@ -2,11 +2,12 @@ package org.github.jrbase.process.hash;
 
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
+import org.github.jrbase.database.HashRedisValue;
+import org.github.jrbase.database.RedisValue;
 import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.process.annotation.KeyCommand;
-import org.github.jrbase.utils.Tools;
 
-import static org.github.jrbase.dataType.RedisDataType.HASHES;
+import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER;
 
 @KeyCommand
 public class HLenProcess implements CmdProcess {
@@ -28,14 +29,12 @@ public class HLenProcess implements CmdProcess {
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
         checkKeyType();
-
-        // llen key
-        // key is first arg
-        //get hash length
-        String mapCountKey = clientCmd.getKey() + HASHES.getAbbreviation();
-        final byte[] mapCountBytes = clientCmd.getBackendProxy().bGet(mapCountKey);
-        int length = Tools.byteArrayToInt(mapCountBytes);
-        return ":" + length + "\r\n";
+        // hlen key
+        final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());
+        if (redisValue == null) {
+            return REDIS_ZORE_INTEGER;
+        }
+        return ":" + ((HashRedisValue) redisValue).getHash().size() + "\r\n";
     }
 
     private void checkKeyType() {

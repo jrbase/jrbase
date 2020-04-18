@@ -1,33 +1,29 @@
 package org.github.jrbase.process.hash
 
 
-import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
+import org.github.jrbase.handler.CmdHandler
 import org.github.jrbase.process.CmdProcess
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING
-import static org.github.jrbase.dataType.RedisDataType.HASHES
 
 class HGetProcessTest extends Specification {
     private CmdProcess cmdProcess = new HGetProcess()
     private ClientCmd clientCmd = new ClientCmd()
 
+    def ""() {
+
+    }
     //hget key field1
     def "Process"() {
-        given:
+        when:
+        def chandler = CmdHandler.newSingleInstance(null)
+        clientCmd.setDb(chandler.getDefaultDB())
         clientCmd.setKey("a")
         clientCmd.setArgs(["field1"] as String[])
-        BackendProxy backendProxy = Mock()
-        def buildUpKey = clientCmd.getKey() + "f" + clientCmd.getArgs()[0] + HASHES.getAbbreviation()
-        backendProxy.bGet(buildUpKey) >> input
-        clientCmd.setBackendProxy(backendProxy)
-        expect:
-        message == cmdProcess.process(clientCmd)
-        where:
-        input               | message
-        null                | REDIS_EMPTY_STRING
-        "value1".getBytes() | '$6\r\nvalue1\r\n'
+        then:
+        REDIS_EMPTY_STRING == cmdProcess.process(clientCmd)
     }
 
     def "testArgumentsException"() {

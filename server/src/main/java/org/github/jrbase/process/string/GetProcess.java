@@ -2,15 +2,13 @@ package org.github.jrbase.process.string;
 
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
+import org.github.jrbase.database.RedisValue;
+import org.github.jrbase.database.StringRedisValue;
 import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.process.annotation.KeyCommand;
 
-import java.util.concurrent.CompletableFuture;
-
-import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING;
-import static org.github.jrbase.dataType.CommonMessage.REDiS_STRING_EMPTY;
-import static org.github.jrbase.dataType.RedisDataType.STRINGS;
+import static org.github.jrbase.utils.Tools.checkArgs;
 
 @KeyCommand
 public class GetProcess implements CmdProcess {
@@ -22,7 +20,7 @@ public class GetProcess implements CmdProcess {
 
     @Override
     public boolean isCorrectArguments(ClientCmd clientCmd) {
-        return true;
+        return checkArgs(0, clientCmd.getArgLength());
     }
 
     @Override
@@ -31,21 +29,21 @@ public class GetProcess implements CmdProcess {
     }
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        // no args
-        String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation();
-        final CompletableFuture<byte[]> future = clientCmd.getBackendProxy().get(buildUpKey);
-        future.whenComplete((getValue, error) -> {
-            // TODO: handle error
 
-            StringBuilder result = new StringBuilder();
-            if (getValue == null) {
-                result.append(REDIS_EMPTY_STRING);
-            } else {
-                final int length = getValue.length;
-                result.append("$").append(length).append("\r\n").append(readUtf8(getValue)).append("\r\n");
-            }
-            clientCmd.getChannel().writeAndFlush(result.toString());
-        });
-        return REDiS_STRING_EMPTY;
+        final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());
+        if (redisValue == null) {
+            return REDIS_EMPTY_STRING;
+        }
+        final long expireMs = redisValue.getExpire();
+        if (expireMs != 0 && System.currentTimeMillis() > expireMs) {// expire true
+            // delete key
+            clientCmd.getDb().getTable().put(clientCmd.getKey(), null);
+            return REDIS_EMPTY_STRING;
+        }
+
+        final String value = ((StringRedisValue) redisValue).getValue();
+        final int length = value.length();
+        return "$" + length + "\r\n" + value + "\r\n";
     }
+
 }
