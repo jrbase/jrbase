@@ -9,9 +9,12 @@ public enum ServerCmd {
     AUTH("auth"),
     ECHO("echo"),
     PING("ping"),
+    SELECT("select"),
+    DBSIZE("dbsize"),
     //Server
     COMMAND("command"),
     //Other
+    CONFIG("config"),
     UNKNOWN("other");
 
     private final String cmdName;

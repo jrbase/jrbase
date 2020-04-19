@@ -10,9 +10,9 @@ import org.github.jrbase.handler.annotation.ScanServerAnnotationConfigure;
 import org.github.jrbase.manager.CmdManager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.github.jrbase.dataType.ServerCmd.AUTH;
 import static org.github.jrbase.handler.CommandParse.parseMessageToClientCmd;
@@ -36,7 +36,7 @@ public class CmdHandler {
     /**
      * save session login status to HashMap<ChannelHandlerContext, RedisClientContext>
      */
-    private final Map<ChannelHandlerContext, RedisClientContext> clientContext = new HashMap<>();
+    private final Map<ChannelHandlerContext, RedisClientContext> clientContext = new ConcurrentHashMap<>();
 
     private RedisConfigurationOption redisConfigurationOption;
 
@@ -60,6 +60,12 @@ public class CmdHandler {
 //        serverCmdHandlerMap.put(COMMAND.getCmdName(), new CommandHandler());
 ////    }
 
+    /**
+     * handle raw string to ClientCmd
+     *
+     * @param ctx     socket handler
+     * @param message raw string from redis-cli
+     */
     public void handleMsg(ChannelHandlerContext ctx, String message) {
 
         final ClientCmd clientCmd = parseMessage(message);
@@ -68,46 +74,46 @@ public class CmdHandler {
         if (checkRequirePassword(ctx, clientCmd)) {
             return;
         }
-
         if (clientCmd.getCmd().isEmpty()) {
             replyErrorToClient(ctx, "empty command");
+            return;
+        }
+        final ServerCmdHandler serverCmdHandler = scanServerAnnotationConfigure.get(clientCmd.getCmd());
+        if (serverCmdHandler != null) {
+            //handle server command
+            final String cmdHandlerResult = serverCmdHandler.handle(clientCmd);
+            ctx.channel().writeAndFlush(cmdHandlerResult);
         } else {
-            final ServerCmdHandler serverCmdHandler = scanServerAnnotationConfigure.get(clientCmd.getCmd());
-            if (serverCmdHandler != null) {
-                //handle server command
-                final String cmdHandlerResult = serverCmdHandler.handle(clientCmd);
-                ctx.channel().writeAndFlush(cmdHandlerResult);
-            } else {
-                //handle data command
-                clientCmd.setChannel(ctx.channel());
-                cmdManager.process(clientCmd);
-            }
+            //handle data command
+            clientCmd.setChannel(ctx.channel());
+            cmdManager.process(clientCmd);
         }
 
     }
 
+    // handle Context then check password
     private boolean checkRequirePassword(final ChannelHandlerContext ctx, final ClientCmd clientCmd) {
-        if (StringUtils.isNotEmpty(redisConfigurationOption.getRequirePass())) {
-            final RedisClientContext redisClientContext = clientContext.get(ctx);
-            if (dontLogin(redisClientContext)) {
-                handleAuth(ctx, clientCmd, clientContext, redisClientContext);
-                return true;
-            }
+        RedisClientContext redisClientContext = clientContext.get(ctx);
+
+        if (redisClientContext == null) {
+            redisClientContext = new RedisClientContext();
+            clientContext.put(ctx, redisClientContext);
+        }
+        clientCmd.setRedisClientContext(redisClientContext);
+        if (StringUtils.isNotEmpty(redisConfigurationOption.getRequirePass()) && dontLogin(redisClientContext)) {
+            handleAuth(ctx, clientCmd, redisClientContext);
+            return true;
         }
         return false;
     }
 
     private boolean dontLogin(RedisClientContext redisClientContext) {
-        return redisClientContext == null || !redisClientContext.isLogin();
+        return !redisClientContext.isLogin();
     }
 
-    private void handleAuth(ChannelHandlerContext ctx, ClientCmd clientCmd, Map<ChannelHandlerContext, RedisClientContext> clientContext, RedisClientContext redisClientContext) {
+    private void handleAuth(ChannelHandlerContext ctx, ClientCmd clientCmd, RedisClientContext redisClientContext) {
         if (AUTH.getCmdName().equals(clientCmd.getCmd())) {
             if (authPassword(clientCmd)) {
-                if (redisClientContext == null) {
-                    redisClientContext = new RedisClientContext();
-                    clientContext.put(ctx, redisClientContext);
-                }
                 redisClientContext.setLogin(true);
                 replyInfoToClient(ctx, REPLY_OK);
             } else {
@@ -151,4 +157,7 @@ public class CmdHandler {
         ctx.channel().writeAndFlush("-" + msg + "\r\n");
     }
 
+    public void removeContext(ChannelHandlerContext ctx) {
+        clientContext.remove(ctx);
+    }
 }

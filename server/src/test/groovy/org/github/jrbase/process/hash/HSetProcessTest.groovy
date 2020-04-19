@@ -2,18 +2,18 @@ package org.github.jrbase.process.hash
 
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.handler.CmdHandler
-import org.github.jrbase.process.CmdProcess
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
 
+@Ignore
 class HSetProcessTest extends Specification {
-    CmdProcess cmdProcess = new HSetProcess()
-    ClientCmd clientCmd = new ClientCmd()
-
     //hset key field1 value
 
     def "Process"() {
+        HSetProcess cmdProcess = new HSetProcess()
+        ClientCmd clientCmd = new ClientCmd()
         given:
         def chandler = CmdHandler.newSingleInstance(null)
         clientCmd.setDb(chandler.getDefaultDB())
@@ -31,6 +31,8 @@ class HSetProcessTest extends Specification {
     }
 
     def "testArgumentsException"() {
+        HSetProcess cmdProcess = new HSetProcess()
+        ClientCmd clientCmd = new ClientCmd()
         given:
         clientCmd.setKey("key")
         clientCmd.setArgs(["field1", "value1", "error arg"] as String[])

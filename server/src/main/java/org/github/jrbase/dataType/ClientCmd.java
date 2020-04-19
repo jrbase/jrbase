@@ -12,6 +12,7 @@ public class ClientCmd {
     private String[] args;
     private Channel channel;
     private BackendProxy backendProxy;
+    private RedisClientContext redisClientContext;
 
     private Database db;
 
@@ -25,6 +26,14 @@ public class ClientCmd {
 
     public ClientCmd() {
 
+    }
+
+    public RedisClientContext getRedisClientContext() {
+        return redisClientContext;
+    }
+
+    public void setRedisClientContext(RedisClientContext redisClientContext) {
+        this.redisClientContext = redisClientContext;
     }
 
     public void setChannel(Channel channel) {

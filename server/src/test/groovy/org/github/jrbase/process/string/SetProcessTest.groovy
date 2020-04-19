@@ -3,13 +3,15 @@ package org.github.jrbase.process.string
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.handler.CmdHandler
 import org.github.jrbase.process.CmdProcess
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
 
+@Ignore
 class SetProcessTest extends Specification {
-    CmdProcess cmdProcess = new SetProcess()
-    ClientCmd clientCmd = new ClientCmd()
+    private CmdProcess cmdProcess = new SetProcess()
+    private ClientCmd clientCmd = new ClientCmd()
 
 //    TODO: async test
     def "Process"() {

@@ -8,8 +8,9 @@ import static org.github.jrbase.dataType.RedisDataType.*;
 
 public enum Cmd {
     // Keys
-    TYPE("type", KEYS),
-    EXPIRE("expire", KEYS),
+    KEYS("keys", KEY),
+    TYPE("type", KEY),
+    EXPIRE("expire", KEY),
     // Strings
     SET("set", STRINGS),
     GET("get", STRINGS),

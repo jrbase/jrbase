@@ -4,11 +4,13 @@ package org.github.jrbase.process.hash
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.handler.CmdHandler
 import org.github.jrbase.process.CmdProcess
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ONE_INTEGER
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
 
+@Ignore
 class HLenProcessTest extends Specification {
     def "Process"() {
         CmdProcess cmdProcess = new HLenProcess()

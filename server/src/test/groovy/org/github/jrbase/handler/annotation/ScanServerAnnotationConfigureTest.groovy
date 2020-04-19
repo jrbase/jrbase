@@ -11,7 +11,7 @@ class ScanServerAnnotationConfigureTest extends Specification {
         ServerCmdHandler serverCmdHandler = scanServerAnnotationConfigure.get("ping")
         then:
         serverCmdHandler.getCmdName() == "ping"
-        scanServerAnnotationConfigure.getCount() == 3
+        scanServerAnnotationConfigure.getCount() == 6
     }
 
     def "testAnnotationSingleton"() {

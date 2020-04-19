@@ -38,17 +38,17 @@ public class ZAddProcess implements CmdProcess {
         final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());
         if (redisValue == null) {
             final ZSortRedisValue zSortRedisValue = new ZSortRedisValue();
-            getzSortRedisValue(clientCmd, zSortRedisValue);
+            getZSortRedisValue(clientCmd, zSortRedisValue);
             return ":" + zSortRedisValue.getValue().size() + "\r\n";
         }
         final ZSortRedisValue value = (ZSortRedisValue) redisValue;
         final int originSize = value.getValue().size();
-        getzSortRedisValue(clientCmd, value);
+        getZSortRedisValue(clientCmd, value);
         return ":" + (value.getValue().size() - originSize) + "\r\n";
     }
 
     @NotNull
-    private ZSortRedisValue getzSortRedisValue(ClientCmd clientCmd, ZSortRedisValue zSortRedisValue) {
+    private ZSortRedisValue getZSortRedisValue(ClientCmd clientCmd, ZSortRedisValue zSortRedisValue) {
         final Map<String, Integer> keyValueMap = generateValueScoreValueMap(clientCmd.getArgs());
         for (String key : keyValueMap.keySet()) {
             zSortRedisValue.getValue().put(key, keyValueMap.get(key));

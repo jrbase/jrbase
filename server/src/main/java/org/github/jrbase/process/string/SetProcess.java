@@ -31,17 +31,18 @@ public class SetProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-
-        final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());
-        if (redisValue == null) {
-            final StringRedisValue addStringRedisValue = new StringRedisValue();
-            addStringRedisValue.setValue(clientCmd.getArgs()[0]);
-            clientCmd.getDb().getTable().put(clientCmd.getKey(), addStringRedisValue);
-            return REDIS_ONE_INTEGER;
+        synchronized (this) {
+            final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());
+            if (redisValue == null) {
+                final StringRedisValue addStringRedisValue = new StringRedisValue();
+                addStringRedisValue.setValue(clientCmd.getArgs()[0]);
+                clientCmd.getDb().getTable().put(clientCmd.getKey(), addStringRedisValue);
+                return REDIS_ONE_INTEGER;
+            }
+            ((StringRedisValue) redisValue).setValue(clientCmd.getArgs()[0]);
+            clientCmd.getDb().getTable().put(clientCmd.getKey(), redisValue);
+            return REDIS_ZORE_INTEGER;
         }
-        ((StringRedisValue) redisValue).setValue(clientCmd.getArgs()[0]);
-        clientCmd.getDb().getTable().put(clientCmd.getKey(), redisValue);
-        return REDIS_ZORE_INTEGER;
     }
 
 }

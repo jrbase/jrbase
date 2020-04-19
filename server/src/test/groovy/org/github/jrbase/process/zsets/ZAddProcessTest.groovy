@@ -1,11 +1,12 @@
 package org.github.jrbase.process.zsets
 
-
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.handler.CmdHandler
 import org.github.jrbase.process.CmdProcess
+import spock.lang.Ignore
 import spock.lang.Specification
 
+@Ignore
 class ZAddProcessTest extends Specification {
     private CmdProcess cmdProcess = new ZAddProcess()
     private ClientCmd clientCmd = new ClientCmd()

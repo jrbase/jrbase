@@ -12,9 +12,7 @@ import static org.github.jrbase.dataType.RedisDataType.STRINGS
 @Ignore
 class GetProcessTest extends Specification {
 
-    //TODO: How to async test
     //get a = b
-    @Ignore
     def "Process"() {
         given:
         CmdProcess cmdProcess = new GetProcess()

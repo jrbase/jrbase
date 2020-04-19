@@ -9,7 +9,7 @@ import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.process.annotation.ScanAnnotationConfigure;
 import org.github.jrbase.proxyRheakv.rheakv.Client;
 
-import static org.github.jrbase.dataType.RedisDataType.KEYS;
+import static org.github.jrbase.dataType.RedisDataType.KEY;
 import static org.github.jrbase.utils.Tools.isCorrectKey;
 
 
@@ -63,7 +63,7 @@ public class CmdManager {
 
     private boolean checkWrongType(ClientCmd clientCmd) {
         final Cmd cmd = Cmd.get(clientCmd.getCmd());
-        if (cmd.getType().equals(KEYS)) {
+        if (cmd.getType().equals(KEY)) {
             return false;
         }
         final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());

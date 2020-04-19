@@ -12,7 +12,7 @@ class ScanAnnotationConfigureTest extends Specification {
         CmdProcess cmdProcess = scanAnnotationConfigure.get("hget")
         then:
         cmdProcess.getCmdName() == "hget"
-        scanAnnotationConfigure.getCount() == 21
+        scanAnnotationConfigure.getCount() == 22
     }
 
     def "testAnnotationSingleton"() {
