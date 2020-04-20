@@ -3,20 +3,26 @@ package org.github.jrbase.process.string
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.handler.CmdHandler
 import org.github.jrbase.process.CmdProcess
+import spock.lang.Shared
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
 
 class SetProcessTest extends Specification {
     private CmdProcess cmdProcess = new SetProcess()
+    @Shared
+    def chandler = CmdHandler.newSingleInstance(null)
+    @Shared
     private ClientCmd clientCmd = new ClientCmd()
+
+    def setupSpec() {
+        chandler.getDefaultDB().getTable().clear()
+        clientCmd.setDb(chandler.getDefaultDB())
+        clientCmd.setKey("key")
+    }
 
     def "Process"() {
         given:
-        def chandler = CmdHandler.newSingleInstance(null)
-        clientCmd.setDb(chandler.getDefaultDB())
-
-        clientCmd.setKey("key")
         String[] arr = args as String[]
         clientCmd.setArgs(arr)
         //set key field value
@@ -30,7 +36,6 @@ class SetProcessTest extends Specification {
 
     def "testArgumentsException"() {
         given:
-        clientCmd.setKey("key")
         clientCmd.setArgs(["value", "error arg"] as String[])
         when:
         def result = cmdProcess.isCorrectArguments(clientCmd)
