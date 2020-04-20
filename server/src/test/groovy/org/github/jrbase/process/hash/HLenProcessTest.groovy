@@ -1,22 +1,28 @@
 package org.github.jrbase.process.hash
 
-
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.handler.CmdHandler
 import org.github.jrbase.process.CmdProcess
-import spock.lang.Ignore
+import spock.lang.Shared
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ONE_INTEGER
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
 
-@Ignore
 class HLenProcessTest extends Specification {
-    def "Process"() {
-        CmdProcess cmdProcess = new HLenProcess()
-        ClientCmd clientCmd = new ClientCmd()
-        def chandler = CmdHandler.newSingleInstance(null)
+    CmdProcess cmdProcess = new HLenProcess()
+    @Shared
+    def chandler = CmdHandler.newSingleInstance(null)
+    @Shared
+    private ClientCmd clientCmd = new ClientCmd()
+
+    def setupSpec() {
+        chandler.getDefaultDB().getTable().clear()
         clientCmd.setDb(chandler.getDefaultDB())
+        clientCmd.setKey("key")
+    }
+
+    def "Process"() {
         given:
         clientCmd.setKey(key)
         clientCmd.setArgs([] as String[])
@@ -29,10 +35,6 @@ class HLenProcessTest extends Specification {
 
     def "Process2"() {
         CmdProcess hSetProcess = new HSetProcess()
-        CmdProcess cmdProcess = new HLenProcess()
-        ClientCmd clientCmd = new ClientCmd()
-        def chandler = CmdHandler.newSingleInstance(null)
-        clientCmd.setDb(chandler.getDefaultDB())
         given:
         clientCmd.setKey(key)
         clientCmd.setArgs(["f", "v"] as String[])

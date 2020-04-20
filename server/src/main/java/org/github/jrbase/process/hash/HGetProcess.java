@@ -36,6 +36,9 @@ public class HGetProcess implements CmdProcess {
         }
         StringBuilder result = new StringBuilder();
         final String value = ((HashRedisValue) redisValue).getHash().get(clientCmd.getArgs()[0]);
+        if (value == null) {
+            return REDIS_EMPTY_STRING;
+        }
         final int length = value.length();
         result.append("$").append(length).append("\r\n").append(value).append("\r\n");
         return result.toString();

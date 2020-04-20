@@ -23,7 +23,7 @@ public class CmdHandler {
     private static CmdHandler singleInstance;
     private final CmdManager cmdManager = CmdManager.newSingleInstance();
 
-    public static Database getDefaultDB() {
+    public Database getDefaultDB() {
         return Databases.get(0);
     }
 

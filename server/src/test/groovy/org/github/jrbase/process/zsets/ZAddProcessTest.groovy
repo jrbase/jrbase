@@ -3,15 +3,18 @@ package org.github.jrbase.process.zsets
 import org.github.jrbase.dataType.ClientCmd
 import org.github.jrbase.handler.CmdHandler
 import org.github.jrbase.process.CmdProcess
-import spock.lang.Ignore
+import spock.lang.Shared
 import spock.lang.Specification
 
-@Ignore
 class ZAddProcessTest extends Specification {
     private CmdProcess cmdProcess = new ZAddProcess()
+    @Shared
+    def chandler = CmdHandler.newSingleInstance(null)
+    @Shared
     private ClientCmd clientCmd = new ClientCmd()
 
-    def setup() {
+    def setupSpec() {
+        chandler.getDefaultDB().getTable().clear()
         clientCmd.setKey("a")
     }
 
@@ -20,7 +23,6 @@ class ZAddProcessTest extends Specification {
 
     def "processData"() {
         given:
-        def chandler = CmdHandler.newSingleInstance(null)
         clientCmd.setDb(chandler.getDefaultDB())
         clientCmd.setArgs(args as String[])
 
