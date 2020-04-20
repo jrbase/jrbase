@@ -34,8 +34,8 @@ import static org.github.jrbase.config.YamlTool.readConfig;
  * second: start the java redis server
  */
 public class JRBaseServer {
-
-    // args[0] = server/config/redis_server.yaml
+    // if you want to add a config file please add following line to your idea Program arguments
+    // server/config/redis_server.yaml
     public static void main(String[] args) throws Exception {
 
         RedisConfigurationOption redisConfigurationOption = new RedisConfigurationOption();

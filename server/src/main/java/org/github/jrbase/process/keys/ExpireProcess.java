@@ -1,45 +1,41 @@
-package org.github.jrbase.process.hash;
+package org.github.jrbase.process.keys;
 
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
-import org.github.jrbase.database.HashRedisValue;
 import org.github.jrbase.database.RedisValue;
 import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.process.annotation.KeyCommand;
 
+import static org.github.jrbase.dataType.CommonMessage.REDIS_ONE_INTEGER;
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER;
 
 @KeyCommand
-public class HLenProcess implements CmdProcess {
+public class ExpireProcess implements CmdProcess {
 
     @Override
     public String getCmdName() {
-        return Cmd.HLEN.getCmdName();
+        return Cmd.EXPIRE.getCmdName();
     }
 
     @Override
     public boolean isCorrectArguments(ClientCmd clientCmd) {
-        return true;
+        return clientCmd.getArgLength() == 1;
     }
 
     @Override
     public String process(ClientCmd clientCmd) {
-        return requestKVAndReplyClient(clientCmd);
-    }
-
-    public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        checkKeyType();
-        // hlen key
+        //set key currentTime + args[0]ms
         final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());
         if (redisValue == null) {
             return REDIS_ZORE_INTEGER;
         }
-        return ":" + ((HashRedisValue) redisValue).getHash().size() + "\r\n";
-    }
+        final String second = clientCmd.getArgs()[0];
+        final int s = Integer.parseInt(second);
+        final int ms = s * 1000;
+        final long valueMs = System.currentTimeMillis() + ms;
+        redisValue.setExpire(valueMs);
+        clientCmd.getDb().getTable().put(clientCmd.getKey(), redisValue);
+        return REDIS_ONE_INTEGER;
 
-    private void checkKeyType() {
-        //TODO:
-        // WRONGTYPE Operation against a key holding the wrong kind of value
     }
-
 }

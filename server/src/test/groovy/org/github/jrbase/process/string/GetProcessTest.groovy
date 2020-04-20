@@ -1,36 +1,50 @@
 package org.github.jrbase.process.string
 
-
-import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
+import org.github.jrbase.handler.CmdHandler
 import org.github.jrbase.process.CmdProcess
-import spock.lang.Ignore
+import spock.lang.Shared
 import spock.lang.Specification
 
 import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING
-import static org.github.jrbase.dataType.RedisDataType.STRINGS
 
 class GetProcessTest extends Specification {
+    CmdProcess cmdProcess = new GetProcess()
+    @Shared
+    def chandler = CmdHandler.newSingleInstance(null)
+    @Shared
+    private ClientCmd clientCmd = new ClientCmd()
 
-    //TODO: How to async test
+    def setupSpec() {
+        chandler.getDefaultDB().getTable().clear()
+        clientCmd.setDb(chandler.getDefaultDB())
+        clientCmd.setKey("key")
+    }
+
     //get a = b
-    @Ignore
     def "Process"() {
-        given:
-        CmdProcess cmdProcess = new GetProcess()
-        ClientCmd clientCmd = new ClientCmd()
-        clientCmd.setKey("a") // the is import, "a" must same as clientCmd.getKey() in process: backendProxy.bGet(clientCmd.getKey())
-        final BackendProxy backendProxy = Mock()
-        clientCmd.setBackendProxy(backendProxy)
-        String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation()
+        when:
+        clientCmd.setArgs("a")
+        then:
+        REDIS_EMPTY_STRING == cmdProcess.process(clientCmd)
+    }
 
-        backendProxy.get(buildUpKey) >> input
-        expect:
-        message == cmdProcess.process(clientCmd)
-        where:
-        input          | message
-        null           | REDIS_EMPTY_STRING
-        "a".getBytes() | '$1\r\na\r\n'
+    def "set and get "() {
+        CmdProcess setProcess = new SetProcess()
+        clientCmd.setArgs(["value1"] as String[])
+        when:
+        setProcess.process(clientCmd)
+        then:
+        '$6\r\nvalue1\r\n' == cmdProcess.process(clientCmd)
+    }
+
+    def "testArgumentsException"() {
+        given:
+        clientCmd.setArgs(["value", "error arg"] as String[])
+        when:
+        def result = cmdProcess.isCorrectArguments(clientCmd)
+        then:
+        !result
     }
 
 }

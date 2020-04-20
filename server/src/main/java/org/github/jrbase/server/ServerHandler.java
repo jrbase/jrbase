@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  */
 public class ServerHandler extends SimpleChannelInboundHandler<String> {
 
-    private CmdHandler cmdHandler;
+    private final CmdHandler cmdHandler;
 
     public ServerHandler(CmdHandler cmdHandler) {
         this.cmdHandler = cmdHandler;
@@ -27,6 +27,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
     }*/
 
     @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        cmdHandler.removeContext(ctx);
+        super.channelInactive(ctx);
+    }
+
+    @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) {
         cmdHandler.handleMsg(ctx, msg);
     }
@@ -36,4 +42,5 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
         cause.printStackTrace();
         ctx.close();
     }
+
 }

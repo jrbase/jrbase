@@ -1,32 +1,48 @@
 package org.github.jrbase.process.hash
 
-
-import org.github.jrbase.backend.BackendProxy
 import org.github.jrbase.dataType.ClientCmd
+import org.github.jrbase.handler.CmdHandler
 import org.github.jrbase.process.CmdProcess
+import spock.lang.Shared
 import spock.lang.Specification
 
+import static org.github.jrbase.dataType.CommonMessage.REDIS_ONE_INTEGER
 import static org.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
-import static org.github.jrbase.dataType.RedisDataType.HASHES
 
 class HLenProcessTest extends Specification {
+    CmdProcess cmdProcess = new HLenProcess()
+    @Shared
+    def chandler = CmdHandler.newSingleInstance(null)
+    @Shared
+    private ClientCmd clientCmd = new ClientCmd()
+
+    def setupSpec() {
+        chandler.getDefaultDB().getTable().clear()
+        clientCmd.setDb(chandler.getDefaultDB())
+        clientCmd.setKey("key")
+    }
+
     def "Process"() {
-        CmdProcess cmdProcess = new HLenProcess()
-        ClientCmd clientCmd = new ClientCmd()
         given:
         clientCmd.setKey(key)
         clientCmd.setArgs([] as String[])
-        final BackendProxy backendProxy = Mock()
-        clientCmd.setBackendProxy(backendProxy)
-        def buildUpKey = clientCmd.getKey() + HASHES.getAbbreviation()
-        backendProxy.bGet(buildUpKey) >> result
         expect:
         message == cmdProcess.process(clientCmd)
         where:
-        key | result       | message
-        "a" | [0, 0, 0, 1] | ':1\r\n'
-        "a" | [0, 0, 0, 2] | ':2\r\n'
-        "a" | null         | REDIS_ZORE_INTEGER
+        key | message
+        "a" | REDIS_ZORE_INTEGER
+    }
 
+    def "Process2"() {
+        CmdProcess hSetProcess = new HSetProcess()
+        given:
+        clientCmd.setKey(key)
+        clientCmd.setArgs(["f", "v"] as String[])
+        expect:
+        hSetProcess.process(clientCmd)
+        message == cmdProcess.process(clientCmd)
+        where:
+        key | message
+        "a" | REDIS_ONE_INTEGER
     }
 }

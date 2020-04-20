@@ -14,7 +14,7 @@ public enum RedisDataType {
     SETS("set", "c"),
     SORTED_SETS("zset", "z"),
     NONE("none", "n"),
-    KEYS("key", "k");
+    KEY("key", "k");
 
     private final String name;
     private final String abbreviation;

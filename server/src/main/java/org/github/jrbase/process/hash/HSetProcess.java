@@ -1,17 +1,14 @@
 package org.github.jrbase.process.hash;
 
-import org.github.jrbase.backend.BackendProxy;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
+import org.github.jrbase.database.HashRedisValue;
+import org.github.jrbase.database.RedisValue;
 import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.process.annotation.KeyCommand;
-import org.github.jrbase.utils.Tools;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
-import static org.github.jrbase.dataType.RedisDataType.HASHES;
 import static org.github.jrbase.utils.ToolsKeyValue.generateKeyValueMap;
 import static org.github.jrbase.utils.ToolsKeyValue.keyValueEventNumber;
 
@@ -35,40 +32,27 @@ public class HSetProcess implements CmdProcess {
     }
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        // hset key field value
-        final BackendProxy backendProxy = clientCmd.getBackendProxy();
-
-        //1 get mapCount
-        String mapCountKey = clientCmd.getKey() + "h";
-        final byte[] mapCountBytes = backendProxy.bGet(mapCountKey);
-        final int originCount = Tools.byteArrayToInt(mapCountBytes);
-        //2 put hset
-        //3 get successCount
-        final int successCount = getSuccessCountUpdate(clientCmd, backendProxy);
-        int totalCount = originCount + successCount;
-
-        //4 update totalCount
-        backendProxy.bPut(mapCountKey, Tools.intToByteArray(totalCount));
-        return ":" + successCount + "\r\n";
-
-        // another think,but cant't implement
-        // kvList.add(new KVEntry(buildUpKey, writeUtf8(value)));
+        // hset key field1 value1 field2 value2
+        final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());
+        if (redisValue == null) {
+            final HashRedisValue addHash = new HashRedisValue();
+            getSuccessCountUpdate(clientCmd, addHash);
+            clientCmd.getDb().getTable().put(clientCmd.getKey(), addHash);
+            return ":" + addHash.getHash().size() + "\r\n";
+        }
+        final Map<String, String> hash = ((HashRedisValue) redisValue).getHash();
+        final int originSize = hash.size();
+        getSuccessCountUpdate(clientCmd, redisValue);
+        final int currentSize = ((HashRedisValue) redisValue).getHash().size();
+        final int updateSize = currentSize - originSize;
+        return ":" + updateSize + "\r\n";
     }
 
-    private int getSuccessCountUpdate(ClientCmd clientCmd, BackendProxy backendProxy) {
-        int successCount = 0;
+    private void getSuccessCountUpdate(ClientCmd clientCmd, RedisValue addHash) {
         final Map<String, String> keyValueMap = generateKeyValueMap(clientCmd.getArgs());
         for (String field : keyValueMap.keySet()) {
-            String buildUpKey = getBuildUpKey(clientCmd.getKey(), field);
-            final byte[] bytes = backendProxy.bGetAndPut(buildUpKey, writeUtf8(keyValueMap.get(field)));
-            successCount = bytes == null ? successCount + 1 : successCount;
+            ((HashRedisValue) addHash).getHash().put(field, keyValueMap.get(field));
         }
-        return successCount;
-    }
-
-    @NotNull
-    private String getBuildUpKey(String key, String field) {
-        return key + "f" + field + HASHES.getAbbreviation();
     }
 
 }
