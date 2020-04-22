@@ -56,9 +56,8 @@ public class CmdManager {
             return;
         }
         final String message = cmdProcess.process(clientCmd);
-        if (!message.isEmpty()) {
-            clientCmd.getChannel().writeAndFlush(message);
-        }
+        clientCmd.getChannel().writeAndFlush(message);
+
     }
 
     private boolean checkWrongType(ClientCmd clientCmd) {

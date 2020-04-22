@@ -9,6 +9,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'org.apache.commons:commons-lang3:3.9'
 
+    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.8-1'
+
 }
 
 task fatJar(type: Jar) {
