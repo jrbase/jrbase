@@ -126,15 +126,15 @@ Sorted Sets
 +------------------+-------------------------+-------------------------------------------------
 |    ZRANGE        |                         | ZRANGE key start stop [WITHSCORES]  
 +------------------+-------------------------+-------------------------------------------------
-|    ZREVRANGE     |                         | ZREVRANGE key start stop [WITHSCORES]    
+|    ZREVRANGE     |                         | zrevrange key start stop [WITHSCORES]    
 +------------------+-------------------------+-------------------------------------------------
-|   ZRANGEBYSCORE  |                         | ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT offset count]     
+|   ZRANGEBYSCORE  |                         | zrangebyscore key min max [WITHSCORES] [LIMIT offset count]     
 +------------------+-------------------------+-------------------------------------------------
-| ZREMRANGEBYSCORE |                         | ZREMRANGEBYSCORE key min max                  
+| ZREMRANGEBYSCORE |                         | zremrangebyscore key min max                  
 +------------------+-------------------------+-------------------------------------------------
 |      ZRANK       |                         | ZRANK key [count]                  
 +------------------+-------------------------+-------------------------------------------------
-|   ZRANGEBYLEX    |                         | ZRANGEBYLEX key min max [LIMIT offset count]   
+|   ZRANGEBYLEX    |                         | zrangebylex key min max [LIMIT offset count]   
 +------------------+-------------------------+-------------------------------------------------
 |     ZINCRBY      |                         | ZINCRBY key increment member       
 +------------------+-------------------------+-------------------------------------------------

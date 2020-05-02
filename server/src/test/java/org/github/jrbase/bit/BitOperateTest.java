@@ -11,13 +11,11 @@ public class BitOperateTest {
 
     @Test
     public void testMe() {
-
         byte[] bits = me.getBytes(StandardCharsets.UTF_8);
         Assert.assertEquals(3, bits.length);
         Assert.assertEquals(-26, bits[0]);
         Assert.assertEquals(-120, bits[1]);
         Assert.assertEquals(-111, bits[2]);
-
     }
 
     @Test
@@ -32,12 +30,6 @@ public class BitOperateTest {
     @Test
     public void test() {
         Assert.assertEquals(0, (97 & (0x01 >> 5)));
-    }
-
-
-    @Test
-    public void testLeftMove() {
-//        1<<
     }
 
 }

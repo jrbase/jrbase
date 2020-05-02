@@ -35,6 +35,7 @@ public enum Cmd {
 
     //Sets
     ZADD("zadd", SORTED_SETS),
+    ZRANGE("zrange", SORTED_SETS),
 
     // others
     OTHER("other", NONE);

@@ -9,6 +9,7 @@ import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_LIST;
 import static org.github.jrbase.dataType.CommonMessage.REDIS_LIST_DELIMITER;
 import static org.github.jrbase.dataType.RedisDataType.LISTS;
+import static org.github.jrbase.utils.Tools.getRealBegin;
 import static org.github.jrbase.utils.Tools.isEmptyBytes;
 
 @KeyCommand
@@ -51,8 +52,8 @@ public class LRangeProcess implements CmdProcess {
         int beginInt = Integer.parseInt(begin);
         int endInt = Integer.parseInt(end);
         //2 -1 0 1  length-1
-        int realBegin = beginInt < 0 ? length + beginInt : beginInt;
-        int realEnd = endInt < 0 ? length + endInt : endInt;
+        int realBegin = getRealBegin(length, beginInt);
+        int realEnd = getRealBegin(length, endInt);
 
         if (realBegin > realEnd) {
             return REDIS_EMPTY_LIST;

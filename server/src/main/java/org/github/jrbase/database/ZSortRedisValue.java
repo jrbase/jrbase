@@ -1,18 +1,25 @@
 package org.github.jrbase.database;
 
 import org.github.jrbase.dataType.RedisDataType;
-
-import java.util.TreeMap;
+import org.github.jrbase.dataType.ScoreMember;
+import org.github.jrbase.utils.skipList.SkipList;
 
 public class ZSortRedisValue extends RedisValue {
 
-    private final TreeMap<String, Integer> value = new TreeMap<>();
+    private final SkipList skipList = new SkipList();
 
     public ZSortRedisValue() {
         this.setType(RedisDataType.SORTED_SETS);
     }
 
-    public TreeMap<String, Integer> getValue() {
-        return value;
+    public void put(String key, int score) {
+        final ScoreMember scoreMember = new ScoreMember(key, score);
+        skipList.put(scoreMember);
     }
+
+    public int getSize() {
+        return skipList.getSize();
+    }
+
 }
+
