@@ -32,7 +32,7 @@ class SkipNode {
         return rec.key();
     }
 
-    public SkipNode(ScoreMember key, Object elem, int level) {
+    SkipNode(ScoreMember key, Object elem, int level) {
         rec = new KVPair(key, elem);
         backward = null;
         this.level = new ZSkipListLevel[level + 1];

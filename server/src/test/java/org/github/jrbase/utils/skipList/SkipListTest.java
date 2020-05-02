@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SkipListTest {
 
-    private final static int SKIP_LIST_COUNT = 6;
+    private static final int SKIP_LIST_COUNT = 6;
     private static final SkipList skipList = new SkipList();
 
     @BeforeClass

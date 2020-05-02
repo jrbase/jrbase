@@ -31,7 +31,7 @@ import static org.github.jrbase.utils.Tools.getRealBegin;
  * Function: Range Query by SkipList  And Single Query by HashMap
  */
 public class SkipList {
-    private final static int MAX_LEVEL = 32;
+    private static final int MAX_LEVEL = 32;
     private final SkipNode head;
     private SkipNode tail;
     // Single Query
@@ -154,8 +154,7 @@ public class SkipList {
 
     private int randomLevel() {
         int lev;
-        for (lev = 1; Math.abs(ran.nextInt()) % 2 == 0 && lev <= MAX_LEVEL; lev++) // ran is random generator
-        {
+        for (lev = 1; Math.abs(ran.nextInt()) % 2 == 0 && lev <= MAX_LEVEL; lev++) { // ran is random generator
             // Do nothing
         }
         return lev;
@@ -175,8 +174,9 @@ public class SkipList {
      * @return insert 1, update 0
      */
     public int put(ScoreMember key) {
-        if (key == null)
+        if (key == null) {
             throw new NullPointerException();
+        }
         return doPut(key);
     }
 
