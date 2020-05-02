@@ -36,7 +36,7 @@ class ZAddProcessTest extends Specification {
         ["2", "b"]           | ':0\r\n'
         ["1", "b", "2", "c"] | ':1\r\n'
         ["1", "b", "2", "c"] | ':0\r\n'
-        ["1", "b", "2", "c"] | ':0\r\n'
+        ["1", "b", "3", "c"] | ':0\r\n'
     }
 
     def "testArgumentsException"() {

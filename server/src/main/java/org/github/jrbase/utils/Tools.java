@@ -123,4 +123,8 @@ public class Tools {
         return bytes == null || bytes.length == 0;
     }
 
+    public static int getRealBegin(int length, int beginInt) {
+        return beginInt < 0 ? length + beginInt : beginInt;
+    }
+
 }

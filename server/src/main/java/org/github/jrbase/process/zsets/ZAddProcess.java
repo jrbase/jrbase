@@ -35,23 +35,26 @@ public class ZAddProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
+//   TODO: replace next use ->  @see Map#compute
+//    default V compute(K key,
+//                BiFunction<? super K, ? super V, ? extends V> remappingFunction)
         final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());
         if (redisValue == null) {
             final ZSortRedisValue zSortRedisValue = new ZSortRedisValue();
             getZSortRedisValue(clientCmd, zSortRedisValue);
-            return ":" + zSortRedisValue.getValue().size() + "\r\n";
+            return ":" + zSortRedisValue.getSize() + "\r\n";
         }
         final ZSortRedisValue value = (ZSortRedisValue) redisValue;
-        final int originSize = value.getValue().size();
+        final int originSize = value.getSize();
         getZSortRedisValue(clientCmd, value);
-        return ":" + (value.getValue().size() - originSize) + "\r\n";
+        return ":" + (value.getSize() - originSize) + "\r\n";
     }
 
     @NotNull
     private ZSortRedisValue getZSortRedisValue(ClientCmd clientCmd, ZSortRedisValue zSortRedisValue) {
         final Map<String, Integer> keyValueMap = generateValueScoreValueMap(clientCmd.getArgs());
         for (String key : keyValueMap.keySet()) {
-            zSortRedisValue.getValue().put(key, keyValueMap.get(key));
+            zSortRedisValue.put(key, keyValueMap.get(key));
         }
         clientCmd.getDb().getTable().put(clientCmd.getKey(), zSortRedisValue);
         return zSortRedisValue;
