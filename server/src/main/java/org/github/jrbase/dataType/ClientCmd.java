@@ -15,6 +15,7 @@ public class ClientCmd {
     private RedisClientContext redisClientContext;
 
     private Database db;
+    private String error;
 
     public Database getDb() {
         return db;
@@ -95,5 +96,13 @@ public class ClientCmd {
                 ", key='" + key + '\'' +
                 ", args=" + Arrays.toString(args) +
                 '}';
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public String getError() {
+        return error;
     }
 }

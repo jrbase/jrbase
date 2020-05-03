@@ -6,7 +6,6 @@ import org.github.jrbase.database.RedisValue;
 import org.github.jrbase.database.ZSortRedisValue;
 import org.github.jrbase.process.CmdProcess;
 import org.github.jrbase.process.annotation.KeyCommand;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,31 +32,20 @@ public class ZAddProcess implements CmdProcess {
         return requestKVAndReplyClient(clientCmd);
     }
 
-
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-//   TODO: replace next use ->  @see Map#compute
-//    default V compute(K key,
-//                BiFunction<? super K, ? super V, ? extends V> remappingFunction)
-        final RedisValue redisValue = clientCmd.getDb().getTable().get(clientCmd.getKey());
-        if (redisValue == null) {
-            final ZSortRedisValue zSortRedisValue = new ZSortRedisValue();
-            getZSortRedisValue(clientCmd, zSortRedisValue);
-            return ":" + zSortRedisValue.getSize() + "\r\n";
-        }
-        final ZSortRedisValue value = (ZSortRedisValue) redisValue;
-        final int originSize = value.getSize();
-        getZSortRedisValue(clientCmd, value);
-        return ":" + (value.getSize() - originSize) + "\r\n";
+        final RedisValue redisValue = clientCmd.getDb().getTable().getOrDefault(clientCmd.getKey(), new ZSortRedisValue());
+        final ZSortRedisValue zSortRedisValue = (ZSortRedisValue) redisValue;
+        final int originSize = zSortRedisValue.getSize();
+        updateZSortRedisValue(clientCmd, zSortRedisValue);
+        clientCmd.getDb().getTable().put(clientCmd.getKey(), zSortRedisValue);
+        return ":" + (zSortRedisValue.getSize() - originSize) + "\r\n";
     }
 
-    @NotNull
-    private ZSortRedisValue getZSortRedisValue(ClientCmd clientCmd, ZSortRedisValue zSortRedisValue) {
+    private void updateZSortRedisValue(ClientCmd clientCmd, ZSortRedisValue zSortRedisValue) {
         final Map<String, Integer> keyValueMap = generateValueScoreValueMap(clientCmd.getArgs());
         for (String key : keyValueMap.keySet()) {
             zSortRedisValue.put(key, keyValueMap.get(key));
         }
-        clientCmd.getDb().getTable().put(clientCmd.getKey(), zSortRedisValue);
-        return zSortRedisValue;
     }
 
     private Map<String, Integer> generateValueScoreValueMap(String[] args) {
