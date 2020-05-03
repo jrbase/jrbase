@@ -2,6 +2,7 @@ package org.github.jrbase.manager;
 
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import io.netty.channel.Channel;
+import org.apache.commons.lang.StringUtils;
 import org.github.jrbase.dataType.ClientCmd;
 import org.github.jrbase.dataType.Cmd;
 import org.github.jrbase.database.RedisValue;
@@ -47,7 +48,11 @@ public class CmdManager {
         }
         // check arguments
         if (!cmdProcess.isCorrectArguments(clientCmd)) {
-            sendWrongArgumentMessage(clientCmd);
+            if (StringUtils.isNotBlank(clientCmd.getError())) {
+                sendCustomError(clientCmd);
+            } else {
+                sendWrongArgumentMessage(clientCmd);
+            }
             return;
         }
         // check type
@@ -69,12 +74,17 @@ public class CmdManager {
         return redisValue != null && !cmd.getType().equals(redisValue.getType());
     }
 
-    static void sendWrongArgumentMessage(ClientCmd clientCmd) {
+    private void sendCustomError(ClientCmd clientCmd) {
+        final Channel channel = clientCmd.getChannel();
+        channel.writeAndFlush(clientCmd.getError());
+    }
+
+    private static void sendWrongArgumentMessage(ClientCmd clientCmd) {
         final Channel channel = clientCmd.getChannel();
         channel.writeAndFlush("-ERR wrong number of arguments for '" + clientCmd.getCmd() + "' command\r\n");
     }
 
-    static void sendWrongTypeMessage(ClientCmd clientCmd) {
+    private static void sendWrongTypeMessage(ClientCmd clientCmd) {
         final Channel channel = clientCmd.getChannel();
         channel.writeAndFlush("-WRONGTYPE Operation against a key holding the wrong kind of value\r\n");
     }

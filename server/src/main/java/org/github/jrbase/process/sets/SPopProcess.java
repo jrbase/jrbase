@@ -13,8 +13,7 @@ import java.util.*;
 import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING;
-import static org.github.jrbase.dataType.CommonMessage.REDIS_LIST_DELIMITER;
+import static org.github.jrbase.dataType.CommonMessage.*;
 import static org.github.jrbase.dataType.RedisDataType.SETS;
 import static org.github.jrbase.utils.ToolsString.deleteLastChar;
 
@@ -77,7 +76,7 @@ public class SPopProcess implements CmdProcess {
         try {
             count = Integer.parseInt(args[0]);
         } catch (NumberFormatException ignore) {
-            return "-ERR value is not an integer or out of range\r\n";
+            return REDIS_ERROR_INTEGER_OUT_RANGE;
         }
 
         final String[] getValueArr = bGetResultStr.split(REDIS_LIST_DELIMITER);
