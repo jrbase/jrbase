@@ -39,7 +39,7 @@ JAVA_CONFIG=$(mktemp XXXXXXXX)
 cat <<EOF | xargs echo >$JAVA_CONFIG
 ${JAVA_OPTS}
 -cp $CLASSPATH
-org.github.jrbase.server.JRBaseServer $1
+io.github.jrbase.server.JRBaseServer $1
 EOF
 
 echo $JAVA_OPTS

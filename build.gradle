@@ -1,25 +1,30 @@
 
-group 'org.github.jrbase'
-version '1.0.1'
-
-task distributionAllPackage(type: Copy) {
-    dependsOn 'jraftKV:distTar','server:distTar'
-    from 'server/build/distributions/'
-    from 'jraftdemo/build/distributions/'
-    into 'build/'
+allprojects {
+    group 'io.github.jrbase'
+    version '1.0.1-SNAPSHOT'
 }
 
-allprojects {
+subprojects {
     apply plugin: "java"
     apply plugin: "groovy"
     apply plugin: 'jacoco'
     apply plugin: com.github.jrbase.codelinecountplugin.CodeLineCountPlugin
     apply plugin: 'checkstyle'
 
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+    apply plugin: 'maven-publish'
+
+
     version = rootProject.version
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
+
+    // Signature of artifacts
+    signing {
+        sign configurations.archives
+    }
 
     plugins.withType(DistributionPlugin) {
         distTar {
@@ -30,10 +35,9 @@ allprojects {
 
     repositories {
         mavenLocal()
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
         jcenter()
         mavenCentral()
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
-        mavenLocal()
     }
 
     dependencies {
@@ -41,7 +45,7 @@ allprojects {
         testImplementation "junit:junit:4.12"
         testImplementation "org.mockito:mockito-core:2.25.1"
 
-        compile "org.codehaus.groovy:groovy-all:2.5.4"
+        testImplementation "org.codehaus.groovy:groovy-all:2.5.4"
         testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-2"
         testRuntime "net.bytebuddy:byte-buddy:1.9.3"
     }
@@ -52,24 +56,97 @@ allprojects {
             events "passed", "skipped", "failed", "standardOut", "standardError"
         }
     }
-}
 
-task codeCoverageReport(type: JacocoReport) {
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-
-    subprojects.each {
-        println(it)
-        sourceSets it.sourceSets.main
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
     }
 
-    reports {
-        xml.enabled true
-        xml.destination file("${buildDir}/reports/jacoco/report.xml")
-        html.enabled true
-        csv.enabled false
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
     }
-}
 
-codeCoverageReport.dependsOn {
-    subprojects*.test
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
+    publishing {
+        repositories {
+            maven {
+                def userName = System.getProperty("username")
+                def passWord = System.getProperty("password")
+                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+                credentials {
+                    username userName
+                    password passWord
+                }
+            }
+        }
+        publications {
+
+            mavenJava(MavenPublication) {
+                from components.java
+
+                artifact sourcesJar
+                artifact javadocJar
+
+                pom {
+                    name = 'jrbase'
+                    packaging 'jar'
+                    description = 'A distributed NoSQL database similar to Redis.'
+                    url = 'https://github.com/jrbase/jrbase'
+
+                    scm {
+                        connection = 'scm:git@github.com:jrbase/jrbase.git'
+                        developerConnection = 'scm:git@github.com:jrbase/jrbase.git'
+                        url = 'https://github.com/jrbase/jrbase'
+                    }
+
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = 'makey22112'
+                            name = 'makey22112'
+                            email = 'makey22112@gmail.com'
+                        }
+                    }
+                }
+            }
+        }
+
+        signing {
+            sign publishing.publications.mavenJava
+        }
+
+    }
+
+    task codeCoverageReport(type: JacocoReport) {
+        executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+        subprojects.each {
+            println(it)
+            sourceSets it.sourceSets.main
+        }
+
+        reports {
+            xml.enabled true
+            xml.destination file("${buildDir}/reports/jacoco/report.xml")
+            html.enabled true
+            csv.enabled false
+        }
+    }
+
+    codeCoverageReport.dependsOn {
+        subprojects*.test
+    }
 }
