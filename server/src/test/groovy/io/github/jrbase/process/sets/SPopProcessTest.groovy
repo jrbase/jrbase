@@ -1,19 +1,21 @@
 package io.github.jrbase.process.sets
 
-
-import io.github.jrbase.backend.BackendProxy
 import io.github.jrbase.dataType.ClientCmd
+import io.github.jrbase.handler.CmdHandler
 import io.github.jrbase.process.CmdProcess
+import spock.lang.Shared
 import spock.lang.Specification
-
-import static io.github.jrbase.dataType.RedisDataType.SETS
-import static io.github.jrbase.utils.ToolsString.toRedisListDelimiter
 
 class SPopProcessTest extends Specification {
     private CmdProcess cmdProcess = new SPopProcess()
+    @Shared
     private ClientCmd clientCmd = new ClientCmd()
 
-    def setup() {
+    def setupSpec() {
+        def chandler = CmdHandler.newSingleInstance(null)
+        chandler.getDefaultDB().clear()
+        clientCmd.setDb(chandler.getDefaultDB())
+
         clientCmd.setKey("a")
     }
 
@@ -22,53 +24,21 @@ class SPopProcessTest extends Specification {
 
     def "processErrorData"() {
         given:
-        clientCmd.setArgs(args as String[])
-        final BackendProxy backendProxy = Mock()
-        clientCmd.setBackendProxy(backendProxy)
-        String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation()
-        //
-        backendProxy.bGet(buildUpKey) >> originValue
+
+        SAddProcess sAddProcess = new SAddProcess()
+        clientCmd.setArgs(["c"] as String[])
+        sAddProcess.process(clientCmd)
         expect:
+        clientCmd.setArgs(args as String[])
         message == cmdProcess.process(clientCmd)
         where:
-        args       | originValue                              | message
-        ["1", "2"] | "c".getBytes()                           | '-ERR syntax error\r\n'
-        []         | "c".getBytes()                           | '*1\r\n$1\r\nc\r\n'
-        ["a"]      | toRedisListDelimiter("a,b,c").getBytes() | '-ERR value is not an integer or out of range\r\n'
+        args       | message
+        ["1", "2"] | '-ERR syntax error\r\n'
+        []         | '*1\r\n$1\r\nc\r\n'
+        ["1"]      | '*1\r\n$1\r\nc\r\n'
+        ["3"]      | '*1\r\n$1\r\nc\r\n'
+        ["a"]      | '-ERR value is not an integer or out of range\r\n'
     }
-
-    def "processReturnAllData"() {
-        given:
-        clientCmd.setArgs(args as String[])
-        final BackendProxy backendProxy = Mock()
-        clientCmd.setBackendProxy(backendProxy)
-        String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation()
-        //
-        backendProxy.bGet(buildUpKey) >> originValue
-        expect:
-        message == cmdProcess.process(clientCmd)
-        where:
-        args   | originValue                              | message
-        ["3"]  | toRedisListDelimiter("a,b,c").getBytes() | '*3\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nc\r\n'
-        ["10"] | toRedisListDelimiter("a,b,c").getBytes() | '*3\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nc\r\n'
-    }
-
-    def "processArgsCount"() {
-        given:
-        clientCmd.setArgs(args as String[])
-        final BackendProxy backendProxy = Mock()
-        clientCmd.setBackendProxy(backendProxy)
-        String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation()
-        //
-        backendProxy.bGet(buildUpKey) >> originValue
-        expect:
-        count == cmdProcess.process(clientCmd).split("\r\n")[0]
-        where:
-        args  | originValue                                  | count
-        ["2"] | toRedisListDelimiter("a,b,c").getBytes()     | "*2"
-        ["4"] | toRedisListDelimiter("a,b,c,d,f").getBytes() | "*4"
-    }
-    //process data
 
 
     def "testArgumentsException"() {
@@ -78,20 +48,6 @@ class SPopProcessTest extends Specification {
         def result = cmdProcess.isCorrectArguments(clientCmd)
         then:
         result
-    }
-
-    def "GetPopResult"() {
-        when:
-        def result = cmdProcess.getPopResult(["a", "b", 'd'])
-        then:
-        result == '*3\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nd\r\n'
-    }
-
-    def "testMakeRandomSets"() {
-        when:
-        def result = cmdProcess.makeRandomSets(10, 8)
-        then:
-        result.size() == 8
     }
 
 }

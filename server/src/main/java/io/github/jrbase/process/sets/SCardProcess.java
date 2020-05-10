@@ -2,9 +2,16 @@ package io.github.jrbase.process.sets;
 
 import io.github.jrbase.dataType.ClientCmd;
 import io.github.jrbase.dataType.Cmd;
+import io.github.jrbase.database.RedisValue;
+import io.github.jrbase.database.SetRedisValue;
 import io.github.jrbase.process.CmdProcess;
 import io.github.jrbase.process.annotation.KeyCommand;
 
+/**
+ * SCARD key
+ * Time complexity: O(1)
+ * Returns the set cardinality (number of elements) of the set stored at key.
+ */
 @KeyCommand
 public class SCardProcess implements CmdProcess {
     @Override
@@ -19,17 +26,9 @@ public class SCardProcess implements CmdProcess {
 
     @Override
     public String process(ClientCmd clientCmd) {
-       /* final BackendProxy backendProxy = clientCmd.getBackendProxy();
 
-        String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation();
-        final byte[] bGetResult = backendProxy.bGet(buildUpKey);
-        if (isEmptyBytes(bGetResult)) {
-            return REDIS_ZORE_INTEGER;
-        } else {
-            final String bGetSetsResult = readUtf8(bGetResult);
-            final String[] getValueArr = bGetSetsResult.split(REDIS_LIST_DELIMITER);
-            return ":" + getValueArr.length + "\r\n";
-        }*/
-        return "";
+        final RedisValue redisValue = clientCmd.getDb().getOrDefault(clientCmd.getKey(), new SetRedisValue());
+        final SetRedisValue setRedisValue = (SetRedisValue) redisValue;
+        return ":" + setRedisValue.getSize() + "\r\n";
     }
 }

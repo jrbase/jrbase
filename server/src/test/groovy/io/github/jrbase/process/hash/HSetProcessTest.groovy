@@ -15,7 +15,7 @@ class HSetProcessTest extends Specification {
     private ClientCmd clientCmd = new ClientCmd()
 
     def setupSpec() {
-        chandler.getDefaultDB().getTable().clear()
+        chandler.getDefaultDB().clear()
         clientCmd.setDb(chandler.getDefaultDB())
         clientCmd.setKey("key")
     }

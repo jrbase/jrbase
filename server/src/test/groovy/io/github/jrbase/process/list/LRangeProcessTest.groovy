@@ -32,8 +32,6 @@ class LRangeProcessTest extends Specification {
         message == cmdProcess.process(clientCmd)
         where:
         args         | message
-
-
         ["0", "0"]   | '*1\r\n$3\r\nabc\r\n'
         ["-1", "-1"] | '*1\r\n$1\r\nc\r\n'
         ["100", "0"] | REDIS_EMPTY_LIST
@@ -43,26 +41,4 @@ class LRangeProcessTest extends Specification {
 
     }
 
-
-    def "GetLRangeList"() {
-        expect:
-        LRangeProcess.getLRangeList(originValueArr as String[], begin as String, end as String) == result
-        where:
-        originValueArr  | begin  | end    | result
-        ["a", "b"]      | "100"  | "100"  | '+(empty list or set)\r\n'
-        ["a", "b"]      | "-100" | "-100" | '+(empty list or set)\r\n'
-        ["a", "b"]      | "100"  | "-100" | '+(empty list or set)\r\n'
-        ["a", "b"]      | "100"  | "-1"   | '+(empty list or set)\r\n'
-        ["a", "b"]      | "-1"   | "0"    | '+(empty list or set)\r\n'
-        ["a", "b"]      | "0"    | "-1"   | '*2\r\n$1\r\na\r\n$1\r\nb\r\n'
-        ["a", "b"]      | "-100" | "100"  | '*2\r\n$1\r\na\r\n$1\r\nb\r\n'
-        ["a", "b", "c"] | "0"    | "0"    | '*1\r\n$1\r\na\r\n'
-        ["a", "b", "c"] | "1"    | "1"    | '*1\r\n$1\r\nb\r\n'
-        ["a", "b", "c"] | "2"    | "2"    | '*1\r\n$1\r\nc\r\n'
-        ["a", "b", "c"] | "0"    | "1"    | '*2\r\n$1\r\na\r\n$1\r\nb\r\n'
-        ["a", "b", "c"] | "0"    | "2"    | '*3\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nc\r\n'
-        ["a", "b", "c"] | "0"    | "3"    | '*3\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nc\r\n'
-        ["a", "b", "c"] | "-1"   | "4"    | '*1\r\n$1\r\nc\r\n'
-
-    }
 }

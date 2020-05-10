@@ -10,6 +10,8 @@ import io.github.jrbase.process.annotation.KeyCommand;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
+
 /**
  * ZADD key [NX|XX] [CH] [INCR] score member [score member ...]
  */
@@ -34,6 +36,9 @@ public class ZAddProcess implements CmdProcess {
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
         final RedisValue redisValue = clientCmd.getDb().getOrDefault(clientCmd.getKey(), new ZSortRedisValue());
+        if (!(redisValue instanceof ZSortRedisValue)) {
+            return REDIS_ERROR_OPERATION_AGAINST;
+        }
         final ZSortRedisValue zSortRedisValue = (ZSortRedisValue) redisValue;
         final int originSize = zSortRedisValue.getSize();
         updateZSortRedisValue(clientCmd, zSortRedisValue);

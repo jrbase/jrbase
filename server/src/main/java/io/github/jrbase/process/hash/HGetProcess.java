@@ -8,6 +8,7 @@ import io.github.jrbase.process.CmdProcess;
 import io.github.jrbase.process.annotation.KeyCommand;
 
 import static io.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING;
+import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
 import static io.github.jrbase.utils.Tools.checkArgs;
 
 @KeyCommand
@@ -33,6 +34,9 @@ public class HGetProcess implements CmdProcess {
         final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
         if (redisValue == null) {
             return REDIS_EMPTY_STRING;
+        }
+        if (!(redisValue instanceof HashRedisValue)) {
+            return REDIS_ERROR_OPERATION_AGAINST;
         }
         StringBuilder result = new StringBuilder();
         final String value = ((HashRedisValue) redisValue).getHash().get(clientCmd.getArgs()[0]);

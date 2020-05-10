@@ -1,32 +1,52 @@
 package io.github.jrbase.process.sets
 
 
-import io.github.jrbase.backend.BackendProxy
 import io.github.jrbase.dataType.ClientCmd
+import io.github.jrbase.handler.CmdHandler
 import io.github.jrbase.process.CmdProcess
+import spock.lang.Shared
 import spock.lang.Specification
 
 import static io.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
-import static io.github.jrbase.dataType.RedisDataType.SETS
-import static io.github.jrbase.utils.ToolsString.toRedisListDelimiter
 
 class SCardProcessTest extends Specification {
     private CmdProcess cmdProcess = new SCardProcess()
+    @Shared
     private ClientCmd clientCmd = new ClientCmd()
+
+    def setupSpec() {
+        def chandler = CmdHandler.newSingleInstance(null)
+        chandler.getDefaultDB().clear()
+        clientCmd.setDb(chandler.getDefaultDB())
+
+        clientCmd.setKey("a")
+    }
 
     def "processData"() {
         given:
-        clientCmd.setKey(key)
-        final BackendProxy backendProxy = Mock()
-        clientCmd.setBackendProxy(backendProxy)
-        String buildUpKey = clientCmd.getKey() + SETS.getAbbreviation()
-        //
-        backendProxy.bGet(buildUpKey) >> originValue
-        expect:
-        message == cmdProcess.process(clientCmd)
-        where:
-        key   | originValue                            | message
-        "abc" | null                                   | REDIS_ZORE_INTEGER
-        "abc" | toRedisListDelimiter("a,b").getBytes() | ":2\r\n"
+        def chandler = CmdHandler.newSingleInstance(null)
+        chandler.getDefaultDB().clear()
+        clientCmd.setDb(chandler.getDefaultDB())
+
+        clientCmd.setKey("key")
+        SAddProcess sAddProcess = new SAddProcess()
+
+        when:
+        clientCmd.setKey("key")
+        then:
+        REDIS_ZORE_INTEGER == cmdProcess.process(clientCmd)
+
+        when:
+        clientCmd.setArgs(["arg1"] as String[])
+        sAddProcess.process(clientCmd)
+        then:
+        ":1\r\n" == cmdProcess.process(clientCmd)
+
+        when:
+        clientCmd.setArgs(["arg2"] as String[])
+        sAddProcess.process(clientCmd)
+        then:
+        ":2\r\n" == cmdProcess.process(clientCmd)
+
     }
 }

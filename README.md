@@ -249,9 +249,25 @@ Scripting
 ## redis-benchmark
 `redis-benchmark -t get,set -n 100000 -q`
 
+## Developer
+1. wireshark capture for Redis protocol input and output
+```text
+Config wireshark: ip.addr == 127.0.0.1 and tcp.port == 6379
+Example:
+init data
+set a a
+start capture
+MGET key a b c
+Input:
+*4\r\n$4\r\nmget\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nc\r\n
+Output:
+*3\r\n$1\r\na\r\n$-1\r\n$-1\r\n
+```
+
 
 ## Related Links
 [redis commands](https://redis.io/commands/)
+[Redis Protocol specification](https://redis.io/topics/protocol)
 
 [A persistent key-value store for fast storage environments](https://rocksdb.org/)
 

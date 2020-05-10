@@ -1,11 +1,6 @@
 package io.github.jrbase.utils
 
-
 import spock.lang.Specification
-
-import java.nio.charset.StandardCharsets
-
-import static Tools.getBit
 
 class ToolsTest extends Specification {
 
@@ -82,52 +77,6 @@ class ToolsTest extends Specification {
         2        | 1
         1        | 1
         0        | 0
-    }
-
-
-    def "getbit"() {
-        String andy = "abc"
-        byte[] bits = andy.getBytes(StandardCharsets.UTF_8)
-        //   1 2 3 4 5 6 7 8
-        // a 0 1 1 0 0 0 0 1
-        //   9 10 11 12 13 14 15 16
-        // b 0 1  1  0  0  0  1  0
-        // c 0 1  1  0  0  0  1  1
-        expect:
-        getBit(input, bits) == output
-        where:
-        input | output
-        -1    | -1
-
-        0     | 0
-        1     | 1
-        2     | 1
-        3     | 0
-        4     | 0
-        5     | 0
-        6     | 0
-        7     | 1
-
-        8     | 0
-        9     | 1
-        10    | 1
-        11    | 0
-        12    | 0
-        13    | 0
-        14    | 1
-        15    | 0
-
-        16    | 0
-        17    | 1
-        18    | 1
-        19    | 0
-        20    | 0
-        21    | 0
-        22    | 1
-        23    | 1
-
-        24    | 0
-
     }
 
 

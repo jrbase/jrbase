@@ -2,12 +2,20 @@ package io.github.jrbase.process.string;
 
 import io.github.jrbase.dataType.ClientCmd;
 import io.github.jrbase.dataType.Cmd;
+import io.github.jrbase.database.ByteRedisValue;
+import io.github.jrbase.database.RedisValue;
 import io.github.jrbase.process.CmdProcess;
 import io.github.jrbase.process.annotation.KeyCommand;
 import io.github.jrbase.utils.Tools;
 
+/**
+ * SETBIT key offset value
+ * Time complexity: O(1)
+ */
 @KeyCommand
 public class SetBitProcess implements CmdProcess {
+    // 1M
+    public static final int MAX_BIT = 1024 * 1024;
 
     @Override
     public String getCmdName() {
@@ -24,32 +32,41 @@ public class SetBitProcess implements CmdProcess {
         return requestKVAndReplyClient(clientCmd);
     }
 
-
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        //setbit key 2 1
-        /*final BackendProxy backendProxy = clientCmd.getBackendProxy();
-
-        String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation();
-        final byte[] bytes = backendProxy.bGet(buildUpKey);
-        if (Tools.isEmptyBytes(bytes)) {
-            return REDIS_ZORE_INTEGER;
-        } else {
-            final String[] args = clientCmd.getArgs();
-            final int lastBit = Tools.getBit(args[0], bytes);
-
-            final int result = Tools.setBit(args[0], args[1], bytes);
-            // update bytes
-            backendProxy.bPut(buildUpKey, bytes);
-
-            if (result == -1) {
+        final RedisValue redisValue = clientCmd.getDb().getOrDefault(clientCmd.getKey(), new ByteRedisValue());
+        final ByteRedisValue byteRedisValue = (ByteRedisValue) redisValue;
+        final String[] args = clientCmd.getArgs();
+        final int positionInt;
+        final int valueInt;
+        try {
+            positionInt = Integer.parseInt(args[0]);
+            valueInt = Integer.parseInt(args[1]);
+            if (positionInt > MAX_BIT || positionInt < 0) {
                 return ("-ERR bit offset is not an integer or out of range\r\n");
-            } else {
-                return (":" + lastBit + "\r\n");
             }
-        }*/
-        return "";
+        } catch (NumberFormatException ignore) {
+            return ("-ERR bit offset is not an integer or out of range\r\n");
+        }
+
+        //setbit key 2 1
+        byte[] value = byteRedisValue.getValue();
+        if (null == value) {
+            value = new byte[MAX_BIT];
+            Tools.setBit(positionInt, valueInt, value);
+            // update bytes
+            byteRedisValue.setValue(value);
+            clientCmd.getDb().put(clientCmd.getKey(), byteRedisValue);
+            return (":" + 0 + "\r\n");
+        } else {
+            final int lastBit = Tools.getBit(positionInt, value);
+            byte[] value2 = Tools.setBit(positionInt, valueInt, value);
+            // update bytes
+            byteRedisValue.setValue(value2);
+            clientCmd.getDb().put(clientCmd.getKey(), byteRedisValue);
+            return (":" + lastBit + "\r\n");
+        }
+
 
     }
-
 
 }

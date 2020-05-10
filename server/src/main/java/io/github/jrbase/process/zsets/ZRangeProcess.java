@@ -12,6 +12,8 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 
+import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
+
 /**
  *
  */
@@ -50,6 +52,9 @@ public class ZRangeProcess implements CmdProcess {
         final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
         if (redisValue == null) {
             return CommonMessage.REDIS_EMPTY_LIST;
+        }
+        if (!(redisValue instanceof ZSortRedisValue)) {
+            return REDIS_ERROR_OPERATION_AGAINST;
         }
         final ZSortRedisValue zSortRedisValue = (ZSortRedisValue) redisValue;
         final List<KVPair> range = zSortRedisValue.findRange(Integer.parseInt(clientCmd.getArgs()[0]), Integer.parseInt(clientCmd.getArgs()[1]));

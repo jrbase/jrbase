@@ -9,6 +9,7 @@ import io.github.jrbase.process.annotation.KeyCommand;
 import io.github.jrbase.utils.Tools;
 
 import static io.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING;
+import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
 
 @KeyCommand
 public class GetProcess implements CmdProcess {
@@ -40,7 +41,9 @@ public class GetProcess implements CmdProcess {
             clientCmd.getDb().put(clientCmd.getKey(), null);
             return REDIS_EMPTY_STRING;
         }
-
+        if (!(redisValue instanceof StringRedisValue)) {
+            return REDIS_ERROR_OPERATION_AGAINST;
+        }
         final String value = ((StringRedisValue) redisValue).getValue();
         final int length = value.length();
         return "$" + length + "\r\n" + value + "\r\n";

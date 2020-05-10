@@ -10,6 +10,8 @@ import io.github.jrbase.utils.ToolsKeyValue;
 
 import java.util.Map;
 
+import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
+
 @KeyCommand
 public class HSetProcess implements CmdProcess {
 
@@ -37,6 +39,9 @@ public class HSetProcess implements CmdProcess {
             getSuccessCountUpdate(clientCmd, addHash);
             clientCmd.getDb().put(clientCmd.getKey(), addHash);
             return ":" + addHash.getHash().size() + "\r\n";
+        }
+        if (!(redisValue instanceof HashRedisValue)) {
+            return REDIS_ERROR_OPERATION_AGAINST;
         }
         final Map<String, String> hash = ((HashRedisValue) redisValue).getHash();
         final int originSize = hash.size();

@@ -19,13 +19,13 @@ class ZRangeProcessTest extends Specification {
     private ClientCmd clientCmd = new ClientCmd()
 
     def setupSpec() {
-        chandler.getDefaultDB().getTable().clear()
+        chandler.getDefaultDB().clear()
         clientCmd.setKey("key")
         ZSortRedisValue zSortRedisValue = new ZSortRedisValue()
         zSortRedisValue.put("m1", 1)
         zSortRedisValue.put("m222", 2)
         zSortRedisValue.put("m369", 3)
-        chandler.getDefaultDB().getTable().put("key", zSortRedisValue)
+        chandler.getDefaultDB().put("key", zSortRedisValue)
     }
 
 

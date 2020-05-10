@@ -9,6 +9,7 @@ import io.github.jrbase.process.annotation.KeyCommand;
 import io.github.jrbase.utils.list.ListNode;
 
 import static io.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING;
+import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
 
 /**
  * Time complexity: O(1)
@@ -35,6 +36,9 @@ public class RPopProcess implements CmdProcess {
     // a b c d
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
         final RedisValue redisValue = clientCmd.getDb().getOrDefault(clientCmd.getKey(), new ListRedisValue());
+        if (!(redisValue instanceof ListRedisValue)) {
+            return REDIS_ERROR_OPERATION_AGAINST;
+        }
         final ListRedisValue listRedisValue = (ListRedisValue) redisValue;
         ListNode rPopValue = listRedisValue.popLast();
         if (rPopValue == null) {

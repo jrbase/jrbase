@@ -1,33 +1,44 @@
 package io.github.jrbase.process.string
 
-import io.github.jrbase.backend.BackendProxy
 import io.github.jrbase.dataType.ClientCmd
+import io.github.jrbase.handler.CmdHandler
 import io.github.jrbase.process.CmdProcess
+import spock.lang.Shared
 import spock.lang.Specification
-
-import static io.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING
-import static io.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
-import static io.github.jrbase.dataType.RedisDataType.STRINGS
 
 class GetBitProcessTest extends Specification {
     CmdProcess cmdProcess = new GetBitProcess()
+    @Shared
     ClientCmd clientCmd = new ClientCmd()
 
+    def setupSpec() {
+        def chandler = CmdHandler.newSingleInstance(null)
+        chandler.getDefaultDB().clear()
+        clientCmd.setDb(chandler.getDefaultDB())
+        clientCmd.setKey("key")
+        //
+
+    }
+
     def "Process"() {
-        clientCmd.setKey("a")
+        SetBitProcess setBitProcess = new SetBitProcess()
+        clientCmd.setArgs(["1", "1"] as String[])
+        setBitProcess.process(clientCmd)
+        clientCmd.setArgs(["2", "1"] as String[])
+        setBitProcess.process(clientCmd)
+        clientCmd.setArgs(["3", "0"] as String[])
+        setBitProcess.process(clientCmd)
+
         clientCmd.setArgs(args as String[])
-        final BackendProxy backendProxy = Mock()
-        clientCmd.setBackendProxy(backendProxy)
-        String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation()
-        backendProxy.bGet(buildUpKey) >> input
+
         expect:
         message == cmdProcess.process(clientCmd)
         where:
-        args  | input          | message
-        ['1'] | null           | REDIS_EMPTY_STRING
-        ['1'] | "a".getBytes() | ':1\r\n'
-        ['2'] | "a".getBytes() | ':1\r\n'
-        ['3'] | "a".getBytes() | REDIS_ZORE_INTEGER
+        args  | message
+        ['5'] | ':0\r\n'
+        ['1'] | ':1\r\n'
+        ['2'] | ':1\r\n'
+        ['3'] | ':0\r\n'
     }
 
 

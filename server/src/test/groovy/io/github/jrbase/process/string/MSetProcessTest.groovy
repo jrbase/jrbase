@@ -1,31 +1,28 @@
 package io.github.jrbase.process.string
 
 
-import io.github.jrbase.backend.BackendProxy
 import io.github.jrbase.dataType.ClientCmd
+import io.github.jrbase.handler.CmdHandler
 import io.github.jrbase.process.CmdProcess
+import spock.lang.Shared
 import spock.lang.Specification
-
-import static io.github.jrbase.dataType.RedisDataType.STRINGS
 
 class MSetProcessTest extends Specification {
     CmdProcess cmdProcess = new MSetProcess()
+    @Shared
     ClientCmd clientCmd = new ClientCmd()
+
+    def setupSpec() {
+        def chandler = CmdHandler.newSingleInstance(null)
+        chandler.getDefaultDB().clear()
+        clientCmd.setDb(chandler.getDefaultDB())
+        clientCmd.setKey("key")
+    }
 
     def "Process"() {
         given:
-        clientCmd.setKey("key")
-        String[] arr = args as String[]
-        clientCmd.setArgs(arr)
+        clientCmd.setArgs(args as String[])
         //set key field value
-        final BackendProxy backendProxy = Mock()
-        clientCmd.setBackendProxy(backendProxy)
-        String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation()
-        backendProxy.bGetAndPut(buildUpKey, writeUtf8(clientCmd.getArgs()[0])) >> null
-        for (int i = 1; i < clientCmd.argLength; i = i + 2) {
-            String buildUpKey2 = clientCmd.getArgs()[i] + STRINGS.getAbbreviation()
-            backendProxy.bGetAndPut(buildUpKey2, writeUtf8(clientCmd.getArgs()[i + 1])) >> null
-        }
         expect:
         message == cmdProcess.process(clientCmd)
         where:

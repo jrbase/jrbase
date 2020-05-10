@@ -10,6 +10,8 @@ import io.github.jrbase.utils.Tools;
 import io.netty.channel.Channel;
 import org.apache.commons.lang.StringUtils;
 
+import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
+
 
 public class CmdManager {
 
@@ -77,7 +79,7 @@ public class CmdManager {
 
     private static void sendWrongTypeMessage(ClientCmd clientCmd) {
         final Channel channel = clientCmd.getChannel();
-        channel.writeAndFlush("-WRONGTYPE Operation against a key holding the wrong kind of value\r\n");
+        channel.writeAndFlush(REDIS_ERROR_OPERATION_AGAINST);
     }
 
     public CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {

@@ -8,6 +8,8 @@ import io.github.jrbase.process.CmdProcess;
 import io.github.jrbase.process.annotation.KeyCommand;
 import io.github.jrbase.utils.list.ListNode;
 
+import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
+
 @KeyCommand
 public class RPushProcess implements CmdProcess {
 
@@ -29,6 +31,9 @@ public class RPushProcess implements CmdProcess {
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
         final RedisValue redisValue = clientCmd.getDb().getOrDefault(clientCmd.getKey(), new ListRedisValue());
+        if (!(redisValue instanceof ListRedisValue)) {
+            return REDIS_ERROR_OPERATION_AGAINST;
+        }
         final ListRedisValue listRedisValue = (ListRedisValue) redisValue;
         for (String arg : clientCmd.getArgs()) {
             listRedisValue.addLast(new ListNode(arg));

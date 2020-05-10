@@ -6,6 +6,5 @@ public class ListToolsTest {
 
     @Test
     public void getLRangeList() {
-//        ListTools.getLRangeList()
     }
 }
