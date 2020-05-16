@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import static io.github.jrbase.dataType.CommonMessage.*;
+import static io.github.jrbase.dataType.RedisDataType.STRINGS;
 
 @KeyCommand
 public class SetProcess implements CmdProcess {
@@ -31,7 +32,7 @@ public class SetProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        synchronized (this) {
+        synchronized (STRINGS) {
             final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
             final String[] args = clientCmd.getArgs();
             if (redisValue == null) {

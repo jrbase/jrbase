@@ -8,6 +8,8 @@ import io.github.jrbase.database.StringRedisValue;
 import io.github.jrbase.process.CmdProcess;
 import io.github.jrbase.process.annotation.KeyCommand;
 
+import static io.github.jrbase.dataType.RedisDataType.STRINGS;
+
 @KeyCommand
 public class MSetProcess implements CmdProcess {
 
@@ -29,16 +31,18 @@ public class MSetProcess implements CmdProcess {
     // 1 key value, key value
     // 0  1    2    3    4
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        addStringRedisValue(clientCmd.getDb(), clientCmd.getKey(), clientCmd.getArgs()[0]);
-        final String[] args = clientCmd.getArgs();
-        int successCount = 1;
-        for (int i = 1; i < args.length; i = i + 2) {
-            final String key = clientCmd.getArgs()[i];
-            final String value = clientCmd.getArgs()[i + 1];
-            addStringRedisValue(clientCmd.getDb(), key, value);
-            successCount++;
+        synchronized (STRINGS) {
+            addStringRedisValue(clientCmd.getDb(), clientCmd.getKey(), clientCmd.getArgs()[0]);
+            final String[] args = clientCmd.getArgs();
+            int successCount = 1;
+            for (int i = 1; i < args.length; i = i + 2) {
+                final String key = clientCmd.getArgs()[i];
+                final String value = clientCmd.getArgs()[i + 1];
+                addStringRedisValue(clientCmd.getDb(), key, value);
+                successCount++;
+            }
+            return (":" + successCount + "\r\n");
         }
-        return (":" + successCount + "\r\n");
 
     }
 

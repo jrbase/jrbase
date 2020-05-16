@@ -2,6 +2,7 @@ package io.github.jrbase.process.list;
 
 import io.github.jrbase.dataType.ClientCmd;
 import io.github.jrbase.dataType.Cmd;
+import io.github.jrbase.dataType.RedisDataType;
 import io.github.jrbase.database.ListRedisValue;
 import io.github.jrbase.database.RedisValue;
 import io.github.jrbase.process.CmdProcess;
@@ -30,16 +31,18 @@ public class RPushProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        final RedisValue redisValue = clientCmd.getDb().getOrDefault(clientCmd.getKey(), new ListRedisValue());
-        if (!(redisValue instanceof ListRedisValue)) {
-            return REDIS_ERROR_OPERATION_AGAINST;
+        synchronized (RedisDataType.LISTS) {
+            final RedisValue redisValue = clientCmd.getDb().getOrDefault(clientCmd.getKey(), new ListRedisValue());
+            if (!(redisValue instanceof ListRedisValue)) {
+                return REDIS_ERROR_OPERATION_AGAINST;
+            }
+            final ListRedisValue listRedisValue = (ListRedisValue) redisValue;
+            for (String arg : clientCmd.getArgs()) {
+                listRedisValue.addLast(new ListNode(arg));
+            }
+            clientCmd.getDb().put(clientCmd.getKey(), redisValue);
+            return (":" + listRedisValue.getSize() + "\r\n");
         }
-        final ListRedisValue listRedisValue = (ListRedisValue) redisValue;
-        for (String arg : clientCmd.getArgs()) {
-            listRedisValue.addLast(new ListNode(arg));
-        }
-        clientCmd.getDb().put(clientCmd.getKey(), redisValue);
-        return (":" + listRedisValue.getSize() + "\r\n");
     }
 
 }

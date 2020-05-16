@@ -11,6 +11,7 @@ import io.github.jrbase.utils.ToolsKeyValue;
 import java.util.Map;
 
 import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
+import static io.github.jrbase.dataType.RedisDataType.HASHES;
 
 @KeyCommand
 public class HSetProcess implements CmdProcess {
@@ -33,22 +34,24 @@ public class HSetProcess implements CmdProcess {
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
         // hset key field1 value1 field2 value2
-        final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
-        if (redisValue == null) {
-            final HashRedisValue addHash = new HashRedisValue();
-            getSuccessCountUpdate(clientCmd, addHash);
-            clientCmd.getDb().put(clientCmd.getKey(), addHash);
-            return ":" + addHash.getHash().size() + "\r\n";
+        synchronized (HASHES) {
+            final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
+            if (redisValue == null) {
+                final HashRedisValue addHash = new HashRedisValue();
+                getSuccessCountUpdate(clientCmd, addHash);
+                clientCmd.getDb().put(clientCmd.getKey(), addHash);
+                return ":" + addHash.getHash().size() + "\r\n";
+            }
+            if (!(redisValue instanceof HashRedisValue)) {
+                return REDIS_ERROR_OPERATION_AGAINST;
+            }
+            final Map<String, String> hash = ((HashRedisValue) redisValue).getHash();
+            final int originSize = hash.size();
+            getSuccessCountUpdate(clientCmd, redisValue);
+            final int currentSize = ((HashRedisValue) redisValue).getHash().size();
+            final int updateSize = currentSize - originSize;
+            return ":" + updateSize + "\r\n";
         }
-        if (!(redisValue instanceof HashRedisValue)) {
-            return REDIS_ERROR_OPERATION_AGAINST;
-        }
-        final Map<String, String> hash = ((HashRedisValue) redisValue).getHash();
-        final int originSize = hash.size();
-        getSuccessCountUpdate(clientCmd, redisValue);
-        final int currentSize = ((HashRedisValue) redisValue).getHash().size();
-        final int updateSize = currentSize - originSize;
-        return ":" + updateSize + "\r\n";
     }
 
     private void getSuccessCountUpdate(ClientCmd clientCmd, RedisValue addHash) {

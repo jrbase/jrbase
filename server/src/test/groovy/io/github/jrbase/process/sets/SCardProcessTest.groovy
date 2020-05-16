@@ -1,13 +1,12 @@
 package io.github.jrbase.process.sets
 
-
 import io.github.jrbase.dataType.ClientCmd
 import io.github.jrbase.handler.CmdHandler
 import io.github.jrbase.process.CmdProcess
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static io.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER
+import static io.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_LIST
 
 class SCardProcessTest extends Specification {
     private CmdProcess cmdProcess = new SCardProcess()
@@ -34,7 +33,7 @@ class SCardProcessTest extends Specification {
         when:
         clientCmd.setKey("key")
         then:
-        REDIS_ZORE_INTEGER == cmdProcess.process(clientCmd)
+        REDIS_EMPTY_LIST == cmdProcess.process(clientCmd)
 
         when:
         clientCmd.setArgs(["arg1"] as String[])

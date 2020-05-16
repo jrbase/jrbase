@@ -18,7 +18,7 @@ package io.github.jrbase.server;
 
 import io.github.jrbase.config.RedisConfigurationOption;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
@@ -31,18 +31,37 @@ import static io.github.jrbase.config.YamlTool.readConfig;
  * second: start the java redis server
  */
 public class JRBaseServer {
+
+    private ChannelFuture future;
+    private NioEventLoopGroup bossGroup;
+    private NioEventLoopGroup workerGroup;
+    private RedisConfigurationOption redisConfigurationOption = new RedisConfigurationOption();
+
+    public JRBaseServer() {
+
+    }
+
+    public JRBaseServer(int port) {
+        redisConfigurationOption.setPort(port);
+    }
+
+    public JRBaseServer(String host, int port) {
+        redisConfigurationOption.setBind(host);
+        redisConfigurationOption.setPort(port);
+    }
+
     // if you want to add a config file please add following line to your idea Program arguments
     // server/config/redis_server.yaml
-    public static void main(String[] args) throws Exception {
+    public synchronized void start(String[] args) {
 
-        RedisConfigurationOption redisConfigurationOption = new RedisConfigurationOption();
+        System.out.println("Start server");
         if (args != null && args.length >= 1) {
             final String confFile = args[0];
             redisConfigurationOption = readConfig(confFile);
         }
 
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup(8);
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup(8);
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
@@ -50,10 +69,25 @@ public class JRBaseServer {
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ServerInitializer(redisConfigurationOption));
 
-            b.bind(redisConfigurationOption.getBind(), redisConfigurationOption.getPort()).sync().channel().closeFuture().sync();
+            future = b.bind(redisConfigurationOption.getBind(), redisConfigurationOption.getPort()).sync();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            shutdown();
+        }
+
+    }
+
+    public synchronized void shutdown() {
+        System.out.println("Stopping server");
+        try {
+            bossGroup.shutdownGracefully().sync();
+            workerGroup.shutdownGracefully().sync();
+            future.channel().closeFuture().sync();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
+            System.out.println("Server stopped");
         }
     }
 

@@ -10,6 +10,7 @@ import io.github.jrbase.utils.Tools;
 
 import static io.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_STRING;
 import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
+import static io.github.jrbase.dataType.RedisDataType.STRINGS;
 
 @KeyCommand
 public class GetProcess implements CmdProcess {
@@ -30,23 +31,24 @@ public class GetProcess implements CmdProcess {
     }
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-
-        final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
-        if (redisValue == null) {
-            return REDIS_EMPTY_STRING;
+        synchronized (STRINGS) {
+            final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
+            if (redisValue == null) {
+                return REDIS_EMPTY_STRING;
+            }
+            final long expireMs = redisValue.getExpire();
+            if (expireMs != 0 && System.currentTimeMillis() > expireMs) {// expire true
+                // delete key
+                clientCmd.getDb().put(clientCmd.getKey(), null);
+                return REDIS_EMPTY_STRING;
+            }
+            if (!(redisValue instanceof StringRedisValue)) {
+                return REDIS_ERROR_OPERATION_AGAINST;
+            }
+            final String value = ((StringRedisValue) redisValue).getValue();
+            final int length = value.length();
+            return "$" + length + "\r\n" + value + "\r\n";
         }
-        final long expireMs = redisValue.getExpire();
-        if (expireMs != 0 && System.currentTimeMillis() > expireMs) {// expire true
-            // delete key
-            clientCmd.getDb().put(clientCmd.getKey(), null);
-            return REDIS_EMPTY_STRING;
-        }
-        if (!(redisValue instanceof StringRedisValue)) {
-            return REDIS_ERROR_OPERATION_AGAINST;
-        }
-        final String value = ((StringRedisValue) redisValue).getValue();
-        final int length = value.length();
-        return "$" + length + "\r\n" + value + "\r\n";
     }
 
 }

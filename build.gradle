@@ -1,7 +1,7 @@
 
 allprojects {
     group 'io.github.jrbase'
-    version '1.0.1-SNAPSHOT'
+    version '0.0.1-SNAPSHOT'
 }
 
 subprojects {
@@ -13,8 +13,6 @@ subprojects {
 
     apply plugin: 'maven'
     apply plugin: 'signing'
-    apply plugin: 'maven-publish'
-
 
     version = rootProject.version
 
@@ -71,33 +69,24 @@ subprojects {
         archives javadocJar, sourcesJar
     }
 
-    publishing {
+    uploadArchives {
         repositories {
-            maven {
-                def userName = System.getProperty("username")
-                def passWord = System.getProperty("password")
-                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-                credentials {
-                    username userName
-                    password passWord
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
                 }
-            }
-        }
-        publications {
 
-            mavenJava(MavenPublication) {
-                from components.java
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
 
-                artifact sourcesJar
-                artifact javadocJar
-
-                pom {
-                    name = 'jrbase'
+                pom.project {
+                    name 'JRBase'
                     packaging 'jar'
-                    description = 'A distributed NoSQL database similar to Redis.'
+                    // optionally artifactId can be defined here
+                    description 'A distributed NoSQL database similar to Redis.'
                     url = 'https://github.com/jrbase/jrbase'
 
                     scm {
@@ -108,8 +97,8 @@ subprojects {
 
                     licenses {
                         license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            name 'The Apache License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                         }
                     }
 
@@ -123,11 +112,6 @@ subprojects {
                 }
             }
         }
-
-        signing {
-            sign publishing.publications.mavenJava
-        }
-
     }
 
     task codeCoverageReport(type: JacocoReport) {

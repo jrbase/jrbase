@@ -9,6 +9,7 @@ import io.github.jrbase.process.annotation.KeyCommand;
 
 import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
 import static io.github.jrbase.dataType.CommonMessage.REDIS_ZORE_INTEGER;
+import static io.github.jrbase.dataType.RedisDataType.HASHES;
 
 @KeyCommand
 public class HLenProcess implements CmdProcess {
@@ -29,21 +30,17 @@ public class HLenProcess implements CmdProcess {
     }
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        checkKeyType();
-        // hlen key
-        final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
-        if (redisValue == null) {
-            return REDIS_ZORE_INTEGER;
+        synchronized (HASHES) {
+            // hlen key
+            final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
+            if (redisValue == null) {
+                return REDIS_ZORE_INTEGER;
+            }
+            if (!(redisValue instanceof HashRedisValue)) {
+                return REDIS_ERROR_OPERATION_AGAINST;
+            }
+            return ":" + ((HashRedisValue) redisValue).getHash().size() + "\r\n";
         }
-        if (!(redisValue instanceof HashRedisValue)) {
-            return REDIS_ERROR_OPERATION_AGAINST;
-        }
-        return ":" + ((HashRedisValue) redisValue).getHash().size() + "\r\n";
-    }
-
-    private void checkKeyType() {
-        //TODO:
-        // WRONGTYPE Operation against a key holding the wrong kind of value
     }
 
 }

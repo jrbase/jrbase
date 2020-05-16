@@ -3,6 +3,7 @@ package io.github.jrbase.process.list;
 import io.github.jrbase.dataType.ClientCmd;
 import io.github.jrbase.dataType.Cmd;
 import io.github.jrbase.dataType.CommonMessage;
+import io.github.jrbase.dataType.RedisDataType;
 import io.github.jrbase.database.ListRedisValue;
 import io.github.jrbase.database.RedisValue;
 import io.github.jrbase.process.CmdProcess;
@@ -46,16 +47,17 @@ public class LRangeProcess implements CmdProcess {
 
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
-        final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
-        if (redisValue == null) {
-            return CommonMessage.REDIS_EMPTY_LIST;
+        synchronized (RedisDataType.LISTS) {
+            final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
+            if (redisValue == null) {
+                return CommonMessage.REDIS_EMPTY_LIST;
+            }
+            if (!(redisValue instanceof ListRedisValue)) {
+                return REDIS_ERROR_OPERATION_AGAINST;
+            }
+            final ListRedisValue listRedisValue = (ListRedisValue) redisValue;
+            return listRedisValue.findRange(clientCmd.getArgs()[0], clientCmd.getArgs()[1]);
         }
-        if (!(redisValue instanceof ListRedisValue)) {
-            return REDIS_ERROR_OPERATION_AGAINST;
-        }
-        final ListRedisValue listRedisValue = (ListRedisValue) redisValue;
-        return listRedisValue.findRange(clientCmd.getArgs()[0], clientCmd.getArgs()[1]);
-
     }
 
 }

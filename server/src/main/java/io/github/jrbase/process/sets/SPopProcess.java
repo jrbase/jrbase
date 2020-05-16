@@ -7,6 +7,7 @@ import io.github.jrbase.database.SetRedisValue;
 import io.github.jrbase.process.CmdProcess;
 import io.github.jrbase.process.annotation.KeyCommand;
 
+import static io.github.jrbase.dataType.CommonMessage.REDIS_EMPTY_LIST;
 import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
 
 /**
@@ -27,7 +28,10 @@ public class SPopProcess implements CmdProcess {
 
     @Override
     public String process(ClientCmd clientCmd) {
-        final RedisValue redisValue = clientCmd.getDb().getOrDefault(clientCmd.getKey(), new SetRedisValue());
+        final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
+        if (redisValue == null) {
+            return REDIS_EMPTY_LIST;
+        }
         if (!(redisValue instanceof SetRedisValue)) {
             return REDIS_ERROR_OPERATION_AGAINST;
         }

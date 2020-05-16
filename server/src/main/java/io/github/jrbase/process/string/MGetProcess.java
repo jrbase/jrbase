@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
+import static io.github.jrbase.dataType.RedisDataType.STRINGS;
 
 @KeyCommand
 public class MGetProcess implements CmdProcess {
@@ -32,22 +33,11 @@ public class MGetProcess implements CmdProcess {
     }
 
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
+        synchronized (STRINGS) {
+            // key is first arg
+            List<String> result = new ArrayList<>();
+            RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
 
-        // key is first arg
-        List<String> result = new ArrayList<>();
-        RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());
-
-        if (redisValue == null) {
-            result.add("-1");
-        } else {
-            if (!(redisValue instanceof StringRedisValue)) {
-                return REDIS_ERROR_OPERATION_AGAINST;
-            }
-            String value = ((StringRedisValue) redisValue).getValue();
-            result.add(value);
-        }
-        for (String key : clientCmd.getArgs()) {
-            redisValue = clientCmd.getDb().get(key);
             if (redisValue == null) {
                 result.add("-1");
             } else {
@@ -57,9 +47,21 @@ public class MGetProcess implements CmdProcess {
                 String value = ((StringRedisValue) redisValue).getValue();
                 result.add(value);
             }
-        }
+            for (String key : clientCmd.getArgs()) {
+                redisValue = clientCmd.getDb().get(key);
+                if (redisValue == null) {
+                    result.add("-1");
+                } else {
+                    if (!(redisValue instanceof StringRedisValue)) {
+                        return REDIS_ERROR_OPERATION_AGAINST;
+                    }
+                    String value = ((StringRedisValue) redisValue).getValue();
+                    result.add(value);
+                }
+            }
 
-        return mgetResult(result);
+            return mgetResult(result);
+        }
     }
 
     @NotNull
