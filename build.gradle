@@ -19,11 +19,6 @@ subprojects {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
-    // Signature of artifacts
-    signing {
-        sign configurations.archives
-    }
-
     plugins.withType(DistributionPlugin) {
         distTar {
             compression = Compression.GZIP
@@ -65,6 +60,12 @@ subprojects {
         from sourceSets.main.allSource
     }
 
+
+    // Signature of artifacts
+    /*signing {
+        sign configurations.archives
+    }
+
     artifacts {
         archives javadocJar, sourcesJar
     }
@@ -74,13 +75,13 @@ subprojects {
             mavenDeployer {
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-//                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-//                    authentication(userName: ossrhUsername, password: ossrhPassword)
-//                }
-//
-//                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-//                    authentication(userName: ossrhUsername, password: ossrhPassword)
-//                }
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
 
                 pom.project {
                     name 'JRBase'
@@ -112,7 +113,7 @@ subprojects {
                 }
             }
         }
-    }
+    }*/
 
     task codeCoverageReport(type: JacocoReport) {
         executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
