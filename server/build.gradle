@@ -2,14 +2,12 @@
 apply plugin: 'distribution'
 
 dependencies {
-    compile "io.netty:netty-all:4.0.32.Final"
-    compile project(":jraftKV")
+    compile "io.netty:netty-all:4.1.25.Final"
     compile group: 'org.reflections', name: 'reflections', version: '0.9.12'
-//    compile 'org.tikv:tikv-client-java:2.0-SNAPSHOT'
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'org.apache.commons:commons-lang3:3.9'
-
-    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.8-1'
+    compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    compile group: 'com.intellij', name: 'annotations', version: '12.0'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.4'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.10.4'
 
 }
 
@@ -17,7 +15,7 @@ task fatJar(type: Jar) {
     manifest {
         attributes 'Implementation-Title': 'Gradle Jar File JRBaseClient',
                 'Implementation-Version': '1.0',
-                'Main-Class': 'org.github.jrbase.server.JRBaseServer'
+                'Main-Class': 'io.github.jrbase.server.JRBaseServer'
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar

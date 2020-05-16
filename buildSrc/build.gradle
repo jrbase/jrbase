@@ -2,7 +2,7 @@ plugins {
     id 'groovy'
 }
 
-group 'org.github.jrbase'
+group 'io.github.jrbase'
 version '1.0.1'
 
 sourceCompatibility = 1.8

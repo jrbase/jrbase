@@ -1,15 +1,63 @@
 [![Build Status](https://travis-ci.org/jrbase/jrbase.svg?branch=master)](https://travis-ci.org/jrbase/jrbase)
 [![codecov](https://codecov.io/gh/jrbase/jrbase/branch/master/graph/badge.svg)](https://codecov.io/gh/jrbase/jrbase)
 [![CircleCI](https://circleci.com/gh/jrbase/jrbase.svg?style=svg)](https://circleci.com/gh/jrbase/jrbase)
-## What is jrbase?
+## What is JRBase?
 
-`jrbase` is a distributed NoSQL database similar to Redis.
+`JRBase` is a distributed NoSQL database similar to Redis.
 
-`jrbase` implement redis server protocol, powered by `custom kv server` or [jraft-rheakv](https://github.com/sofastack/sofa-jraft/tree/master/jraft-rheakv) backend.
+`JRBase` implement redis server protocol, powered by Memory or [jraft-rheakv](https://github.com/sofastack/sofa-jraft/tree/master/jraft-rheakv) backend.
 
-## Architecture
-![Architecture](./wiki/images/architecture.png)
-![Architecture](./wiki/images/architecture2.png)
+`jrbase server` is an embedded java redis for test.
+
+### JRBase server Usage Example
+```xml
+<profiles>
+    <profile>
+        <id>allow-snapshots</id>
+        <activation><activeByDefault>true</activeByDefault></activation>
+        <repositories>
+            <repository>
+                <id>snapshots-repo</id>
+                <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                <releases><enabled>false</enabled></releases>
+                <snapshots><enabled>true</enabled></snapshots>
+            </repository>
+        </repositories>
+    </profile>
+</profiles>
+```
+
+```xml
+<dependency>
+    <groupId>io.github.jrbase</groupId>
+    <artifactId>server</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+```java
+class ServerDemoTest {
+
+    private static final JRServerEmbedded jrServerEmbedded = new JRServerEmbedded("6379");
+
+    @BeforeAll
+    static void start() throws IOException {
+        jrServerEmbedded.start();
+    }
+
+    @AfterAll
+    static void end() {
+        jrServerEmbedded.stop();
+    }
+
+    @Test
+    void main() throws InterruptedException {
+        // access redis operate
+        Thread.sleep(10 * 1000);
+    }
+}
+```
+[jrbase demo](https://github.com/jrbase/jrbaseDemo)
 
 ### Plan supported commands
 
@@ -21,15 +69,15 @@ Strings
 +-----------+----------------+------+-------------------------------------
 |    get    |           Y           | get key         
 +-----------+-----------------------+-------------------------------------
-|    set    |           D           | set key value [EX sec|PX ms][NX|XX]                     
+|    set    |           Y           | set key value [EX sec|PX ms][NX|XX]                     
 +-----------+-----------------------+------------------------------------
-|    mget   |           D           | MGET key [key ...]              
+|    mget   |           Y           | MGET key [key ...]              
 +-----------+-----------------------+------------------------------------
-|    mset   |           D           | mset key1 value1 key2 value2 ...    
+|    mset   |           Y           | mset key1 value1 key2 value2 ...    
 +-----------+-----------------------+-------------------------------------
-|   getbit  |           D           | getbit key offset                      
+|   getbit  |           Y           | getbit key offset                      
 +-----------+-----------------------+-------------------------------------
-|   setbit  |           D           | setbit key offset value             
+|   setbit  |           Y           | setbit key offset value             
 +-----------+-----------------------+-------------------------------------
 |    del    |                       | del key1 key2 ...                   
 +-----------+-----------------------+-------------------------------------
@@ -75,15 +123,15 @@ Lists
 |  command   |      supported          |               format                          
 |            |  (Y=yes,N=no, D=doing)  |                                               
 +------------+-------------------------+-------------------------------------------------
-|    lpush   |         D               | lpush key value1 value2 value3...      
+|    lpush   |         Y               | lpush key value1 value2 value3...      
 +------------+-------------------------+-------------------------------------------------
-|    rpush   |         D               | rpush key value1 value2 value3...                     
+|    rpush   |         Y               | rpush key value1 value2 value3...                     
 +------------+-------------------------+-------------------------------------------------
-|    lpop    |         D               | lpop key                 
+|    lpop    |         Y               | lpop key                 
 +------------+-------------------------+-------------------------------------------------
-|    rpop    |         D               | rpop key                 
+|    rpop    |         Y               | rpop key                 
 +------------+-------------------------+-------------------------------------------------
-|   lrange   |         D               | lrange key start stop                 
+|   lrange   |         Y               | lrange key start stop                 
 +------------+-------------------------+-------------------------------------------------
 |   lindex   |                         |                   
 +------------+-------------------------+-------------------------------------------------
@@ -102,11 +150,11 @@ Sets
 |  command    |        supported        |               format                          
 |             |  (Y=yes,N=no, D=doing)  |                                               
 +-------------+-------------------------+-------------------------------------------------
-|    sadd     |           D             | sadd key member [member ...]        
+|    sadd     |           Y             | sadd key member [member ...]        
 +-------------+-------------------------+-------------------------------------------------
-|    spop     |           D             | spop key [count]                  
+|    spop     |           Y             | spop key [count]                  
 +-------------+-------------------------+-------------------------------------------------
-|  scard      |           D             | hget key                   
+|  scard      |           Y             | hget key                   
 +-------------+-------------------------+-------------------------------------------------
 | smembers    |                         | smembers key                   
 +-------------+-------------------------+-------------------------------------------------
@@ -122,7 +170,7 @@ Sorted Sets
 |  command         |        supported        |               format                          
 |                  |  (Y=yes,N=no, D=doing)  |                                               
 +------------------+-------------------------+-------------------------------------------------
-|      ZADD        |           D             | ZADD key [NX|XX] [CH] [INCR] score member [score member ...]   
+|      ZADD        |           Y             | ZADD key [NX|XX] [CH] [INCR] score member [score member ...]   
 +------------------+-------------------------+-------------------------------------------------
 |    ZRANGE        |           Y             | ZRANGE key start stop [WITHSCORES]  
 +------------------+-------------------------+-------------------------------------------------
@@ -249,9 +297,25 @@ Scripting
 ## redis-benchmark
 `redis-benchmark -t get,set -n 100000 -q`
 
+## Developer
+1. wireshark capture for Redis protocol input and output
+```text
+Config wireshark: ip.addr == 127.0.0.1 and tcp.port == 6379
+Example:
+init data
+set a a
+start capture
+MGET key a b c
+Input:
+*4\r\n$4\r\nmget\r\n$1\r\na\r\n$1\r\nb\r\n$1\r\nc\r\n
+Output:
+*3\r\n$1\r\na\r\n$-1\r\n$-1\r\n
+```
+
 
 ## Related Links
 [redis commands](https://redis.io/commands/)
+[Redis Protocol specification](https://redis.io/topics/protocol)
 
 [A persistent key-value store for fast storage environments](https://rocksdb.org/)
 
@@ -264,6 +328,3 @@ Scripting
 [use tikv to build distrubuted redis service](https://pingcap.com/blog-cn/use-tikv-to-build-distributed-redis-service/)
 
 [reflections](https://code.google.com/archive/p/reflections/)
-
-[antlr4 doc lexer rules](https://github.com/antlr/antlr4/blob/master/doc/lexer-rules.md)
-
