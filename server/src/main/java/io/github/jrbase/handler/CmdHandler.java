@@ -5,6 +5,7 @@ import io.github.jrbase.dataType.ClientCmd;
 import io.github.jrbase.dataType.RedisClientContext;
 import io.github.jrbase.database.Database;
 import io.github.jrbase.handler.annotation.ScanServerAnnotationConfigure;
+import io.github.jrbase.handler.pubsub.RedisChannel;
 import io.github.jrbase.manager.CmdManager;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang.StringUtils;
@@ -96,6 +97,7 @@ public class CmdHandler {
 
         if (redisClientContext == null) {
             redisClientContext = new RedisClientContext();
+            redisClientContext.setRedisClient(ctx);
             clientContext.put(ctx, redisClientContext);
         }
         clientCmd.setRedisClientContext(redisClientContext);
@@ -157,6 +159,8 @@ public class CmdHandler {
     }
 
     public void removeContext(ChannelHandlerContext ctx) {
+        final RedisClientContext redisClientContext = clientContext.get(ctx);
+        RedisChannel.unSubscribe(redisClientContext);
         clientContext.remove(ctx);
     }
 }

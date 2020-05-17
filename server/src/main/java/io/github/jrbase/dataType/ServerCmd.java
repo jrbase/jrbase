@@ -13,6 +13,9 @@ public enum ServerCmd {
     DBSIZE("dbsize"),
     //Server
     COMMAND("command"),
+    // SubPub
+    SUBSCRIBE("subscribe"),
+    PUBLISH("publish"),
     //Other
     CONFIG("config"),
     UNKNOWN("other");
