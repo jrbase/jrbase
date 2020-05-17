@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     compile("org.jline:jline:3.6.2")
+    compile "io.netty:netty-all:4.1.25.Final"
 }
 
 task fatJar(type: Jar) {

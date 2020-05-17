@@ -1,9 +1,20 @@
 package io.github.jrbase.dataType;
 
+import io.netty.channel.ChannelHandlerContext;
+
 public class RedisClientContext {
     private boolean isLogin = false;
-    private RedisClientContext redisClientContext;
     private int dbIndex = 0;
+
+    private ChannelHandlerContext redisClient;
+
+    public ChannelHandlerContext getRedisClient() {
+        return redisClient;
+    }
+
+    public void setRedisClient(ChannelHandlerContext redisClient) {
+        this.redisClient = redisClient;
+    }
 
     public int getDbIndex() {
         return dbIndex;
@@ -21,11 +32,4 @@ public class RedisClientContext {
         isLogin = login;
     }
 
-    public RedisClientContext getRedisClientContext() {
-        return redisClientContext;
-    }
-
-    public void setRedisClientContext(RedisClientContext redisClientContext) {
-        this.redisClientContext = redisClientContext;
-    }
 }
