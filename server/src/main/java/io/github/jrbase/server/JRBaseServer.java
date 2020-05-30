@@ -16,7 +16,7 @@
 
 package io.github.jrbase.server;
 
-import io.github.jrbase.config.RedisConfigurationOption;
+import io.github.jrbase.common.config.RedisConfigurationOption;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -24,11 +24,12 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
-import static io.github.jrbase.config.YamlTool.readConfig;
+import static io.github.jrbase.common.config.YamlTool.readConfig;
+
 
 /**
  * standalone server
- * second: start the java redis server
+ * start the java redis server
  */
 public class JRBaseServer {
 

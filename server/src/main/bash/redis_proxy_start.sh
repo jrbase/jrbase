@@ -12,6 +12,7 @@ echo "java version:$JAVA_VERSION path:$JAVA"
 MEMORY=$(cat /proc/meminfo | grep 'MemTotal' | awk -F : '{print $2}' | awk '{print $1}' | sed 's/^[ \t]*//g')
 echo -e "Total Memory:\n${MEMORY} KB\n"
 
+# shellcheck disable=SC2076
 if [[ $JAVA_VERSION =~ "1.8" ]]; then
   echo "Use java version 1.8 opt"
 
@@ -39,7 +40,7 @@ JAVA_CONFIG=$(mktemp XXXXXXXX)
 cat <<EOF | xargs echo >$JAVA_CONFIG
 ${JAVA_OPTS}
 -cp $CLASSPATH
-io.github.jrbase.JRServer $1
+io.github.jrbase.JRServerRun $1
 EOF
 
 echo $JAVA_OPTS

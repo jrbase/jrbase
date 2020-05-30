@@ -1,4 +1,4 @@
-package io.github.jrbase.config;
+package io.github.jrbase.common.config;
 
 /**
  * Redis configuration file class
@@ -8,6 +8,38 @@ public class RedisConfigurationOption {
     private String protectedMode = "yes";
     private int port = 6379;
     private String requirePass = "";
+
+
+    private String zookeeper = "192.168.100.128:2181";
+    private String registerAddress = "192.168.100.128";
+    private String appName = "JRBaseServer";
+
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+
+    public String getRegisterAddress() {
+        return registerAddress;
+    }
+
+    public void setRegisterAddress(String registerAddress) {
+        this.registerAddress = registerAddress;
+    }
+
+
+    public String getZookeeper() {
+        return zookeeper;
+    }
+
+    public void setZookeeper(String zookeeper) {
+        this.zookeeper = zookeeper;
+    }
 
     public String getBind() {
         return bind;
