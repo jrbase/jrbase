@@ -9,11 +9,24 @@ public class RedisConfigurationOption {
     private int port = 6379;
     private String requirePass = "";
 
-
+    private boolean cluster = false;
     private String zookeeper = "192.168.100.128:2181";
     private String registerAddress = "192.168.100.128";
     private String appName = "JRBaseServer";
 
+    public RedisConfigurationOption(){}
+    public RedisConfigurationOption(String bind, int port){
+        this.bind = bind;
+        this.port = port;
+    }
+
+    public boolean isCluster() {
+        return cluster;
+    }
+
+    public void setCluster(boolean cluster) {
+        this.cluster = cluster;
+    }
 
     public String getAppName() {
         return appName;

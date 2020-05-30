@@ -3,3 +3,7 @@ bind: 127.0.0.1
 #protectedMode: yes
 port: 6379
 #requirePass: 123456
+
+cluster: true
+zookeeper: "192.168.100.128:2181"
+appName: "JRBaseServer"
