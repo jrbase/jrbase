@@ -1,6 +1,7 @@
-package io.github.jrbase.config
+package io.github.jrbase.common
 
 import spock.lang.Specification
+import io.github.jrbase.common.config.YamlTool
 
 class YamlToolTest extends Specification {
     def "ReadConfig"() {

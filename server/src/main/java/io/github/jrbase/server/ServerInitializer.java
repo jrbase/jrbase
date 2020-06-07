@@ -1,6 +1,6 @@
 package io.github.jrbase.server;
 
-import io.github.jrbase.config.RedisConfigurationOption;
+import io.github.jrbase.common.config.RedisConfigurationOption;
 import io.github.jrbase.handler.CmdHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;

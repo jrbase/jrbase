@@ -16,7 +16,8 @@
 
 package io.github.jrbase.server;
 
-import io.github.jrbase.config.RedisConfigurationOption;
+import io.github.jrbase.common.config.RedisConfigurationOption;
+import io.github.jrbase.common.zk.ZKServerRegister;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -24,41 +25,46 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
-import static io.github.jrbase.config.YamlTool.readConfig;
+import static io.github.jrbase.common.config.YamlTool.readConfig;
+
 
 /**
  * standalone server
- * second: start the java redis server
+ * start the java redis server
  */
-public class JRBaseServer {
+public class JRBaseServer extends IServer {
 
     private ChannelFuture future;
     private NioEventLoopGroup bossGroup;
     private NioEventLoopGroup workerGroup;
-    private RedisConfigurationOption redisConfigurationOption = new RedisConfigurationOption();
+    private RedisConfigurationOption config = new RedisConfigurationOption();
+    private ZKServerRegister zkServerRegister;
 
     public JRBaseServer() {
 
     }
 
     public JRBaseServer(int port) {
-        redisConfigurationOption.setPort(port);
+        config.setPort(port);
     }
 
     public JRBaseServer(String host, int port) {
-        redisConfigurationOption.setBind(host);
-        redisConfigurationOption.setPort(port);
+        config.setBind(host);
+        config.setPort(port);
     }
 
     // if you want to add a config file please add following line to your idea Program arguments
     // server/config/redis_server.yaml
+    @Override
     public synchronized void start(String[] args) {
 
         System.out.println("Start server");
         if (args != null && args.length >= 1) {
             final String confFile = args[0];
-            redisConfigurationOption = readConfig(confFile);
+            config = readConfig(confFile);
         }
+
+        startCluster();
 
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup(8);
@@ -67,9 +73,9 @@ public class JRBaseServer {
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new ServerInitializer(redisConfigurationOption));
+                    .childHandler(new ServerInitializer(config));
 
-            future = b.bind(redisConfigurationOption.getBind(), redisConfigurationOption.getPort()).sync();
+            future = b.bind(config.getBind(), config.getPort()).sync();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,8 +84,10 @@ public class JRBaseServer {
 
     }
 
+    @Override
     public synchronized void shutdown() {
         System.out.println("Stopping server");
+        stopCluster();
         try {
             bossGroup.shutdownGracefully().sync();
             workerGroup.shutdownGracefully().sync();
@@ -88,6 +96,21 @@ public class JRBaseServer {
             e.printStackTrace();
         } finally {
             System.out.println("Server stopped");
+        }
+    }
+
+    @Override
+    protected void startCluster() {
+        if (config.isCluster()) {
+            zkServerRegister = new ZKServerRegister(config);
+            zkServerRegister.register();
+        }
+    }
+
+    @Override
+    protected void stopCluster() {
+        if (config.isCluster()) {
+            zkServerRegister.unRegister();
         }
     }
 

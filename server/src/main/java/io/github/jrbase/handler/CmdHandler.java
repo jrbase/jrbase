@@ -1,6 +1,6 @@
 package io.github.jrbase.handler;
 
-import io.github.jrbase.config.RedisConfigurationOption;
+import io.github.jrbase.common.config.RedisConfigurationOption;
 import io.github.jrbase.dataType.ClientCmd;
 import io.github.jrbase.dataType.RedisClientContext;
 import io.github.jrbase.database.Database;

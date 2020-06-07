@@ -1,4 +1,4 @@
-package io.github.jrbase.config;
+package io.github.jrbase.common.config;
 
 public class ConfigManager {
     private ConfigManager() {
