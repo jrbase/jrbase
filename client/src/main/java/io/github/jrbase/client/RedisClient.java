@@ -10,36 +10,29 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
-import io.netty.util.concurrent.Promise;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class RedisClient {
     private final EventLoopGroup group;
     private ChannelFuture channelFuture;
+    private BlockingQueue<String> queue = new LinkedBlockingQueue<>(10);
 
 
-    public List<Promise<String>> getPromiseList() {
-        return promiseList;
-    }
-
-    private final List<Promise<String>> promiseList = new ArrayList<>();
+    private final ClientHandler clientHandler;
 
     public RedisClient() {
         this("localhost", 6379);
+//        this("192.168.100.1", 6379);
     }
 
     public RedisClient(String host, int port) {
         group = new NioEventLoopGroup();
-        promiseList.add(group.next().newPromise());
-        promiseList.add(group.next().newPromise());
-        promiseList.add(group.next().newPromise());
-        promiseList.add(group.next().newPromise());
-        promiseList.add(group.next().newPromise());
 
+        clientHandler = new ClientHandler(queue);
         try {
             Bootstrap clientBootstrap = new Bootstrap();
 
@@ -51,7 +44,7 @@ public class RedisClient {
                     final ChannelPipeline pipeline = socketChannel.pipeline();
                     pipeline.addLast(new StringDecoder());
                     pipeline.addLast(new StringEncoder());
-                    pipeline.addLast(new ClientHandler(promiseList));
+                    pipeline.addLast(clientHandler);
                 }
             });
             channelFuture = clientBootstrap.connect().sync();
@@ -64,12 +57,20 @@ public class RedisClient {
 
     }
 
-    public void sendMessage(String message) {
-        channelFuture.channel().writeAndFlush(message);
+    public String sendMessage(String message) {
+        String redisCommand = RedisRequestCommand.toRedisCommand(message);
+        clientHandler.sendMessage(redisCommand);
+        return receiveMsg();
     }
 
-    public void sendMessage(RedisCommand redisCommand) {
-        channelFuture.channel().writeAndFlush(redisCommand.toString());
+    public String receiveMsg() {
+        String take = "";
+        try {
+            take = queue.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return take;
     }
 
     public void stop() {
@@ -81,17 +82,15 @@ public class RedisClient {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
-        final RedisClient redisClient = new RedisClient();
-        redisClient.sendMessage("*2\r\n$4\r\nping\r\n");
-
-        final String message = redisClient.getPromise().get();
+    public static void main(String[] args) {
+        final RedisClient redisClient = new RedisClient("192.168.100.1", 6379);
+        String message = redisClient.sendMessage("*2\r\n$4\r\nping\r\n$3\r\n123\r\n");
         System.out.println(message);
-        redisClient.stop();
-    }
 
-    public Promise<String> getPromise() {
-        return promiseList.get(0);
+        message = redisClient.sendMessage("*2\r\n$4\r\nping\r\n$3\r\n456\r\n");
+        System.out.println(message);
+
+        redisClient.stop();
     }
 
 }

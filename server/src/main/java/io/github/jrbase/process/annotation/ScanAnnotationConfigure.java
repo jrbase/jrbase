@@ -3,13 +3,14 @@ package io.github.jrbase.process.annotation;
 import io.github.jrbase.process.CmdProcess;
 import org.reflections.Reflections;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class ScanAnnotationConfigure {
 
-    private static final Map<String, CmdProcess> cmdProcessManager = new HashMap<>();
+    private final Map<String, CmdProcess> cmdProcessManager = new HashMap<>();
     private static ScanAnnotationConfigure singleInstance;
 
     public static ScanAnnotationConfigure newSingleInstance() {

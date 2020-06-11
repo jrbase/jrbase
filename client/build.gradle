@@ -13,12 +13,8 @@ task fatJar(type: Jar) {
     manifest {
         attributes 'Implementation-Title': 'Gradle Jar File JRBaseClient',
                 'Implementation-Version': '1.0',
-                'Main-Class': 'io.github.jrbase.client.JRBaseClient'
+                'Main-Class': 'io.github.jrbase.terminal.JRTerminal'
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
-
-
-
-

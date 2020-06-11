@@ -34,17 +34,15 @@ public class ServerClientTest {
     }
 
     @Test
-    public void testSmock() throws ExecutionException, InterruptedException {
+    public void testSmock() {
         RedisClient redisClient = new RedisClient();
 
-        redisClient.sendMessage("*2\r\n$4\r\nping\r\n$3\r\n123\r\n");
+        final String message = redisClient.sendMessage("*2\r\n$4\r\nping\r\n$3\r\n123\r\n");
 
-        final String message = redisClient.getPromise().get();
         System.out.println(message);
         Assert.assertEquals("$3\r\n123\r\n", message);
 
-        redisClient.sendMessage("*2\r\n$4\r\nping\r\n");
-        final String message2 = redisClient.getPromiseList().get(1).get();
+        final String message2 = redisClient.sendMessage("*2\r\n$4\r\nping\r\n");
         System.out.println(message2);
         Assert.assertEquals("+PONG\r\n", message2);
 
@@ -53,11 +51,10 @@ public class ServerClientTest {
     }
 
     @Test
-    public void testSubscribe() throws ExecutionException, InterruptedException {
+    public void testSubscribe() {
         RedisClient redisClient = new RedisClient();
 
-        redisClient.sendMessage("*3\r\n$9\r\nsubscribe\r\n$8\r\nchannel1\r\n$8\r\nchannel2\r\n");
-        final String message = redisClient.getPromise().get();
+        final String message = redisClient.sendMessage("*3\r\n$9\r\nsubscribe\r\n$8\r\nchannel1\r\n$8\r\nchannel2\r\n");
         System.out.println(message);
         StringBuilder result = new StringBuilder();
         List<String> channels = new ArrayList<>(Arrays.asList("channel1", "channel2"));
@@ -74,21 +71,16 @@ public class ServerClientTest {
     }
 
     @Test
-    public void testPublishMessage() throws InterruptedException, ExecutionException {
+    public void testPublishMessage() throws InterruptedException {
         RedisClient redisClient = new RedisClient();
 
-        redisClient.sendMessage("*3\r\n$9\r\nsubscribe\r\n$8\r\nchannel1\r\n$8\r\nchannel2\r\n");
-        String some = redisClient.getPromise().get();
+        String some = redisClient.sendMessage("*3\r\n$9\r\nsubscribe\r\n$8\r\nchannel1\r\n$8\r\nchannel2\r\n");
         System.out.println(some + "||");
         CountDownLatch countDownLatch = new CountDownLatch(1);
         executorService.submit(() -> {
             final RedisClient publisher = new RedisClient();
-            publisher.sendMessage("*3\r\n$7\r\npublish\r\n$8\r\nchannel1\r\n$9\r\nmes112233\r\n");
-            try {
-                String count = publisher.getPromise().get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
+            String result = publisher.sendMessage("*3\r\n$7\r\npublish\r\n$8\r\nchannel1\r\n$9\r\nmes112233\r\n");
+            System.out.println(result);
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -99,7 +91,7 @@ public class ServerClientTest {
         });
 
         countDownLatch.await();
-        String receiveMessage = redisClient.getPromiseList().get(1).get();
+        String receiveMessage = redisClient.receiveMsg();
         redisClient.stop();
 
         Assert.assertEquals("*3\r\n$7\r\nmessage\r\n$8\r\nchannel1\r\n$9\r\nmes112233\r\n", receiveMessage);

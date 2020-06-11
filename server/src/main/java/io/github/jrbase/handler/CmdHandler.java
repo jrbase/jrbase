@@ -4,6 +4,7 @@ import io.github.jrbase.common.config.RedisConfigurationOption;
 import io.github.jrbase.dataType.ClientCmd;
 import io.github.jrbase.dataType.RedisClientContext;
 import io.github.jrbase.database.Database;
+import io.github.jrbase.factory.CommandAbstractFactory;
 import io.github.jrbase.handler.annotation.ScanServerAnnotationConfigure;
 import io.github.jrbase.handler.pubsub.RedisChannel;
 import io.github.jrbase.manager.CmdManager;
@@ -18,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static io.github.jrbase.dataType.ServerCmd.AUTH;
 
 public class CmdHandler {
-    private static final List<Database> Databases = new ArrayList<>(1);
+    private static final List<Database> Databases = new ArrayList<>(16);
 
     private static CmdHandler singleInstance;
     private final CmdManager cmdManager = CmdManager.newSingleInstance();
@@ -31,7 +32,7 @@ public class CmdHandler {
 
     private static final String REPLY_OK = "OK";
 
-    private static final ScanServerAnnotationConfigure scanServerAnnotationConfigure = ScanServerAnnotationConfigure.newSingleInstance();
+    private static final ScanServerAnnotationConfigure scanServerAnnotationConfigure = CommandAbstractFactory.newHandlerAnnotation();
 
     /**
      * save session login status to HashMap<ChannelHandlerContext, RedisClientContext>
@@ -54,12 +55,6 @@ public class CmdHandler {
         return singleInstance;
     }
 
-//    private void initHandlerMap() {
-//        serverCmdHandlerMap.put(ECHO.getCmdName(), new EchoHandler());
-//        serverCmdHandlerMap.put(PING.getCmdName(), new PingHandler());
-//        serverCmdHandlerMap.put(COMMAND.getCmdName(), new CommandHandler());
-////    }
-
     /**
      * handle raw string to ClientCmd
      *
@@ -78,6 +73,7 @@ public class CmdHandler {
             replyErrorToClient(ctx, "empty command");
             return;
         }
+        // Strategy patten
         final ServerCmdHandler serverCmdHandler = scanServerAnnotationConfigure.get(clientCmd.getCmd());
         if (serverCmdHandler != null) {
             //handle server command
@@ -101,15 +97,15 @@ public class CmdHandler {
             clientContext.put(ctx, redisClientContext);
         }
         clientCmd.setRedisClientContext(redisClientContext);
-        if (StringUtils.isNotEmpty(redisConfigurationOption.getRequirePass()) && dontLogin(redisClientContext)) {
+        if (StringUtils.isNotEmpty(redisConfigurationOption.getRequirePass()) && isLogin(redisClientContext)) {
             handleAuth(ctx, clientCmd, redisClientContext);
             return true;
         }
         return false;
     }
 
-    private boolean dontLogin(RedisClientContext redisClientContext) {
-        return !redisClientContext.isLogin();
+    private boolean isLogin(RedisClientContext redisClientContext) {
+        return redisClientContext.isLogin();
     }
 
     private void handleAuth(ChannelHandlerContext ctx, ClientCmd clientCmd, RedisClientContext redisClientContext) {

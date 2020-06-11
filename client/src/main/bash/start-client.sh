@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-java -jar /home/hj/idea/base/gradle/jrbase/client/build/libs/client-1.0.1.jar
+java -jar ~/ideaProjects/jrbase/jrbase/client/build/libs/client-0.0.1-SNAPSHOT.jar
