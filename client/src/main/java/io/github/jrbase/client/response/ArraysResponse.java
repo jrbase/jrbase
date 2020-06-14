@@ -19,20 +19,22 @@ package io.github.jrbase.client.response;
  */
 public class ArraysResponse implements TypeResponse {
     @Override
-    public void handle(String command) {
+    public String handle(String command) {
         String[] split = command.split("\r\n");
         int j = 1;
         int i = 1;
+        StringBuilder result = new StringBuilder();
         while (i < split.length) {
             if (split[i].startsWith("$-1")) {
-                System.out.println(j + ") " + "(nil)");
+                result.append(j).append(") ").append("(nil)");
                 i = i + 1;
             } else {
-                System.out.println(j + ") " + "\"" + split[i + 1] + "\"");
+                result.append(j).append(") ").append("\"").append(split[i + 1]).append("\"");
                 i = i + 2;
             }
             j++;
         }
+        return result.toString();
     }
 
 }

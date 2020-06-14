@@ -1,7 +1,7 @@
 package io.github.jrbase.process.sets;
 
+import io.github.jrbase.common.datatype.Cmd;
 import io.github.jrbase.dataType.ClientCmd;
-import io.github.jrbase.dataType.Cmd;
 import io.github.jrbase.database.RedisValue;
 import io.github.jrbase.database.SetRedisValue;
 import io.github.jrbase.process.CmdProcess;

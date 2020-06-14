@@ -1,7 +1,7 @@
 package io.github.jrbase.process.string;
 
+import io.github.jrbase.common.datatype.Cmd;
 import io.github.jrbase.dataType.ClientCmd;
-import io.github.jrbase.dataType.Cmd;
 import io.github.jrbase.database.RedisValue;
 import io.github.jrbase.database.StringRedisValue;
 import io.github.jrbase.process.CmdProcess;
@@ -11,8 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.github.jrbase.common.datatype.RedisDataType.STRINGS;
 import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
-import static io.github.jrbase.dataType.RedisDataType.STRINGS;
 
 @KeyCommand
 public class MGetProcess implements CmdProcess {

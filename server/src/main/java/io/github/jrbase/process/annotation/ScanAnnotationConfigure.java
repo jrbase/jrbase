@@ -3,7 +3,6 @@ package io.github.jrbase.process.annotation;
 import io.github.jrbase.process.CmdProcess;
 import org.reflections.Reflections;
 
-import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

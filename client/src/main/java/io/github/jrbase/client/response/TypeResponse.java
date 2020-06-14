@@ -36,7 +36,8 @@ package io.github.jrbase.client.response;
 public interface TypeResponse {
     /**
      * parse response string
+     *
      * @param command input command
      */
-    void handle(String command);
+    String handle(String command);
 }

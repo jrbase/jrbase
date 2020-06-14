@@ -1,9 +1,9 @@
 package io.github.jrbase.process.list;
 
+import io.github.jrbase.common.datatype.Cmd;
+import io.github.jrbase.common.datatype.RedisDataType;
 import io.github.jrbase.dataType.ClientCmd;
-import io.github.jrbase.dataType.Cmd;
 import io.github.jrbase.dataType.CommonMessage;
-import io.github.jrbase.dataType.RedisDataType;
 import io.github.jrbase.database.ListRedisValue;
 import io.github.jrbase.database.RedisValue;
 import io.github.jrbase.process.CmdProcess;

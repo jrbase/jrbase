@@ -7,9 +7,9 @@ package io.github.jrbase.client.response;
  */
 public class IntegersResponse implements TypeResponse {
     @Override
-    public void handle(String command) {
+    public String handle(String command) {
         // ":0\r\n" => (integer) 0
         String msg = command.substring(1, command.length() - 2);
-        System.out.println("(integer) " + msg);
+        return ("(integer) " + msg);
     }
 }

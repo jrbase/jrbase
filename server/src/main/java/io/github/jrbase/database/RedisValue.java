@@ -1,6 +1,6 @@
 package io.github.jrbase.database;
 
-import io.github.jrbase.dataType.RedisDataType;
+import io.github.jrbase.common.datatype.RedisDataType;
 
 public class RedisValue {
     private RedisDataType type;

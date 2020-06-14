@@ -13,26 +13,77 @@ import io.netty.handler.codec.string.StringEncoder;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class RedisClient {
-    private final EventLoopGroup group;
+
+    private final BlockingQueue<String> queue = new LinkedBlockingQueue<>(10);
+    private boolean active = false;
     private ChannelFuture channelFuture;
-    private BlockingQueue<String> queue = new LinkedBlockingQueue<>(10);
+    private EventLoopGroup group;
+    private ClientHandler clientHandler;
 
-
-    private final ClientHandler clientHandler;
+    private String host;
+    private int port;
+    private long timeout = 2000;
 
     public RedisClient() {
         this("localhost", 6379);
-//        this("192.168.100.1", 6379);
     }
 
     public RedisClient(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    public static RedisClient builder() {
+        return new RedisClient();
+    }
+
+    public RedisClient host(String host) {
+        this.host = host;
+        return this;
+    }
+
+    public RedisClient port(int port) {
+        this.port = port;
+        return this;
+    }
+
+    public RedisClient timeout(long timeout) {
+        this.timeout = timeout;
+        return this;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void connect() {
         group = new NioEventLoopGroup();
 
-        clientHandler = new ClientHandler(queue);
+        clientHandler = new ClientHandler(queue, this);
         try {
             Bootstrap clientBootstrap = new Bootstrap();
 
@@ -48,49 +99,68 @@ public class RedisClient {
                 }
             });
             channelFuture = clientBootstrap.connect().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+//            e.printStackTrace();
             stop();
-        } finally {
-            System.out.println("connect");
+            active = false;
+//            System.out.println("cant connect");
         }
-
     }
 
-    public String sendMessage(String message) {
+    public void sendMessage(String message) {
+        checkConnect();
+        String redisCommand = RedisRequestCommand.toRedisCommand(message);
+        clientHandler.sendMessage(redisCommand);
+    }
+
+    public String sendMessageAndReceive(String message) {
+        checkConnect();
         String redisCommand = RedisRequestCommand.toRedisCommand(message);
         clientHandler.sendMessage(redisCommand);
         return receiveMsg();
     }
 
+    private void checkConnect() {
+        if (!active) {
+            connect();
+        }
+    }
+
     public String receiveMsg() {
-        String take = "";
+        String message = "";
         try {
-            take = queue.take();
+            if (timeout > 0) {
+                message = queue.poll(2000, TimeUnit.MILLISECONDS);
+            } else {
+                message = queue.take();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return take;
+        return message;
+    }
+
+    public String receiveMsg(long timeout, TimeUnit timeUnit) {
+        String message = "";
+        try {
+            message = queue.poll(timeout, timeUnit);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return message;
     }
 
     public void stop() {
         try {
-            group.shutdownGracefully().sync();
-            channelFuture.channel().closeFuture().sync();
+            if (group != null) {
+                group.shutdownGracefully().sync();
+            }
+            if (channelFuture != null) {
+                channelFuture.channel().closeFuture().sync();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        final RedisClient redisClient = new RedisClient("192.168.100.1", 6379);
-        String message = redisClient.sendMessage("*2\r\n$4\r\nping\r\n$3\r\n123\r\n");
-        System.out.println(message);
-
-        message = redisClient.sendMessage("*2\r\n$4\r\nping\r\n$3\r\n456\r\n");
-        System.out.println(message);
-
-        redisClient.stop();
     }
 
 }

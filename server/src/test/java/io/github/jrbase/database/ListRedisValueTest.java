@@ -1,6 +1,6 @@
 package io.github.jrbase.database;
 
-import io.github.jrbase.utils.list.ListNode;
+import io.github.jrbase.client.utils.list.ListNode;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

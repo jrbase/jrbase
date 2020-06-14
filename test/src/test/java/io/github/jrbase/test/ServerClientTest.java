@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class ServerClientTest {
 
@@ -36,13 +36,14 @@ public class ServerClientTest {
     @Test
     public void testSmock() {
         RedisClient redisClient = new RedisClient();
+        redisClient.connect();
 
-        final String message = redisClient.sendMessage("*2\r\n$4\r\nping\r\n$3\r\n123\r\n");
+        final String message = redisClient.sendMessageAndReceive("ping 123");
 
         System.out.println(message);
         Assert.assertEquals("$3\r\n123\r\n", message);
 
-        final String message2 = redisClient.sendMessage("*2\r\n$4\r\nping\r\n");
+        final String message2 = redisClient.sendMessageAndReceive("ping");
         System.out.println(message2);
         Assert.assertEquals("+PONG\r\n", message2);
 
@@ -51,41 +52,52 @@ public class ServerClientTest {
     }
 
     @Test
+    public void testReceiveTimeout() {
+        RedisClient redisClient = new RedisClient();
+        redisClient.connect();
+
+        redisClient.sendMessage("ping 123");
+        String message = redisClient.receiveMsg(2000, TimeUnit.MILLISECONDS);
+
+        Assert.assertEquals("$3\r\n123\r\n", message);
+
+    }
+
+    @Test
     public void testSubscribe() {
         RedisClient redisClient = new RedisClient();
+        redisClient.connect();
 
-        final String message = redisClient.sendMessage("*3\r\n$9\r\nsubscribe\r\n$8\r\nchannel1\r\n$8\r\nchannel2\r\n");
-        System.out.println(message);
-        StringBuilder result = new StringBuilder();
+        final String actual = redisClient.sendMessageAndReceive("subscribe channel1 channel2");
+        System.out.println(actual);
+        StringBuilder expected = new StringBuilder();
         List<String> channels = new ArrayList<>(Arrays.asList("channel1", "channel2"));
         for (int i = 0; i < channels.size(); i++) {
             final String ch = channels.get(i);
-            result.append("*").append(3).append("\r\n")
+            expected.append("*").append(3).append("\r\n")
                     .append("$").append(9).append("\r\n").append("subscribe").append("\r\n")
                     .append("$").append(ch.length()).append("\r\n").append(ch).append("\r\n")
-                    .append(":").append(i).append("\r\n");
+                    .append(":").append(i + 1).append("\r\n");
         }
         redisClient.stop();
-        Assert.assertEquals(result.toString(), message);
+        Assert.assertEquals(expected.toString(), actual);
 
     }
 
     @Test
     public void testPublishMessage() throws InterruptedException {
         RedisClient redisClient = new RedisClient();
+        redisClient.connect();
 
-        String some = redisClient.sendMessage("*3\r\n$9\r\nsubscribe\r\n$8\r\nchannel1\r\n$8\r\nchannel2\r\n");
+        String some = redisClient.sendMessageAndReceive("subscribe channel1 channel2");
         System.out.println(some + "||");
         CountDownLatch countDownLatch = new CountDownLatch(1);
         executorService.submit(() -> {
             final RedisClient publisher = new RedisClient();
-            String result = publisher.sendMessage("*3\r\n$7\r\npublish\r\n$8\r\nchannel1\r\n$9\r\nmes112233\r\n");
+            publisher.connect();
+            String result = publisher.sendMessageAndReceive("publish channel1 mes112233");
             System.out.println(result);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             publisher.stop();
             countDownLatch.countDown();
         });
@@ -97,5 +109,6 @@ public class ServerClientTest {
         Assert.assertEquals("*3\r\n$7\r\nmessage\r\n$8\r\nchannel1\r\n$9\r\nmes112233\r\n", receiveMessage);
 
     }
+
 
 }

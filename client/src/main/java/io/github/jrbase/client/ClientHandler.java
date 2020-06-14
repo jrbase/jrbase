@@ -1,22 +1,22 @@
 package io.github.jrbase.client;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.concurrent.Promise;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class ClientHandler extends SimpleChannelInboundHandler<String> {
 
-    private BlockingQueue<String> queue;
+    private final BlockingQueue<String> queue;
 
     private ChannelHandlerContext ctx;
 
-    public ClientHandler(BlockingQueue<String> queue) {
+    private final RedisClient redisClient;
+
+    public ClientHandler(BlockingQueue<String> queue, RedisClient redisClient) {
         this.queue = queue;
+        this.redisClient = redisClient;
     }
 
 
@@ -24,6 +24,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         this.ctx = ctx;
+        redisClient.setActive(true);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
+        redisClient.setActive(false);
     }
 
     @Override
@@ -35,12 +41,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
         }
     }
 
-    public synchronized void sendMessage(String message) {
+    public void sendMessage(String message) {
         while (ctx == null) {
             try {
                 TimeUnit.MILLISECONDS.sleep(1);
             } catch (InterruptedException e) {
-                System.out.println("等待ChannelHandlerContext实例化过程中出错" + e);
+                System.out.println("ClientHandler#sendMessage " + e);
             }
         }
         ctx.writeAndFlush(message);

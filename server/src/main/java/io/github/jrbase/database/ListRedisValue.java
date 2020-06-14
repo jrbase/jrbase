@@ -1,10 +1,10 @@
 package io.github.jrbase.database;
 
-import io.github.jrbase.dataType.RedisDataType;
-import io.github.jrbase.utils.list.ListNode;
-import io.github.jrbase.utils.list.RedisList;
+import io.github.jrbase.client.utils.list.ListNode;
+import io.github.jrbase.client.utils.list.RedisList;
+import io.github.jrbase.common.datatype.RedisDataType;
 
-import static io.github.jrbase.utils.list.ListTools.getLRangeList;
+import static io.github.jrbase.client.utils.list.ListTools.getLRangeList;
 
 public class ListRedisValue extends RedisValue {
 

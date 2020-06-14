@@ -1,14 +1,14 @@
 package io.github.jrbase.process.string;
 
+import io.github.jrbase.client.utils.Tools;
+import io.github.jrbase.common.datatype.Cmd;
 import io.github.jrbase.dataType.ClientCmd;
-import io.github.jrbase.dataType.Cmd;
 import io.github.jrbase.database.ByteRedisValue;
 import io.github.jrbase.database.RedisValue;
 import io.github.jrbase.process.CmdProcess;
 import io.github.jrbase.process.annotation.KeyCommand;
-import io.github.jrbase.utils.Tools;
 
-import static io.github.jrbase.dataType.Cmd.GETBIT;
+import static io.github.jrbase.common.datatype.Cmd.GETBIT;
 
 /**
  * SETBIT key offset value

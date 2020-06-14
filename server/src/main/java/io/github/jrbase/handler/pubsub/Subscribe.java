@@ -29,7 +29,7 @@ public class Subscribe implements ServerCmdHandler {
             result.append("*").append(3).append("\r\n")
                     .append("$").append(9).append("\r\n").append("subscribe").append("\r\n")
                     .append("$").append(ch.length()).append("\r\n").append(ch).append("\r\n")
-                    .append(":").append(i).append("\r\n");
+                    .append(":").append(i + 1).append("\r\n");
             RedisChannel.subscribe(ch, clientCmd.getRedisClientContext());
         }
         return result.toString();

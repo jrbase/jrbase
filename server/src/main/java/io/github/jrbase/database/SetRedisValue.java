@@ -1,15 +1,15 @@
 package io.github.jrbase.database;
 
-import io.github.jrbase.dataType.RedisDataType;
+import io.github.jrbase.common.datatype.RedisDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static io.github.jrbase.client.utils.sets.SetTools.getPopResult;
+import static io.github.jrbase.client.utils.sets.SetTools.makeRandomSets;
 import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_INTEGER_OUT_RANGE;
-import static io.github.jrbase.utils.sets.SetTools.getPopResult;
-import static io.github.jrbase.utils.sets.SetTools.makeRandomSets;
 
 public class SetRedisValue extends RedisValue {
 

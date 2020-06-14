@@ -1,11 +1,12 @@
 package io.github.jrbase.client.response;
 
 public class SimpleStringsResponse implements TypeResponse {
+
     @Override
-    public void handle(String command) {
+    public String handle(String command) {
         //+OK\r\n => OK
         String msg = getMsg(command);
-        System.out.println(msg);
+        return ("\"" + msg + "\"");
     }
 
     private String getMsg(String command) {

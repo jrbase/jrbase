@@ -89,9 +89,15 @@ public class JRBaseServer extends IServer {
         System.out.println("Stopping server");
         stopCluster();
         try {
-            bossGroup.shutdownGracefully().sync();
-            workerGroup.shutdownGracefully().sync();
-            future.channel().closeFuture().sync();
+            if (bossGroup != null) {
+                bossGroup.shutdownGracefully().sync();
+            }
+            if (workerGroup != null) {
+                workerGroup.shutdownGracefully().sync();
+            }
+            if (future != null) {
+                future.channel().closeFuture().sync();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {

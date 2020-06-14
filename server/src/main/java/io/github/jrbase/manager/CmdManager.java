@@ -1,13 +1,13 @@
 package io.github.jrbase.manager;
 
+import io.github.jrbase.client.utils.Tools;
+import io.github.jrbase.common.datatype.Cmd;
+import io.github.jrbase.common.datatype.RedisDataType;
 import io.github.jrbase.dataType.ClientCmd;
-import io.github.jrbase.dataType.Cmd;
-import io.github.jrbase.dataType.RedisDataType;
 import io.github.jrbase.database.RedisValue;
 import io.github.jrbase.factory.CommandAbstractFactory;
 import io.github.jrbase.process.CmdProcess;
 import io.github.jrbase.process.annotation.ScanAnnotationConfigure;
-import io.github.jrbase.utils.Tools;
 import io.netty.channel.Channel;
 import org.apache.commons.lang.StringUtils;
 
@@ -84,7 +84,7 @@ public class CmdManager {
         channel.writeAndFlush(REDIS_ERROR_OPERATION_AGAINST);
     }
 
-    private CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
+    CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
         return scanAnnotationConfigure.get(clientCmd.getCmd());
     }
 

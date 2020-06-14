@@ -1,14 +1,14 @@
 package io.github.jrbase.process.string;
 
+import io.github.jrbase.common.datatype.Cmd;
 import io.github.jrbase.dataType.ClientCmd;
-import io.github.jrbase.dataType.Cmd;
 import io.github.jrbase.database.Database;
 import io.github.jrbase.database.RedisValue;
 import io.github.jrbase.database.StringRedisValue;
 import io.github.jrbase.process.CmdProcess;
 import io.github.jrbase.process.annotation.KeyCommand;
 
-import static io.github.jrbase.dataType.RedisDataType.STRINGS;
+import static io.github.jrbase.common.datatype.RedisDataType.STRINGS;
 
 @KeyCommand
 public class MSetProcess implements CmdProcess {
