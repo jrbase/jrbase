@@ -1,7 +1,7 @@
 package io.github.jrbase.process.zsets;
 
+import io.github.jrbase.common.datatype.Cmd;
 import io.github.jrbase.dataType.ClientCmd;
-import io.github.jrbase.dataType.Cmd;
 import io.github.jrbase.database.RedisValue;
 import io.github.jrbase.database.ZSortRedisValue;
 import io.github.jrbase.process.CmdProcess;
@@ -10,8 +10,8 @@ import io.github.jrbase.process.annotation.KeyCommand;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.github.jrbase.common.datatype.RedisDataType.SORTED_SETS;
 import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAINST;
-import static io.github.jrbase.dataType.RedisDataType.SORTED_SETS;
 
 /**
  * ZADD key [NX|XX] [CH] [INCR] score member [score member ...]

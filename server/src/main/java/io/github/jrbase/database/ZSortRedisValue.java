@@ -1,9 +1,9 @@
 package io.github.jrbase.database;
 
-import io.github.jrbase.dataType.RedisDataType;
+import io.github.jrbase.client.utils.skipList.KVPair;
+import io.github.jrbase.client.utils.skipList.SkipList;
+import io.github.jrbase.common.datatype.RedisDataType;
 import io.github.jrbase.dataType.ScoreMember;
-import io.github.jrbase.utils.skipList.KVPair;
-import io.github.jrbase.utils.skipList.SkipList;
 
 import java.util.List;
 

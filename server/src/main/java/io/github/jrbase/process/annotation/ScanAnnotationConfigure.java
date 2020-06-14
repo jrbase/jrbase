@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class ScanAnnotationConfigure {
 
-    private static final Map<String, CmdProcess> cmdProcessManager = new HashMap<>();
+    private final Map<String, CmdProcess> cmdProcessManager = new HashMap<>();
     private static ScanAnnotationConfigure singleInstance;
 
     public static ScanAnnotationConfigure newSingleInstance() {

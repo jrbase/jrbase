@@ -1,16 +1,13 @@
 package io.github.jrbase.manager
 
-import io.github.jrbase.backend.BackendProxy
+import io.github.jrbase.common.datatype.Cmd
 import io.github.jrbase.dataType.ClientCmd
-import io.github.jrbase.dataType.Cmd
+import io.github.jrbase.handler.CmdHandler
 import io.github.jrbase.process.string.GetProcess
 import io.github.jrbase.process.string.SetProcess
 import io.netty.channel.Channel
 import org.junit.Assert
-import spock.lang.Ignore
 import spock.lang.Specification
-
-import static io.github.jrbase.dataType.RedisDataType.STRINGS
 
 class CmdManagerTest extends Specification {
 
@@ -48,15 +45,16 @@ class CmdManagerTest extends Specification {
     }
 
     //TODO: async test
-    @Ignore
     def "processSuccess"() {
+        def chandler = CmdHandler.newSingleInstance(null)
+
         given:
         ClientCmd clientCmd = new ClientCmd("get")
         clientCmd.setKey("key")
-        final BackendProxy backendProxy = Mock()
-        clientCmd.setBackendProxy(backendProxy)
-        String buildUpKey = clientCmd.getKey() + STRINGS.getAbbreviation()
-        backendProxy.bGet(buildUpKey) >> null
+
+        chandler.getDefaultDB().clear()
+        clientCmd.setDb(chandler.getDefaultDB())
+        clientCmd.setKey("key")
 
         Channel channel = Mock()
         channel.writeAndFlush("\$-1\r\n")

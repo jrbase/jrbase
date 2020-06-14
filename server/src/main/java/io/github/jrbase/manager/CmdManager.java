@@ -1,12 +1,13 @@
 package io.github.jrbase.manager;
 
+import io.github.jrbase.client.utils.Tools;
+import io.github.jrbase.common.datatype.Cmd;
+import io.github.jrbase.common.datatype.RedisDataType;
 import io.github.jrbase.dataType.ClientCmd;
-import io.github.jrbase.dataType.Cmd;
-import io.github.jrbase.dataType.RedisDataType;
 import io.github.jrbase.database.RedisValue;
+import io.github.jrbase.factory.CommandAbstractFactory;
 import io.github.jrbase.process.CmdProcess;
 import io.github.jrbase.process.annotation.ScanAnnotationConfigure;
-import io.github.jrbase.utils.Tools;
 import io.netty.channel.Channel;
 import org.apache.commons.lang.StringUtils;
 
@@ -16,7 +17,7 @@ import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAI
 public class CmdManager {
 
 
-    private static final ScanAnnotationConfigure scanAnnotationConfigure = ScanAnnotationConfigure.newSingleInstance();
+    private static final ScanAnnotationConfigure scanAnnotationConfigure = CommandAbstractFactory.newProcessAnnotationConfigure();
     private static CmdManager singleInstance;
 
     private CmdManager() {
@@ -28,8 +29,9 @@ public class CmdManager {
         }
         return singleInstance;
     }
-
+    // Template Pattern
     public void process(ClientCmd clientCmd) {
+        // Strategy patten
         CmdProcess cmdProcess = clientCmdToCmdProcess(clientCmd);
         if (cmdProcess == null) {
             cmdProcess = scanAnnotationConfigure.get(Cmd.OTHER.getCmdName());
@@ -82,11 +84,8 @@ public class CmdManager {
         channel.writeAndFlush(REDIS_ERROR_OPERATION_AGAINST);
     }
 
-    public CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
+    CmdProcess clientCmdToCmdProcess(ClientCmd clientCmd) {
         return scanAnnotationConfigure.get(clientCmd.getCmd());
     }
 
-    public void shutdown() {
-
-    }
 }

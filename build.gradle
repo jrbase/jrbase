@@ -1,14 +1,15 @@
+import com.github.jrbase.codelinecountplugin.CodeLineCountPlugin
 
 allprojects {
     group 'io.github.jrbase'
-    version '0.0.1-SNAPSHOT'
+    version '0.1.1-SNAPSHOT'
 }
 
 subprojects {
     apply plugin: "java"
     apply plugin: "groovy"
     apply plugin: 'jacoco'
-    apply plugin: com.github.jrbase.codelinecountplugin.CodeLineCountPlugin
+    apply plugin: CodeLineCountPlugin
     apply plugin: 'checkstyle'
 
     apply plugin: 'maven'

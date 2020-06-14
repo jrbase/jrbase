@@ -3,22 +3,9 @@ plugins {
 }
 
 dependencies {
-    compile("org.jline:jline:3.6.2")
     compile "io.netty:netty-all:4.1.25.Final"
     implementation project(':common')
 
 }
-
-task fatJar(type: Jar) {
-    manifest {
-        attributes 'Implementation-Title': 'Gradle Jar File JRBaseClient',
-                'Implementation-Version': '1.0',
-                'Main-Class': 'io.github.jrbase.client.JRBaseClient'
-    }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
-
 
 

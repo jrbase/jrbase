@@ -4,7 +4,7 @@ jdk:
   - openjdk8
 
 script:
-  ./gradlew checkstyleMain checkstyleTest test codeCoverageReport
+  ./gradlew clean checkstyleMain checkstyleTest test codeCoverageReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) $CODECOV_TOKEN
