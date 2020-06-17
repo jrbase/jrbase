@@ -9,11 +9,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * scan two @interface
+ *
+ * @param <T>
+ * @see io.github.jrbase.process.annotation.KeyCommand
+ * @see io.github.jrbase.handler.annotation.ServerCommand
+ * @see io.github.jrbase.process.CmdProcess
+ * @see io.github.jrbase.handler.ServerCmdHandler
+ */
 public class ScanAnnotationConfigure<T> {
 
     private static final Logger logger = Logger.getLogger(ScanAnnotationConfigure.class);
 
-    public Map<String, T> cmdProcessManager = new HashMap<>();
+    private final Map<String, T> cmdProcessManager = new HashMap<>();
 
     public void doScan(String packageName, final Class<? extends Annotation> annotation, Consumer<T> consumer) {
         Reflections reflections = new Reflections(packageName);
