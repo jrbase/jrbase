@@ -13,6 +13,7 @@ import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.ServiceInstanceBuilder;
 import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,11 +22,14 @@ import java.util.concurrent.TimeUnit;
 
 public class ZKServerRegister {
 
-    private Map<String, RedisConfigurationOption> router = new HashMap<>();
+    private static final Logger logger = Logger.getLogger(ZKServerRegister.class);
+
+
+    private final Map<String, RedisConfigurationOption> router = new HashMap<>();
 
     private CuratorFramework client;
     private ServiceDiscovery<ServiceDetail> serviceDiscovery;
-    private RedisConfigurationOption config;
+    private final RedisConfigurationOption config;
 
     public ZKServerRegister(RedisConfigurationOption config) {
         this.config = config;
@@ -58,13 +62,17 @@ public class ZKServerRegister {
             serviceDiscovery.start();
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error(e.toString());
             unRegister();
+            throw new RuntimeException(e);
         }
 
         try {
             addEvent();
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error(e);
+            throw new RuntimeException(e);
         }
 
     }
@@ -73,7 +81,7 @@ public class ZKServerRegister {
         PathChildrenCache pathChildrenCache = new PathChildrenCache(client, "/" + ServiceDetail.REGISTER_ROOT_PATH + "/" + config.getAppName(), true);
         pathChildrenCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
         pathChildrenCache.getListenable().addListener((client1, event) -> {
-            System.out.println("事件类型：" + event.getType() + "；操作节点：" + event.getData().getPath());
+            logger.info("事件类型：" + event.getType() + "；操作节点：" + event.getData().getPath());
             switch (event.getType()) {
                 case CHILD_ADDED: {
                     addServer(event);
@@ -109,6 +117,8 @@ public class ZKServerRegister {
                 config.setPort(service.getPort());
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
+                logger.error(e);
+                throw new RuntimeException(e);
             }
         } else {
             addServer(event);
@@ -119,11 +129,13 @@ public class ZKServerRegister {
         ObjectMapper mapper = new ObjectMapper();
         try {
             ServiceInstance service = mapper.readValue(new String(event.getData().getData()), ServiceInstance.class);
-            System.out.println(service.getAddress() + "\t" + service.getPort());
+            logger.info(service.getAddress() + "\t" + service.getPort());
             router.put(event.getData().getPath(), new RedisConfigurationOption(service.getAddress(), service.getPort()));
-            System.out.println("---------------------");
+            logger.info("---------------------");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            logger.error(e);
+            throw new RuntimeException(e);
         }
 
 
