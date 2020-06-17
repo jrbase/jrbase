@@ -3,8 +3,7 @@ package io.github.jrbase.server;
 import io.github.jrbase.handler.CmdHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -18,7 +17,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
         this.cmdHandler = cmdHandler;
     }
 
-    private static final Logger logger = Logger.getLogger(JRBaseServer.class.getName());
+    private static final Logger logger = Logger.getLogger(JRBaseServer.class);
 
 
   /*  @Override
@@ -31,7 +30,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
         cmdHandler.removeContext(ctx);
         super.channelInactive(ctx);
     }
-
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) {
         cmdHandler.handleMsg(ctx, msg);
@@ -41,6 +39,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<String> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
         ctx.close();
+        logger.error(cause);
     }
 
 }

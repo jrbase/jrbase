@@ -24,6 +24,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import org.apache.log4j.Logger;
 
 import static io.github.jrbase.common.config.YamlTool.readConfig;
 
@@ -33,6 +34,8 @@ import static io.github.jrbase.common.config.YamlTool.readConfig;
  * start the java redis server
  */
 public class JRBaseServer extends IServer {
+
+    private static final Logger logger = Logger.getLogger(JRBaseServer.class);
 
     private ChannelFuture future;
     private NioEventLoopGroup bossGroup;
@@ -58,7 +61,7 @@ public class JRBaseServer extends IServer {
     @Override
     public synchronized void start(String[] args) {
 
-        System.out.println("Start server");
+        logger.info("Start server");
         if (args != null && args.length >= 1) {
             final String confFile = args[0];
             config = readConfig(confFile);
@@ -67,7 +70,7 @@ public class JRBaseServer extends IServer {
         startCluster();
 
         bossGroup = new NioEventLoopGroup(1);
-        workerGroup = new NioEventLoopGroup(8);
+        workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
@@ -79,6 +82,7 @@ public class JRBaseServer extends IServer {
 
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error(e.toString());
             shutdown();
         }
 
@@ -86,7 +90,7 @@ public class JRBaseServer extends IServer {
 
     @Override
     public synchronized void shutdown() {
-        System.out.println("Stopping server");
+        logger.info("Stopping server");
         stopCluster();
         try {
             if (bossGroup != null) {
@@ -101,7 +105,7 @@ public class JRBaseServer extends IServer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            System.out.println("Server stopped");
+            logger.info("Server stopped");
         }
     }
 

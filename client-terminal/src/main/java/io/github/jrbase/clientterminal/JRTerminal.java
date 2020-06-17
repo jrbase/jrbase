@@ -18,10 +18,6 @@ public class JRTerminal {
     //TODO: auth
     public static void main(String[] args) throws IOException {
         // parse args
-        System.out.println("args:");
-        for (String arg : args) {
-            System.out.println(arg);
-        }
         ArgumentParser parser = ArgumentParsers
                 .newFor("redis-client.sh")
                 .addHelp(false)

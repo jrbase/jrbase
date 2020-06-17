@@ -17,7 +17,7 @@ import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_OPERATION_AGAI
 public class CmdManager {
 
 
-    private static final ScanAnnotationConfigure scanAnnotationConfigure = CommandAbstractFactory.newProcessAnnotationConfigure();
+    private static final ScanAnnotationConfigure<CmdProcess> scanAnnotationConfigure = CommandAbstractFactory.newProcessAnnotationConfigure();
     private static CmdManager singleInstance;
 
     private CmdManager() {
