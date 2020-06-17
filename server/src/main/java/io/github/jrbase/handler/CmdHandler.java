@@ -5,9 +5,9 @@ import io.github.jrbase.dataType.ClientCmd;
 import io.github.jrbase.dataType.RedisClientContext;
 import io.github.jrbase.database.Database;
 import io.github.jrbase.factory.CommandAbstractFactory;
-import io.github.jrbase.handler.annotation.ScanServerAnnotationConfigure;
 import io.github.jrbase.handler.pubsub.RedisChannel;
 import io.github.jrbase.manager.CmdManager;
+import io.github.jrbase.process.annotation.ScanAnnotationConfigure;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang.StringUtils;
 
@@ -32,7 +32,7 @@ public class CmdHandler {
 
     private static final String REPLY_OK = "OK";
 
-    private static final ScanServerAnnotationConfigure scanServerAnnotationConfigure = CommandAbstractFactory.newHandlerAnnotation();
+    private static final ScanAnnotationConfigure<ServerCmdHandler> scanServerAnnotationConfigure = CommandAbstractFactory.newHandlerAnnotation();
 
     /**
      * save session login status to HashMap<ChannelHandlerContext, RedisClientContext>

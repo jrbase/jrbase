@@ -4,6 +4,7 @@ target
 build/
 .gradle/
 log
+logs
 raft_data
 rhea_db
 /tikvServer/logs/
