@@ -8,7 +8,6 @@ version '1.0.1'
 sourceCompatibility = 1.8
 
 repositories {
-    maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
     mavenCentral()
 }
 
