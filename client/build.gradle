@@ -2,6 +2,12 @@ plugins {
     id 'java'
 }
 
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+
 dependencies {
     compile "io.netty:netty-all:4.1.25.Final"
     implementation project(':common')

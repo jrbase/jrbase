@@ -1,5 +1,7 @@
 apply plugin: 'distribution'
 
+group 'io.github.jrbase'
+
 dependencies {
     compile group: 'net.sourceforge.argparse4j', name: 'argparse4j', version: '0.8.1'
     compile("org.jline:jline:3.6.2")
