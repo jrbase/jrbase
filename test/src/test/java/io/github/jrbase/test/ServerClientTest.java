@@ -11,10 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class ServerClientTest {
 
@@ -25,13 +22,14 @@ public class ServerClientTest {
     public static void before() throws IOException, InterruptedException {
         jrServerEmbedded.start();
         Thread.sleep(1000);
-        executorService = Executors.newFixedThreadPool(2);
+        executorService = Executors.newFixedThreadPool(4);
     }
 
     @AfterClass
     public static void end() {
         jrServerEmbedded.stop();
     }
+
 
     @Test
     public void testSmock() {
@@ -110,5 +108,56 @@ public class ServerClientTest {
 
     }
 
+    @Test
+    public void testPSubscribe1() {
+        testPSubscribe("psubscribe h?llo",
+                "publish hello mes112233",
+                "*3\r\n$7\r\nmessage\r\n$5\r\nhello\r\n$9\r\nmes112233\r\n");
+
+    }
+
+    @Test
+    public void testPSubscribe2() {
+
+        testPSubscribe("psubscribe w*rld",
+                "publish woorld mes112233",
+                "*3\r\n$7\r\nmessage\r\n$6\r\nwoorld\r\n$9\r\nmes112233\r\n");
+
+    }
+
+    @Test
+    public void testPSubscribe3() {
+
+        testPSubscribe("psubscribe [ae]pple",
+                "publish apple mes112233",
+                "*3\r\n$7\r\nmessage\r\n$5\r\napple\r\n$9\r\nmes112233\r\n");
+
+    }
+
+
+    private void testPSubscribe(String subscribeMsg, String publishMsg, String expectedMsg) {
+        RedisClient redisClient = new RedisClient();
+        redisClient.connect();
+
+        CompletableFuture<Void> future = CompletableFuture
+                .runAsync(() -> {
+                    String some = redisClient.sendMessageAndReceive(subscribeMsg);
+                }, executorService)
+                .thenRunAsync(() -> {
+                    final RedisClient publisher = new RedisClient();
+                    publisher.connect();
+                    String result = publisher.sendMessageAndReceive(publishMsg);
+                    System.out.println(result);
+
+                    publisher.stop();
+                }, executorService)
+                .thenRunAsync(() -> {
+                    String receiveMessage = redisClient.receiveMsg();
+                    Assert.assertEquals(expectedMsg, receiveMessage);
+                    redisClient.stop();
+
+                }, executorService);
+        future.join();
+    }
 
 }

@@ -15,7 +15,10 @@ public enum ServerCmd {
     COMMAND("command"),
     // SubPub
     SUBSCRIBE("subscribe"),
+    UNSUBSCRIBE("unsubscribe"),
     PUBLISH("publish"),
+    PSUBSCRIBE("psubscribe"),
+    PUNSUBSCRIBE("punsubscribe"),
     //Other
     CONFIG("config"),
     UNKNOWN("other");

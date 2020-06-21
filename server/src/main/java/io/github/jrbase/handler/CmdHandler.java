@@ -157,6 +157,7 @@ public class CmdHandler {
     public void removeContext(ChannelHandlerContext ctx) {
         final RedisClientContext redisClientContext = clientContext.get(ctx);
         RedisChannel.unSubscribe(redisClientContext);
+        RedisChannel.punSubscribe(redisClientContext);
         clientContext.remove(ctx);
     }
 }

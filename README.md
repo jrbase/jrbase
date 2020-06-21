@@ -234,7 +234,7 @@ Geo
 |  command    |    supported            |               format                          
 |             |(Y=yes,N=no, D=doing)    |                                               
 +-------------+-------------------------+-------------------------------------------------
-|   geoadd    |                         | geoadd key longitude latitude member [longitude latitude member ...]        
+|   geoadd    |         D               | geoadd key longitude latitude member [longitude latitude member ...]        
 +-------------+-------------------------+-------------------------------------------------
 |   geopos    |                         | geopos key  member [member ...]            
 +-------------+-------------------------+-------------------------------------------------
@@ -291,11 +291,11 @@ Pub/Sub
 +-------------+-------------------------+-------------------------------------------------
 |  publish    |          Y              | publish channel message             |  
 +-------------+-------------------------+-------------------------------------------------
-| unsubscribe |          N              | unsubscribe [channel [channel ...]] |  
+| unsubscribe |          Y              | unsubscribe [channel [channel ...]] |  
 +-------------+-------------------------+-------------------------------------------------
-| psubscribe  |          N              | psubscribe pattern [pattern ...]    |  
+| psubscribe  |          Y              | psubscribe pattern [pattern ...]    |  
 +-------------+-------------------------+-------------------------------------------------
-|punsubscribe |          N              | punsubscribe [pattern [pattern ...]] |  
+|punsubscribe |          Y              | punsubscribe [pattern [pattern ...]]|  
 +-------------+-------------------------+-------------------------------------------------
 
 Transactions
