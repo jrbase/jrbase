@@ -29,7 +29,6 @@ public class LPopProcess implements CmdProcess {
         return requestKVAndReplyClient(clientCmd);
     }
 
-
     public String requestKVAndReplyClient(ClientCmd clientCmd) {
         synchronized (RedisDataType.LISTS) {
             final RedisValue redisValue = clientCmd.getDb().get(clientCmd.getKey());

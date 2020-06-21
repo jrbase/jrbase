@@ -6,10 +6,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Database {
     private final int id;
-    private final Map<String, RedisValue> table = new ConcurrentHashMap<>(100);
+    private final Map<String, RedisValue> table;
 
     public Database(int id) {
         this.id = id;
+        this.table = new ConcurrentHashMap<>(1024);
+    }
+
+    public Database(int id, int size) {
+        this.id = id;
+        this.table = new ConcurrentHashMap<>(size);
     }
 
     public int getId() {

@@ -30,7 +30,7 @@ public class ScanAnnotationConfigureTest {
 
         ServerCmdHandler serverCmdHandler = scanAnnotationConfigure.get("ping");
         assertEquals("ping", serverCmdHandler.getCmdName());
-        assertEquals(8, scanAnnotationConfigure.size());
+        assertEquals(9, scanAnnotationConfigure.size());
 
         ServerCmdHandler serverCmdHandler2 = scanAnnotationConfigure.get("ping");
 
