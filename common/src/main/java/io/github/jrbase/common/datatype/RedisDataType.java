@@ -13,6 +13,7 @@ public enum RedisDataType {
     LISTS("list", "l"),
     SETS("set", "c"),
     SORTED_SETS("zset", "z"),
+    GEO("geo", "g"),
     NONE("none", "n"),
     KEY("key", "k");
 

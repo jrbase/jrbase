@@ -20,7 +20,7 @@ public class ScanAnnotationConfigureTest {
         assertEquals(cmdProcess, cmdProcess2);
         CmdProcess cmdProcess3 = scanAnnotationConfigure.get("hget");
         assertEquals("hget", cmdProcess3.getCmdName());
-        assertEquals(23, scanAnnotationConfigure.size());
+        assertEquals(29, scanAnnotationConfigure.size());
     }
 
     @Test

@@ -4,6 +4,7 @@ package io.github.jrbase.process.zsets
 import io.github.jrbase.dataType.ClientCmd
 import io.github.jrbase.database.ZSortRedisValue
 import io.github.jrbase.handler.CmdHandler
+import io.github.jrbase.process.CmdProcess
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -11,8 +12,8 @@ import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_INTEGER_OUT_RA
 import static io.github.jrbase.dataType.CommonMessage.REDIS_ERROR_SYNTAX
 
 class ZRangeProcessTest extends Specification {
-    private io.github.jrbase.process.CmdProcess cmdProcess = new ZRangeProcess()
-    private io.github.jrbase.process.CmdProcess zAddProcess = new ZAddProcess()
+    private CmdProcess cmdProcess = new ZRangeProcess()
+    private CmdProcess zAddProcess = new ZAddProcess()
     @Shared
     def chandler = CmdHandler.newSingleInstance(null)
     @Shared
@@ -40,7 +41,7 @@ class ZRangeProcessTest extends Specification {
         where:
         args                     | message
         ["0", "0"]               | '*1\r\n$2\r\nm1\r\n'
-        ["0", "0", "withscores"] | '*1\r\n$2\r\nm1\r\n$1\r\n1\r\n'
+        ["0", "0", "withscores"] | '*1\r\n$2\r\nm1\r\n$3\r\n1.0\r\n'
         ["0", "-1"]              | '*3\r\n$2\r\nm1\r\n$4\r\nm222\r\n$4\r\nm369\r\n'
     }
 

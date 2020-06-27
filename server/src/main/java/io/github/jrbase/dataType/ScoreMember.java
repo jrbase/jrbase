@@ -6,27 +6,17 @@ import org.jetbrains.annotations.NotNull;
  * redis sort set
  */
 public class ScoreMember implements Comparable<ScoreMember> {
-    private String member;
-    private int score;
+    private double score;
 
-    public ScoreMember(String member, int score) {
-        this.member = member;
+    public ScoreMember(double score) {
         this.score = score;
     }
 
-    public String getMember() {
-        return member;
-    }
-
-    public void setMember(String member) {
-        this.member = member;
-    }
-
-    public int getScore() {
+    public double getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(double score) {
         this.score = score;
     }
 
@@ -39,30 +29,21 @@ public class ScoreMember implements Comparable<ScoreMember> {
             return false;
         }
         final ScoreMember other = (ScoreMember) obj;
-        return this.member.equals(other.member);
+        return this.score == other.score;
     }
 
     @Override
     public int hashCode() {
-        return member.hashCode();
+        return (int) score;
     }
 
     @Override
     public int compareTo(@NotNull ScoreMember o) {
-        if (this.score > o.score) {
-            return 1;
-        } else if (this.score < o.score) {
-            return -1;
-        } else {
-            return this.member.compareTo(o.member);
-        }
+        return (int) (this.score - o.score);
     }
 
     @Override
     public String toString() {
-        return "ScoreMember{" +
-                "member='" + member + '\'' +
-                ", score=" + score +
-                '}';
+        return "" + score;
     }
 }

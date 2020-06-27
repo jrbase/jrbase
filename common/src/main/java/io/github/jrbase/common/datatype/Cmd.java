@@ -35,6 +35,14 @@ public enum Cmd {
     ZADD("zadd", RedisDataType.SORTED_SETS),
     ZRANGE("zrange", RedisDataType.SORTED_SETS),
 
+    //GEO
+    GEOADD("geoadd", RedisDataType.GEO),
+    GEODIST("geodist", RedisDataType.GEO),
+    GEOHASH("geohash", RedisDataType.GEO),
+    GEOPOS("geopos", RedisDataType.GEO),
+    GEORADIUS("georadius", RedisDataType.GEO),
+    GEORADIUSBYMEMBER("georadiusbymember", RedisDataType.GEO),
+
     // others
     OTHER("other", RedisDataType.NONE);
 
