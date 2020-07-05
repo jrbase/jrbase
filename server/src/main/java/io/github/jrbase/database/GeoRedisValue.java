@@ -15,12 +15,12 @@ public class GeoRedisValue extends RedisValue {
         this.setType(RedisDataType.GEO);
     }
 
-    public void put(String longitude, String latitude, String member) {
-        put(member, Double.parseDouble(latitude), Double.parseDouble(longitude));
+    public int put(String longitude, String latitude, String member) {
+        return put(member, Double.parseDouble(latitude), Double.parseDouble(longitude));
     }
 
-    public void put(String member, double latitude, double longitude) {
-        SkipLists.putPosition(skipList, member, latitude, longitude);
+    public int put(String member, double latitude, double longitude) {
+        return SkipLists.putPosition(skipList, member, latitude, longitude);
     }
 
     public List<SkipList<PositionScore>.KVPair> findRange(int beginIndex, int endIndex) {
@@ -31,5 +31,8 @@ public class GeoRedisValue extends RedisValue {
         return skipList.getSize();
     }
 
+    public PositionScore get(String member) {
+        return skipList.find(member);
+    }
 }
 

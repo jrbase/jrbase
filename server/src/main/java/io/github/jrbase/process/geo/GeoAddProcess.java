@@ -21,11 +21,11 @@ public class GeoAddProcess implements CmdProcess {
 
     @Override
     public boolean isCorrectArguments(ClientCmd clientCmd) {
-        return isgeoaddArgument(clientCmd.getArgLength());
+        return isGeoAddArgument(clientCmd.getArgLength());
     }
 
-    private boolean isgeoaddArgument(int length) {
-        return length >= 5 && (length - 5) % 3 == 0;
+    private boolean isGeoAddArgument(int length) {
+        return length >= 3 && (length - 3) % 3 == 0;
     }
 
     @Override
@@ -35,7 +35,22 @@ public class GeoAddProcess implements CmdProcess {
             return REDIS_ERROR_OPERATION_AGAINST;
         }
         GeoRedisValue geoRedisValue = (GeoRedisValue) redisValue;
-        geoRedisValue.put(clientCmd.getArgs()[0], clientCmd.getArgs()[1], clientCmd.getArgs()[2]);
-        return null;
+        int addSize = addGeo(geoRedisValue, clientCmd.getArgs());
+        clientCmd.getDb().put(clientCmd.getKey(), geoRedisValue);
+        return gainSize(addSize);
+    }
+
+    private int addGeo(GeoRedisValue geoRedisValue, String[] args) {
+        int addSize = 0;
+        for (int i = 0; i < args.length; i = i + 3) {
+            int add = geoRedisValue.put(args[i], args[i + 1], args[i + 2]);
+            addSize += add;
+        }
+        return addSize;
+
+    }
+
+    private String gainSize(int addSize) {
+        return ":" + addSize + "\r\n";
     }
 }

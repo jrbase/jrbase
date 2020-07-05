@@ -45,5 +45,11 @@ public class GEOUtilsTest {
 
     }
 
+    @Test
+    public void testDistance() {
+        double distance = GEOUtils.distance(102.485658, 25.270572, 102.828981, 24.887476);
+        System.out.println(distance);
+    }
+
 
 }

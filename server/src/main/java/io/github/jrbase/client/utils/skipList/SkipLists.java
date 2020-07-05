@@ -24,24 +24,32 @@ public class SkipLists {
 
     }
 
-    public static void putPosition(final SkipList<PositionScore> skipList, String member,
-                                   double latitude, double longitude) {
+    public static int putPosition(final SkipList<PositionScore> skipList, String member,
+                                  double latitude, double longitude) {
         if (member == null) {
             throw new NullPointerException();
         }
+        int result;
         skipList.lock();
         try {
             PositionScore scoreMember = skipList.find(member);
             if (scoreMember != null) {
-                scoreMember.setLongitude(longitude);
-                scoreMember.setLatitude(latitude);
+                updatePosition(latitude, longitude, scoreMember);
+                result = 0;
             } else {
+                // insertPosition
                 skipList.put(member, new PositionScore(longitude, latitude));
+                result = 1;
             }
         } finally {
             skipList.unLock();
         }
+        return result;
+    }
 
+    private static void updatePosition(double latitude, double longitude, PositionScore scoreMember) {
+        scoreMember.setLongitude(longitude);
+        scoreMember.setLatitude(latitude);
     }
 
 }
