@@ -4,51 +4,51 @@ package io.github.jrbase.client.utils.geo;
  * geohash utils
  */
 public class GEOUtils {
-    private static final double EARTH_RADIUS = 6371;// km
+    private static final double EARTH_RADIUS_IN_METERS = 6372797.560856; // m
 
-    public static void add(double latitude, double longitude) {
-//        SkipList<GeoObj> geoObjSkipList = new SkipList();
-    }
-    // TODO:
     // 1. GEOADD key longitude latitude member [longitude latitude member ...]
     //    geoadd store all position to skipList
     // 2. GEODIST key member1 member2 [m|km|ft|mi]
-    //
 
-    public static String distanceByUnit(double lat1, double lng1, double lat2, double lng2, String unit) {
-        double result;
-        if ("km".equals(unit)) {
-            result = distance(lat1, lng1, lat2, lng2);
-        } else if ("m".equals(unit)) {
-            // km = 1000m
-            result = distance(lat1, lng1, lat2, lng2) * 1000;
+    public static double extractUnit(String unit) {
+        // 1 * 1000 m = km
+        // 1 * 0.3048 m = ft
+        // 1 * 1609.34 m = mi
+        if ("m".equals(unit)) {
+            return 1;
+        } else if ("km".equals(unit)) {
+            return 1000;
         } else if ("ft".equals(unit)) {
-            // 1 m	3.28 ft
-            result = distance(lat1, lng1, lat2, lng2) * 1000 * 3.28;
+            return 0.3048;
         } else if ("mi".equals(unit)) {
-            // 1km = 0.62137mi
-            result = distance(lat1, lng1, lat2, lng2) * 0.62137;
+            return 1609.34;
         } else {
             throw new RuntimeException("(error) ERR unsupported unit provided. please use m, km, ft, mi");
         }
+    }
+
+    public static String distanceByUnit(double lng1, double lat1, double lng2, double lat2, String unit) {
+        double result;
+        result = getDistance(lng1, lat1, lng2, lat2) / extractUnit(unit);
+
         return String.format("%.4f", result);
     }
 
-    /**
-     * distance
-     *
-     * @return (km)
-     */
-    static double distance(double lat1, double lng1, double lat2, double lng2) {
-        double x1 = Math.cos(lat1) * Math.cos(lng1);
-        double y1 = Math.cos(lat1) * Math.sin(lng1);
-        double z1 = Math.sin(lat1);
-        double x2 = Math.cos(lat2) * Math.cos(lng2);
-        double y2 = Math.cos(lat2) * Math.sin(lng2);
-        double z2 = Math.sin(lat2);
-        double lineDistance =
-                Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
-        return EARTH_RADIUS * Math.PI * 2 * Math.asin(0.5 * lineDistance) / 180;
+    private static double rad(double d) {
+        return d * Math.PI / 180.0;
+    }
+
+    public static double getDistance(double lng1, double lat1, double lng2, double lat2) {
+        double lat1r = rad(lat1);
+        double lon1r = rad(lng1);
+        double lat2r = rad(lat2);
+        double lon2r = rad(lng2);
+
+        double u = Math.sin((lat2r - lat1r) / 2);
+        double v = Math.sin((lon2r - lon1r) / 2);
+
+        return 2.0 * EARTH_RADIUS_IN_METERS *
+                Math.asin(Math.sqrt(u * u + Math.cos(lat1r) * Math.cos(lat2r) * v * v));
     }
 
 }

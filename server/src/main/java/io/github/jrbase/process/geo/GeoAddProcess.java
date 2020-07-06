@@ -43,6 +43,7 @@ public class GeoAddProcess implements CmdProcess {
     private int addGeo(GeoRedisValue geoRedisValue, String[] args) {
         int addSize = 0;
         for (int i = 0; i < args.length; i = i + 3) {
+            //                         log       lat       member
             int add = geoRedisValue.put(args[i], args[i + 1], args[i + 2]);
             addSize += add;
         }

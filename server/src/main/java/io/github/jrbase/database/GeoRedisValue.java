@@ -19,7 +19,7 @@ public class GeoRedisValue extends RedisValue {
         return put(member, Double.parseDouble(latitude), Double.parseDouble(longitude));
     }
 
-    public int put(String member, double latitude, double longitude) {
+    public int put(String member, double longitude, double latitude) {
         return SkipLists.putPosition(skipList, member, latitude, longitude);
     }
 

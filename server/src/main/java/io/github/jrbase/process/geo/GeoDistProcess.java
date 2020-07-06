@@ -47,12 +47,12 @@ public class GeoDistProcess implements CmdProcess {
         }
         String distance;
         if (clientCmd.getArgLength() == 2) {
-            distance = GEOUtils.distanceByUnit(positionScore1.getLatitude(), positionScore1.getLongitude(),
-                    positionScore2.getLatitude(), positionScore2.getLongitude(), "km");
+            distance = GEOUtils.distanceByUnit(positionScore1.getLongitude(), positionScore1.getLatitude(),
+                    positionScore2.getLongitude(), positionScore2.getLatitude(), "m");
         } else {
             try {
-                distance = GEOUtils.distanceByUnit(positionScore1.getLatitude(), positionScore1.getLongitude(),
-                        positionScore2.getLatitude(), positionScore2.getLongitude(), clientCmd.getArgs()[2]);
+                distance = GEOUtils.distanceByUnit(positionScore1.getLongitude(), positionScore1.getLatitude(),
+                        positionScore2.getLongitude(), positionScore2.getLatitude(), clientCmd.getArgs()[2]);
             } catch (Exception e) {
                 return "-ERR unsupported unit provided. please use m, km, ft, mi\r\n";
             }

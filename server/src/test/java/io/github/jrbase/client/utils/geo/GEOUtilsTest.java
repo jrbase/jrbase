@@ -1,6 +1,7 @@
 package io.github.jrbase.client.utils.geo;
 
 import ch.hsr.geohash.GeoHash;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -47,8 +48,31 @@ public class GEOUtilsTest {
 
     @Test
     public void testDistance() {
-        double distance = GEOUtils.distance(102.485658, 25.270572, 102.828981, 24.887476);
-        System.out.println(distance);
+        // 43.74948721127861
+        double distance = GEOUtils.getDistance(102.485658, 25.270572, 102.828981, 24.887476);
+        Assert.assertEquals(54880.3982, distance, 4);
+    }
+
+    @Test
+    public void testDistanceByUnit() {
+        // GEOADD Sicily 102.485658 25.270572 "Palermo" 102.828981 24.887476 "Catania"
+        // geodist Sicily Palermo Catania
+        String distance = GEOUtils.distanceByUnit(102.485658, 25.270572, 102.828981, 24.887476,
+                "km");
+        Assert.assertEquals("54.8804", distance);
+
+        distance = GEOUtils.distanceByUnit(102.485658, 25.270572, 102.828981, 24.887476,
+                "ft");
+        Assert.assertEquals("180053.7998", distance);
+
+        distance = GEOUtils.distanceByUnit(102.485658, 25.270572, 102.828981, 24.887476,
+                "mi");
+        Assert.assertEquals("34.1012", distance);
+
+        distance = GEOUtils.distanceByUnit(102.485658, 25.270572, 102.828981, 24.887476,
+                "m");
+        Assert.assertEquals("54880.3982", distance);
+
     }
 
 
