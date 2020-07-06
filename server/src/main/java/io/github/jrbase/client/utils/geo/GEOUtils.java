@@ -28,9 +28,7 @@ public class GEOUtils {
     }
 
     public static String distanceByUnit(double lng1, double lat1, double lng2, double lat2, String unit) {
-        double result;
-        result = getDistance(lng1, lat1, lng2, lat2) / extractUnit(unit);
-
+        double result = getDistance(lng1, lat1, lng2, lat2) / extractUnit(unit);
         return String.format("%.4f", result);
     }
 
@@ -38,7 +36,7 @@ public class GEOUtils {
         return d * Math.PI / 180.0;
     }
 
-    public static double getDistance(double lng1, double lat1, double lng2, double lat2) {
+    static double getDistance(double lng1, double lat1, double lng2, double lat2) {
         double lat1r = rad(lat1);
         double lon1r = rad(lng1);
         double lat2r = rad(lat2);

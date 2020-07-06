@@ -11,7 +11,7 @@ public class PositionScore implements Comparable<PositionScore> {
     public PositionScore(double latitude, double longitude) {
         this.longitude = longitude;
         this.latitude = latitude;
-        GeoHash geoHash = GeoHash.withCharacterPrecision(latitude, longitude, 8);
+        GeoHash geoHash = GeoHash.withCharacterPrecision(latitude, longitude, 11);
         this.positionCode = geoHash.toBase32();
     }
 
@@ -29,6 +29,10 @@ public class PositionScore implements Comparable<PositionScore> {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+    }
+
+    public String getPositionCode() {
+        return positionCode;
     }
 
     @Override
