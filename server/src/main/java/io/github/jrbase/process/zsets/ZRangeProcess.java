@@ -1,9 +1,10 @@
 package io.github.jrbase.process.zsets;
 
-import io.github.jrbase.client.utils.skipList.KVPair;
+import io.github.jrbase.client.utils.skipList.SkipList;
 import io.github.jrbase.common.datatype.Cmd;
 import io.github.jrbase.dataType.ClientCmd;
 import io.github.jrbase.dataType.CommonMessage;
+import io.github.jrbase.dataType.ScoreMember;
 import io.github.jrbase.database.RedisValue;
 import io.github.jrbase.database.ZSortRedisValue;
 import io.github.jrbase.process.CmdProcess;
@@ -59,12 +60,12 @@ public class ZRangeProcess implements CmdProcess {
                 return REDIS_ERROR_OPERATION_AGAINST;
             }
             final ZSortRedisValue zSortRedisValue = (ZSortRedisValue) redisValue;
-            final List<KVPair> range = zSortRedisValue.findRange(Integer.parseInt(clientCmd.getArgs()[0]), Integer.parseInt(clientCmd.getArgs()[1]));
-            StringBuilder result = new StringBuilder();
+            List<SkipList<ScoreMember>.KVPair> range = zSortRedisValue.findRange(Integer.parseInt(clientCmd.getArgs()[0]), Integer.parseInt(clientCmd.getArgs()[1]));
+            final StringBuilder result = new StringBuilder();
             result.append("*").append(range.size()).append("\r\n");
-            for (KVPair kvPair : range) {
-                final String member = kvPair.key().getMember();
-                final int score = kvPair.key().getScore();
+            for (SkipList<ScoreMember>.KVPair kvPair : range) {
+                final String member = kvPair.key();
+                final ScoreMember score = kvPair.value();
                 if (this.withScore) {
                     result
                             .append("$").append(member.length()).append("\r\n")

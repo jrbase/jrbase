@@ -7,13 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiFunction;
 
 import static io.github.jrbase.client.utils.Tools.getRealBegin;
 
 //import shade.com.google.common.annotations.VisibleForTesting;
 
 /**
- * {@link SkipList#insert(ScoreMember, Object)} is most import method. You should care about calculation of span and rank.
+ * {@link SkipList#(ScoreMember, Object)} is most import method. You should care about calculation of span and rank.
  * {@link SkipNode#backward} is used of reversing query.
  * Simple SkipList VS Redis SkipList
  * 1. Simple SkipList
@@ -31,12 +34,14 @@ import static io.github.jrbase.client.utils.Tools.getRealBegin;
  * <p>
  * Function: Range Query by SkipList  And Single Query by HashMap
  */
-public class SkipList {
+public class SkipList<T extends Comparable<T>> {
+    private final Lock lock = new ReentrantLock();
+
     private static final int MAX_LEVEL = 32;
     private final SkipNode head;
     private SkipNode tail;
     // Single Query
-    private final Map<String, ScoreMember> hashMap = new ConcurrentHashMap<>();
+    private final Map<String, T> hashMap = new ConcurrentHashMap<>();
 
     public int getSize() {
         return size;
@@ -109,29 +114,25 @@ public class SkipList {
         SkipNode x = head;
         int index = 0;
         synchronized (this) {
-            x = x.level[0].forward;
+            x = x.level.get(0).forward;
             while (x != null) {
                 if (index > end) {
                     break;
                 }
                 if (index < begin) {
                     index++;
-                    x = x.level[0].forward;
+                    x = x.level.get(0).forward;
                     continue;
                 }
                 result.add(x.rec);
-                x = x.level[0].forward;
+                x = x.level.get(0).forward;
                 index++;
             }
         }
         return result;
     }
 
-    public ScoreMember find(ScoreMember key) {
-        return this.find(key.getMember());
-    }
-
-    public ScoreMember find(String member) {
+    public T find(String member) {
         return this.hashMap.get(member);
     }
 
@@ -161,66 +162,41 @@ public class SkipList {
         return lev;
     }
 
-    /**
-     * {@link SkipList#put(ScoreMember)}
-     */
-    public void put(String member, int score) {
-        put(new ScoreMember(member, score));
+    void put(String key, T elem) {
+        hashMap.put(key, elem);
+        insert(key, elem);
     }
 
-    /**
-     * Insert if absent, update if present
-     * {@link SkipList#insert(ScoreMember, Object)}
-     *
-     * @return insert 1, update 0
-     */
-    public int put(ScoreMember key) {
-        if (key == null) {
-            throw new NullPointerException();
-        }
-        return doPut(key);
-    }
-
-    private int doPut(ScoreMember key) {
-        synchronized (this) {
-            final ScoreMember value = find(key);
-            if (value != null) {
-                value.setScore(key.getScore());
-                return 0;
-            } else {
-                hashMap.put(key.getMember(), key);
-                insert(key, key);
-                return 1;
-            }
-        }
-    }
 
     /**
      * @param key  {@link ScoreMember}
      * @param elem value
      */
-    private void insert(ScoreMember key, Object elem) {
+    private void insert(String key, T elem) {
         int[] rank = new int[MAX_LEVEL];
-        SkipNode[] turnPointArray = new SkipNode[MAX_LEVEL];
+        List<SkipNode> turnPointArray = new ArrayList<>(MAX_LEVEL);
+        for (int f = 0; f < MAX_LEVEL; f++) {
+            turnPointArray.add(null);
+        }
         // find turning point then save all level point to turnPointArray
         SkipNode x = head;
         for (int i = level - 1; i >= 0; i--) { // Find insert position
             rank[i] = i == (this.level - 1) ? 0 : rank[i + 1];
-            while ((x.level[i].forward != null) &&
-                    (x.level[i].forward.key() != null) &&
-                    (x.level[i].forward.key().compareTo(key) < 0)) {
-                rank[i] += x.level[i].span;
-                x = x.level[i].forward;
+            while ((x.level.get(i).forward != null) &&
+                    (x.level.get(i).forward.key() != null) &&
+                    compareKeyAndScore(key, x, i)) {
+                rank[i] += x.level.get(i).span;
+                x = x.level.get(i).forward;
             }
-            turnPointArray[i] = x;
+            turnPointArray.set(i, x);
         }
         // generate random and init trunPointArray of `newLevel > this.level`
         int newLevel = randomLevel();
         if (newLevel > this.level) {
             for (int i = this.level; i < newLevel; i++) {
                 rank[i] = 0; // point NULL
-                turnPointArray[i] = this.head;
-                turnPointArray[i].level[i].span = this.size;
+                turnPointArray.set(i, this.head);
+                turnPointArray.get(i).level.get(i).span = this.size;
             }
             level = newLevel;
         }
@@ -229,26 +205,126 @@ public class SkipList {
         SkipNode insertNode = new SkipNode(key, elem, newLevel);
 
         for (int i = 0; i < newLevel; i++) {
-            insertNode.level[i].forward = turnPointArray[i].level[i].forward;
-            turnPointArray[i].level[i].forward = insertNode;
-            insertNode.level[i].span = turnPointArray[i].level[i].span - (rank[0] - rank[i]);
-            turnPointArray[i].level[i].span = (rank[0] - rank[i] + 1);
+            insertNode.level.get(i).forward = turnPointArray.get(i).level.get(i).forward;
+            turnPointArray.get(i).level.get(i).forward = insertNode;
+            insertNode.level.get(i).span = turnPointArray.get(i).level.get(i).span - (rank[0] - rank[i]);
+            turnPointArray.get(i).level.get(i).span = (rank[0] - rank[i] + 1);
         }
         /* increment span for untouched levels */
         for (int i = newLevel; i < this.level; i++) {
-            turnPointArray[i].level[i].span++;
+            turnPointArray.get(i).level.get(i).span++;
         }
         // update backward:
         // turnPointArray ->  insetNode -> insertNode.level[0].forward
-        insertNode.backward = turnPointArray[0];
-        if (insertNode.level[0].forward != null) {
-            insertNode.level[0].forward.backward = insertNode;
+        insertNode.backward = turnPointArray.get(0);
+        if (insertNode.level.get(0).forward != null) {
+            insertNode.level.get(0).forward.backward = insertNode;
         } else {
             //update tail for reverse range query
             this.tail = insertNode;
         }
         // Increment size
         size++;
+    }
+
+    private boolean compareKeyAndScore(String key, SkipNode x, int i) {
+        T v1 = hashMap.get(x.level.get(i).forward.key());
+        T v2 = hashMap.get(key);
+        int result = compare(v1, v2, Comparable::compareTo);
+        if (result < 0) {
+            return true;
+        } else if (result > 0) {
+            return false;
+        } else {
+
+            return x.level.get(i).forward.key().compareTo(key) < 0;
+        }
+
+    }
+
+    private int compare(T a, T b, BiFunction<T, T, Integer> biFunction) {
+        return biFunction.apply(a, b);
+    }
+
+    public void lock() {
+        lock.lock();
+    }
+
+    public void unLock() {
+        lock.unlock();
+    }
+
+    public class KVPair {
+        private final String key;
+        private final T value;
+
+        public KVPair(String key, T value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public T value() {
+            return this.value;
+        }
+
+        public String key() {
+            return this.key;
+        }
+
+        @Override
+        public String toString() {
+            return "KVPair{" +
+                    "key=" + key +
+                    ", value=" + value +
+                    '}';
+        }
+    }
+
+    class ZSkipListLevel {
+        public SkipNode forward;
+        public int span;
+
+        @Override
+        public String toString() {
+            return "ZSkipListLevel{" +
+                    "forward=" + forward +
+                    ", span=" + span +
+                    '}';
+        }
+    }
+
+    public class SkipNode {
+        public KVPair rec;
+        // number of nodes need be crossed to reach to next node
+
+        // backward pointer, only exist in level zero list
+        public SkipNode backward;
+        // next node, may skip a lot of nodes
+        public List<ZSkipListLevel> level;
+
+        SkipNode(String key, T elem, int level) {
+            rec = new KVPair(key, elem);
+            backward = null;
+            this.level = new ArrayList<>();
+            for (int i = 0; i <= level; i++) {
+                this.level.add(new ZSkipListLevel());
+            }
+        }
+
+        public Object element() {
+            return rec.value();
+        }
+
+        public String key() {
+            return rec.key();
+        }
+
+        @Override
+        public String toString() {
+            return "SkipNode{" +
+                    "rec=" + rec +
+                    '}';
+        }
     }
 
 }

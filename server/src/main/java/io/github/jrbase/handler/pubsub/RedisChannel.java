@@ -3,6 +3,7 @@ package io.github.jrbase.handler.pubsub;
 import io.github.jrbase.dataType.RedisClientContext;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -38,33 +39,48 @@ public class RedisChannel {
     }
 
     public static synchronized int publishMessage(String channel, String message) {
-        List<RedisClientContext> pattenSubscribers = handlePatten(channel);
+        return handlePatten(channel, message) + handleSingleChannel(channel, message);
+    }
+
+    private static boolean isPatten(String channel) {
+        return channel.contains("*") || channel.contains("?") || (channel.contains("[") && channel.contains("]"));
+    }
+
+    private static int handleSingleChannel(String channel, String message) {
         List<RedisClientContext> subscribers = channels.get(channel);
-        if (subscribers != null) {
-            pattenSubscribers.addAll(subscribers);
+        if (subscribers == null || subscribers.size() == 0) {
+            return 0;
         }
-        for (RedisClientContext subscriber : pattenSubscribers) {
+        for (RedisClientContext subscriber : subscribers) {
             String result = "*3" + "\r\n" + "$" + 7 + "\r\n" + "message" + "\r\n" +
                     "$" + channel.length() + "\r\n" + channel + "\r\n" +
                     "$" + message.length() + "\r\n" + message + "\r\n";
             subscriber.getRedisClient().writeAndFlush(result);
         }
-        return pattenSubscribers.size();
+        return subscribers.size();
     }
 
-    private static List<RedisClientContext> handlePatten(String channel) {
+    private static int handlePatten(String channel, String message) {
         Set<String> matchPatten = pattenChannels.keySet().stream()
                 .filter(patten -> {
                     Pattern compile = Pattern.compile(patten);
                     return compile.matcher(channel).find();
                 })
                 .collect(Collectors.toSet());
-        List<RedisClientContext> result = new ArrayList<>();
-        matchPatten.forEach(item -> {
-            List<RedisClientContext> redisClientContexts = pattenChannels.get(item);
-            result.addAll(redisClientContexts);
+        AtomicInteger size = new AtomicInteger();
+        matchPatten.forEach(patten -> {
+            List<RedisClientContext> subscribers = pattenChannels.get(patten);
+            size.addAndGet(subscribers.size());
+            for (RedisClientContext subscriber : subscribers) {
+                String result = "*4" + "\r\n" + "$" + 8 + "\r\n" + "pmessage" + "\r\n" +
+                        "$" + patten.length() + "\r\n" + patten + "\r\n" +
+                        "$" + channel.length() + "\r\n" + channel + "\r\n" +
+                        "$" + message.length() + "\r\n" + message + "\r\n";
+                subscriber.getRedisClient().writeAndFlush(result);
+            }
         });
-        return result;
+
+        return size.get();
     }
 
     public static synchronized void unSubscribe(RedisClientContext redisClientContext) {

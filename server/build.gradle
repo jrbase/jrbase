@@ -10,6 +10,10 @@ dependencies {
     compile project(':common')
     compile 'org.slf4j:slf4j-nop:1.7.25'
 
+    // https://mvnrepository.com/artifact/ch.hsr/geohash
+    compile group: 'ch.hsr', name: 'geohash', version: '1.4.0'
+
+
 }
 
 task fatJar(type: Jar) {

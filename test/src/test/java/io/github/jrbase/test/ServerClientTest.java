@@ -112,7 +112,7 @@ public class ServerClientTest {
     public void testPSubscribe1() {
         testPSubscribe("psubscribe h?llo",
                 "publish hello mes112233",
-                "*3\r\n$7\r\nmessage\r\n$5\r\nhello\r\n$9\r\nmes112233\r\n");
+                "*4\r\n$8\r\npmessage\r\n$5\r\nh?llo\r\n$5\r\nhello\r\n$9\r\nmes112233\r\n");
 
     }
 
@@ -121,7 +121,7 @@ public class ServerClientTest {
 
         testPSubscribe("psubscribe w*rld",
                 "publish woorld mes112233",
-                "*3\r\n$7\r\nmessage\r\n$6\r\nwoorld\r\n$9\r\nmes112233\r\n");
+                "*4\r\n$8\r\npmessage\r\n$5\r\nw*rld\r\n$6\r\nwoorld\r\n$9\r\nmes112233\r\n");
 
     }
 
@@ -130,7 +130,7 @@ public class ServerClientTest {
 
         testPSubscribe("psubscribe [ae]pple",
                 "publish apple mes112233",
-                "*3\r\n$7\r\nmessage\r\n$5\r\napple\r\n$9\r\nmes112233\r\n");
+                "*4\r\n$8\r\npmessage\r\n$8\r\n[ae]pple\r\n$5\r\napple\r\n$9\r\nmes112233\r\n");
 
     }
 

@@ -12,39 +12,39 @@ import java.util.concurrent.CountDownLatch;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SkipListTest {
 
     private static final int SKIP_LIST_COUNT = 6;
-    private static final SkipList skipList = new SkipList();
+    private static final SkipList<ScoreMember> skipList = new SkipList<>();
 
     @BeforeClass
     public static void init() {
-        skipList.put(new ScoreMember("7", 3));
-        skipList.put(new ScoreMember("6", 5));
-        skipList.put(new ScoreMember("a", 8));
-        skipList.put(new ScoreMember("12", 1));
-        skipList.put(new ScoreMember("3", 13));
-        skipList.put(new ScoreMember("9", 7));
+        SkipLists.putScoreMember(skipList, "7", 3);
+        SkipLists.putScoreMember(skipList, "a", 5);
+        SkipLists.putScoreMember(skipList, "6", 5);
+        SkipLists.putScoreMember(skipList, "12", 1);
+        SkipLists.putScoreMember(skipList, "3", 13);
+        SkipLists.putScoreMember(skipList, "9", 7);
     }
 
     @Test(expected = NullPointerException.class)
     public void test1PutError() {
-        skipList.put(null);
+        SkipLists.putScoreMember(skipList, null, 0);
     }
-
 
     @Test
     public void test2FindRange() {
-        final List<KVPair> range = skipList.findRange(0, SKIP_LIST_COUNT);
+        //final List<SkipList<ScoreMember>.KVPair> range =
+        List<SkipList<ScoreMember>.KVPair> range = skipList.findRange(0, SKIP_LIST_COUNT);
         assertEquals(SKIP_LIST_COUNT, range.size());
-        assertEquals("[KVPair{key=ScoreMember{member='12', score=1}, value=ScoreMember{member='12', score=1}}, KVPair{key=ScoreMember{member='7', score=3}, value=ScoreMember{member='7', score=3}}, KVPair{key=ScoreMember{member='6', score=5}, value=ScoreMember{member='6', score=5}}, KVPair{key=ScoreMember{member='9', score=7}, value=ScoreMember{member='9', score=7}}, KVPair{key=ScoreMember{member='a', score=8}, value=ScoreMember{member='a', score=8}}, KVPair{key=ScoreMember{member='3', score=13}, value=ScoreMember{member='3', score=13}}]",
-                range.toString());
+        assertEquals("[KVPair{key=12, value=1.0}, KVPair{key=7, value=3.0}, KVPair{key=6, value=5.0}, KVPair{key=a, value=5.0}, KVPair{key=9, value=7.0}, KVPair{key=3, value=13.0}]", range.toString());
     }
 
     @Test
     public void test3RangeSize() {
-        List<KVPair> range = skipList.findRange(0, -1);
+        List<SkipList<ScoreMember>.KVPair> range = skipList.findRange(0, -1);
         assertEquals(SKIP_LIST_COUNT, range.size());
 
         range = skipList.findRange(0, 0);
@@ -62,32 +62,31 @@ public class SkipListTest {
 
     @Test
     public void test4FindRevRange() {
-        final List<KVPair> range = skipList.findRevRange(0, SKIP_LIST_COUNT);
+        final List<SkipList<ScoreMember>.KVPair> range = skipList.findRevRange(0, SKIP_LIST_COUNT);
         assertEquals(SKIP_LIST_COUNT, range.size());
-        assertEquals("[KVPair{key=ScoreMember{member='3', score=13}, value=ScoreMember{member='3', score=13}}, KVPair{key=ScoreMember{member='a', score=8}, value=ScoreMember{member='a', score=8}}, KVPair{key=ScoreMember{member='9', score=7}, value=ScoreMember{member='9', score=7}}, KVPair{key=ScoreMember{member='6', score=5}, value=ScoreMember{member='6', score=5}}, KVPair{key=ScoreMember{member='7', score=3}, value=ScoreMember{member='7', score=3}}, KVPair{key=ScoreMember{member='12', score=1}, value=ScoreMember{member='12', score=1}}]",
-                range.toString());
+        assertEquals("[KVPair{key=3, value=13.0}, KVPair{key=9, value=7.0}, KVPair{key=a, value=5.0}, KVPair{key=6, value=5.0}, KVPair{key=7, value=3.0}, KVPair{key=12, value=1.0}]", range.toString());
     }
 
 
     @Test
     public void test5Span() {
-        SkipNode next = skipList.getHead();
-        while (next.level[0].forward != null) {
-            System.out.println("level:" + next.level[0]);
-            assertEquals(1, next.level[0].span);
-            next = next.level[0].forward;
+        SkipList<ScoreMember>.SkipNode next = skipList.getHead();
+        while (next.level.get(0).forward != null) {
+            System.out.println("level:" + next.level.get(0));
+            assertEquals(1, next.level.get(0).span);
+            next = next.level.get(0).forward;
         }
     }
 
     @Test
     public void test6Span2() {
-        final SkipNode head = skipList.getHead();
+        final SkipList<ScoreMember>.SkipNode head = skipList.getHead();
         for (int i = 0; i <= skipList.getLevel(); i++) {
-            SkipNode next = head;
-            while (next.level[i].forward != null) {
-                System.out.println("level:" + i + next.level[i]);
-                assertTrue(next.level[0].span > 0);
-                next = next.level[i].forward;
+            SkipList<ScoreMember>.SkipNode next = head;
+            while (next.level.get(i).forward != null) {
+                System.out.println("level:" + i + next.level.get(i));
+                assertTrue(next.level.get(i).span > 0);
+                next = next.level.get(i).forward;
             }
             System.out.println("------------------");
         }
@@ -96,22 +95,23 @@ public class SkipListTest {
 
     @Test
     public void test7Update() {
-        skipList.put(new ScoreMember("7", 100));
-        ScoreMember newValue = skipList.find(new ScoreMember("7", 100));
-        assertEquals(100, newValue.getScore());
-        skipList.put("7", 3);
+        SkipLists.putScoreMember(skipList, "7", 100);
+        ScoreMember newValue = skipList.find("7");
+        assertEquals(100f, newValue.getScore(), 4);
+        SkipLists.putScoreMember(skipList, "7", 3);
         newValue = skipList.find("7");
-        assertEquals(3, newValue.getScore());
+        assertEquals(3, newValue.getScore(), 4);
     }
 
     @Test
     public void test8MultiThread2PutSame() throws InterruptedException {
+        Object lock = new Object();
         int threadCount = 10;
         CountDownLatch downLatch = new CountDownLatch(threadCount);
         for (int i = 0; i < threadCount; i++) {
             new Thread(() -> {
                 for (int j = 0; j < 100; j++) {
-                    skipList.put(new ScoreMember(("pre" + j), j));
+                    SkipLists.putScoreMember(skipList, "pre" + j, j);
                 }
                 downLatch.countDown();
             }).start();
