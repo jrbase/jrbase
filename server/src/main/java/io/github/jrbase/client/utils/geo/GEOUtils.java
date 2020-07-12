@@ -1,15 +1,19 @@
 package io.github.jrbase.client.utils.geo;
 
+import static java.lang.Math.*;
+
 /**
  * geohash utils
  */
 public class GEOUtils {
+
     private static final double EARTH_RADIUS_IN_METERS = 6372797.560856; // m
+
+    static double D_R = (Math.PI / 180.0);
 
     // 1. GEOADD key longitude latitude member [longitude latitude member ...]
     //    geoadd store all position to skipList
     // 2. GEODIST key member1 member2 [m|km|ft|mi]
-
     public static double extractUnit(String unit) {
         // 1 * 1000 m = km
         // 1 * 0.3048 m = ft
@@ -42,11 +46,11 @@ public class GEOUtils {
         double lat2r = rad(lat2);
         double lon2r = rad(lng2);
 
-        double u = Math.sin((lat2r - lat1r) / 2);
-        double v = Math.sin((lon2r - lon1r) / 2);
+        double u = sin((lat2r - lat1r) / 2);
+        double v = sin((lon2r - lon1r) / 2);
 
         return 2.0 * EARTH_RADIUS_IN_METERS *
-                Math.asin(Math.sqrt(u * u + Math.cos(lat1r) * Math.cos(lat2r) * v * v));
+                Math.asin(sqrt(u * u + cos(lat1r) * cos(lat2r) * v * v));
     }
 
 }
