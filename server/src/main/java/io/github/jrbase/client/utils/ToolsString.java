@@ -1,5 +1,6 @@
 package io.github.jrbase.client.utils;
 
+import io.github.jrbase.dataType.ClientCmd;
 import org.jetbrains.annotations.NotNull;
 
 import static io.github.jrbase.dataType.CommonMessage.REDIS_LIST_DELIMITER;
@@ -96,6 +97,21 @@ public class ToolsString {
             result.append(s).append(REDIS_LIST_DELIMITER);
         }
         deleteLastChar(result);
+        return result.toString();
+    }
+
+
+    @NotNull
+    public static String unregisterCommandStr(ClientCmd clientCmd) {
+        StringBuilder result = new StringBuilder();
+        result.append("-ERR unknown command '").append(clientCmd.getCmd()).append("', with args beginning with:");
+        if (!clientCmd.getKey().isEmpty()) {
+            result.append(clientCmd.getKey()).append(", ");
+        }
+        for (String arg : clientCmd.getArgs()) {
+            result.append(arg).append(", ");
+        }
+        result.append("\r\n");
         return result.toString();
     }
 }
