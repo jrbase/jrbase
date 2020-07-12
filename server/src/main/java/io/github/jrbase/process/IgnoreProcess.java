@@ -4,6 +4,8 @@ import io.github.jrbase.common.datatype.Cmd;
 import io.github.jrbase.dataType.ClientCmd;
 import io.github.jrbase.process.annotation.KeyCommand;
 
+import static io.github.jrbase.client.utils.ToolsString.unregisterCommandStr;
+
 /**
  * error command process class
  */
@@ -23,16 +25,7 @@ public class IgnoreProcess implements CmdProcess {
 
     @Override
     public String process(ClientCmd clientCmd) {
-        StringBuilder result = new StringBuilder();
-        result.append("-ERR unknown command '").append(clientCmd.getCmd()).append("', with args beginning with:");
-        if (!clientCmd.getKey().isEmpty()) {
-            result.append(clientCmd.getKey()).append(", ");
-        }
-        for (String arg : clientCmd.getArgs()) {
-            result.append(arg).append(", ");
-        }
-        result.append("\r\n");
-        return result.toString();
+        return unregisterCommandStr(clientCmd);
     }
 
 }

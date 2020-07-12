@@ -43,12 +43,10 @@ public class GEOUtilsTest {
         System.out.println("经度二进制编码：" + lonCode.toString());
         System.out.println("纬度二进制编码：" + latCode.toString());
 
-
     }
 
     @Test
     public void testDistance() {
-        // 43.74948721127861
         double distance = GEOUtils.getDistance(102.485658, 25.270572, 102.828981, 24.887476);
         Assert.assertEquals(54880.3982, distance, 4);
     }
